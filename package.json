@@ -1,0 +1,23 @@
+{
+  "name": "spy4js",
+  "version": "1.0.0",
+  "description": "Use new Spy() to optimize your tests with helpful debug messages.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "spy4js"
+  },
+  "keywords": [
+    "spy4js",
+    "spy",
+    "debug",
+    "js",
+    "flow",
+    "es6"
+  ],
+  "author": "Viktor Luft",
+  "license": "LGPL-3.0"
+}
