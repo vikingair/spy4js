@@ -2,9 +2,17 @@
   "name": "spy4js",
   "version": "1.0.0",
   "description": "Use new Spy() to optimize your tests with helpful debug messages.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "files": [
+    "dist/equality.js",
+    "dist/equality.js.flow",
+    "dist/registry.js",
+    "dist/registry.js.flow",
+    "dist/spy.js",
+    "dist/spy.js.flow"
+  ],
   "scripts": {
-    "test": "node test.js"
+    "test": "mocha --compilers js:babel-register"
   },
   "repository": {
     "type": "git",
@@ -19,5 +27,40 @@
     "es6"
   ],
   "author": "Viktor Luft",
-  "license": "LGPL-3.0"
+  "license": "LGPL-3.0",
+  "dependencies": {},
+  "private": true,
+  "devDependencies": {
+    "babel-core": "6.7.6",
+    "babel-eslint": "6.0.2",
+    "babel-loader": "6.2.4",
+    "babel-plugin-add-module-exports": "0.1.2",
+    "babel-plugin-transform-flow-strip-types": "6.7.0",
+    "babel-preset-es2015": "6.6.0",
+    "babel-preset-stage-0": "6.5.0",
+    "babel-register": "6.7.2",
+    "babelify": "7.2.0",
+    "browserify": "13.0.0",
+    "chalk": "1.1.3",
+    "eslint": "2.8.0",
+    "eslint-config-google": "0.4.0",
+    "expect": "1.16.0",
+    "flow-bin": "0.33.0",
+    "gulp": "3.9.1",
+    "gulp-babel": "6.1.2",
+    "gulp-clean": "0.3.2",
+    "gulp-flatten": "0.2.0",
+    "gulp-rename": "1.2.2",
+    "istanbul-instrumenter-loader": "0.2.0",
+    "karma": "0.13.22",
+    "karma-babel-preprocessor": "6.0.1",
+    "karma-browserify": "5.0.3",
+    "karma-chrome-launcher": "0.2.3",
+    "karma-coverage": "0.5.5",
+    "karma-mocha": "0.2.2",
+    "karma-mocha-reporter": "2.0.0",
+    "mocha": "2.4.5",
+    "run-sequence": "1.1.5",
+    "watchify": "3.7.0"
+  }
 }
