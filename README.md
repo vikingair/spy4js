@@ -6,13 +6,13 @@
 
 ### Benefits
 
-    - Well tested
-    - Used in production of large projects
-    - Flow support (therefore autocompletion in some IDEs)
-    - Without dependecies nor boilerplate
-    - Helpful Debug-Messages
-    - Supports own "equals" implementation on objects
-    - A lot of useful operations on spys
+  - Well tested
+  - Used in production of large projects
+  - Flow support (therefore autocompletion in some IDEs)
+  - Without dependecies nor boilerplate
+  - Helpful Debug-Messages
+  - Supports own "equals" implementation on objects
+  - A lot of useful operations on spys
 
 ### Introduction
 
@@ -47,14 +47,14 @@ const [spy4, spy5, spy6] = Spy.onMany(someObject, 'toJSON', 'toString', 'getDate
 
 You may apply additional behaviour to every spy. The valid operations here are:
     
-⋅⋅- `configure` (some external librarys may use own "equals" implementations in an unexpected way)
-⋅⋅- `calls` (does make the spy call the provided functions sequentially)
-⋅⋅- `returns` (does make the spy return the provided params sequentially)
-⋅⋅- `throws` (does make the spy throw an error when called)
-⋅⋅- `transparent` (does make the spy call the original method of a mocked object)
-⋅⋅- `transparentAfter` (does make the spy call the original method of a mocked object after a certain amount of made calls)
-⋅⋅- `reset` (resets the registered calls which were already made)
-⋅⋅- `restore` (does make the spy restore the mocked object)
+  - `configure` (some external librarys may use own "equals" implementations in an unexpected way)
+  - `calls` (does make the spy call the provided functions sequentially)
+  - `returns` (does make the spy return the provided params sequentially)
+  - `throws` (does make the spy throw an error when called)
+  - `transparent` (does make the spy call the original method of a mocked object)
+  - `transparentAfter` (does make the spy call the original method of a mocked object after a certain amount of made calls)
+  - `reset` (resets the registered calls which were already made)
+  - `restore` (does make the spy restore the mocked object)
     
 All those methods on a spy are designed in a builder pattern. So you may chain any of these configurations. But be aware that some behaviours override existing behaviours.
 
@@ -99,10 +99,10 @@ spy.restore(); // other than "transparent" does not control input and output of 
 
 Even as important are the facts, we want to display:
 
-⋅⋅- `wasCalled` (does display that the spy was called a specifiable amount of times)
-⋅⋅- `wasNotCalled` (does display that the spy was never called)
-⋅⋅- `wasCalledWith` (does display that the spy was called at least once like with the provided params)
-⋅⋅- `wasNotCalledWith` (does display that the spy was never like with the provided params)
+  - `wasCalled` (does display that the spy was called a specifiable amount of times)
+  - `wasNotCalled` (does display that the spy was never called)
+  - `wasCalledWith` (does display that the spy was called at least once like with the provided params)
+  - `wasNotCalledWith` (does display that the spy was never like with the provided params)
 
 Those methods on a spy display facts. Facts have to be true, otherwise they will throw an Exception, which displays in a formatted debug message why the given fact was a lie. By writing those facts in your tests, a big refactoring loses its scare.
 
@@ -128,7 +128,7 @@ spy.wasNotCalledWith([1, 'test', {attr: [3]}]); // the spy was not called with t
 
 There is one static method that does restore all existing spies in all tests. This is extremly useful to clean up all still existing mocks and also a very comfortable to this automaticly after every test (like in an "afterEach").
     
-⋅⋅- `restoreAll` (does restore every existing spy)
+  - `restoreAll` (does restore every existing spy)
 
 ```js
 Spy.restoreAll();
@@ -136,8 +136,8 @@ Spy.restoreAll();
 
 And also sometimes it is necessary to have access to some of the call arguments with which the spy was called.
 
-⋅⋅- `getCallArguments` (returns all call arguments for a specified call in an array)
-⋅⋅- `getFirstCallArgument` (same as getCallArguments, but returns only the first element of the array)
+  - `getCallArguments` (returns all call arguments for a specified call in an array)
+  - `getFirstCallArgument` (same as getCallArguments, but returns only the first element of the array)
     
 ```js
 const spy = new Spy();
