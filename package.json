@@ -1,8 +1,8 @@
 {
   "name": "spy4js",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Use new Spy() to optimize your tests with helpful debug messages.",
-  "main": "dist/index.js",
+  "main": "dist/spy.js",
   "files": [
     "dist/equality.js",
     "dist/equality.js.flow",
@@ -29,7 +29,6 @@
   "author": "Viktor Luft",
   "license": "LGPL-3.0",
   "dependencies": {},
-  "private": true,
   "devDependencies": {
     "babel-core": "6.7.6",
     "babel-eslint": "6.0.2",
