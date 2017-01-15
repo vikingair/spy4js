@@ -6,11 +6,12 @@ import expect from 'expect';
 import {SpyRegistry} from './registry';
 
 /**
- * The tests are written not method specific. Meaning that storing objects information
- * does not restrict to functions although this will be the central use case for the spy utils.
+ * The tests are written not method specific.
+ * Meaning that storing objects information
+ * does not restrict to functions although this
+ * will be the central use case for the spy utils.
  */
 describe('Spy - Utils', () => {
-
     it('should not allow to use the constructor of the Spy without new', () => {
         expect(() => SpyRegistry()).toThrow(); // eslint-disable-line
     });
@@ -57,7 +58,8 @@ describe('Spy - Utils', () => {
         expect(testObject.attr3).toBe(someDate);
     });
 
-    it('should be able to restore all registered objects properties at once', () => {
+    it('should be able to restore all ' +
+        'registered objects properties at once', () => {
         const someDate = new Date();
         const testObject = {attr1: 'string', attr2: 88, attr3: someDate};
         const reg:any = new SpyRegistry();
@@ -80,7 +82,8 @@ describe('Spy - Utils', () => {
         expect(testObject.attr3).toBe(someDate);
     });
 
-    it('should be able to to return the stored value without restoring the object', () => {
+    it('should be able to to return the stored value' +
+        ' without restoring the object', () => {
         const someDate = new Date();
         const testObject = {attr1: 'string', attr2: 88, attr3: someDate};
         const reg:any = new SpyRegistry();

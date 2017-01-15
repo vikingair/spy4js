@@ -16,11 +16,13 @@
 
 ### Introduction
 
-**spy4js** provides a stand-alone spy framework. It is decoupled by any dependecies and other assertion frameworks. Other than most test frameworks it uses a different - maybe you will need to get used to - test notation. It does not make assertion, which are expected to be fulfilled on runtime, but displays facts, that are considered to be fulfilled on runtime. And if this fact is not true, it will throw an exception. I consider the way of writing facts more regular because it fits more to the rest of the written code.
+**spy4js** provides a stand-alone spy framework. It is decoupled by any dependencies and other assertion frameworks. Other than most test frameworks it uses a different - maybe you will need to get used to - test notation. It does not make assertion, which are expected to be fulfilled on runtime, but displays facts, that are considered to be fulfilled on runtime. And if this fact is not true, it will throw an exception. I consider the way of writing facts more regular because it fits more to the rest of the written code.
 
 **spy4js** comes with the one interesting (es6 like) class `Spy`. The spy instances are treated as class instances and come with a lot of useful features. See below for more.
 
-### Installation (TODO)
+### Installation
+
+Like every other npm package. You may `npm install spy4js --save-dev` to save the latest version to your dev dependencies.
 
 ### Interface
 
@@ -36,12 +38,12 @@ const spy1 = new Spy();
 const spy2 = new Spy('special spy for me');
 
 // initialize by mocking another objects attribute (usually this attribute is a function)
-const someObject = new Date(2017, 01, 15);
+const someObject = new Date(2017, 1, 15);
 const spy3 = Spy.on(someObject, 'toJSON');
 // (spy name will be accordingly: 'the spy on \'toJSON\'')
 
 // initialize many by mocking another objects attributes
-const someObject = new Date(2017, 01, 15);
+const someObject = new Date(2017, 1, 15);
 const [spy4, spy5, spy6] = Spy.onMany(someObject, 'toJSON', 'toString', 'getDate');
 ```
 
@@ -66,26 +68,26 @@ spy.configure({useOwnEquals: false});
 
 // make it call any functions
 spy.calls(func1, func2, func3);
-someObject.someMethod(arg) // returns func1(arg)
-someObject.someMethod(arg1, arg2) // returns func2(arg1, arg2)
-someObject.someMethod(arg) // returns func3(arg)
-someObject.someMethod(arg1, arg2, arg3) // returns func3(arg1, arg2, arg3) // sticks to the last
+someObject.someMethod(arg); // returns func1(arg)
+someObject.someMethod(arg1, arg2); // returns func2(arg1, arg2)
+someObject.someMethod(arg); // returns func3(arg)
+someObject.someMethod(arg1, arg2, arg3); // returns func3(arg1, arg2, arg3) // sticks to the last
 
 // make it return any values
 spy.returns(value1, value2);
-someObject.someMethod(arg) // returns value1
-someObject.someMethod(arg1, arg2) // returns value2
-someObject.someMethod(arg) // returns value2 // sticks to the last
+someObject.someMethod(arg); // returns value1
+someObject.someMethod(arg1, arg2); // returns value2
+someObject.someMethod(arg); // returns value2 // sticks to the last
 
 // make it throw any message (the message is optional)
 spy.throws('throw this');
-someObject.someMethod(arg) // throws new Error('throw this')
+someObject.someMethod(arg); // throws new Error('throw this')
 
 // make it return always the current date and transparentAfter 2 calls
 spy.calls(() => new Date()).transparentAfter(2);
-someObject.someMethod(arg) // returns new Date()
-someObject.someMethod(arg1, arg2) // returns new(er) Date()
-someObject.someMethod(arg) // returns someObject.someMethod(arg) // sticks to this behaviour
+someObject.someMethod(arg); // returns new Date()
+someObject.someMethod(arg1, arg2); // returns new(er) Date()
+someObject.someMethod(arg); // returns someObject.someMethod(arg) // sticks to this behaviour
 
 // make it immediatly transparent
 spy.transparent();
@@ -148,20 +150,20 @@ spy([1, 2, 3]);
 spy();
 spy(null);
 
-spy.getCallArguments(/* default = 0 */) // returns ['string', 1]
-spy.getFirstCallArgument(/* default = 0 */) // returns 'string'
+spy.getCallArguments(/* default = 0 */); // returns ['string', 1]
+spy.getFirstCallArgument(/* default = 0 */); // returns 'string'
 
-spy.getCallArguments(1) // returns [[1, 2, 3]]
-spy.getFirstCallArgument(1) // returns [1, 2, 3]
+spy.getCallArguments(1); // returns [[1, 2, 3]]
+spy.getFirstCallArgument(1); // returns [1, 2, 3]
 
-spy.getCallArguments(2) // returns []
-spy.getFirstCallArgument(2) // returns undefined
+spy.getCallArguments(2); // returns []
+spy.getFirstCallArgument(2); // returns undefined
 
-spy.getCallArguments(3) // returns [null]
-spy.getFirstCallArgument(3) // returns null
+spy.getCallArguments(3); // returns [null]
+spy.getFirstCallArgument(3); // returns null
 
-spy.getCallArguments(4) // throws Exception because less calls were made
-spy.getFirstCallArgument(4) // throws same Exception
+spy.getCallArguments(4); // throws Exception because less calls were made
+spy.getFirstCallArgument(4); // throws same Exception
 ```
 
 The last method is `showCallArguments`. It is mostly used internally to improve the debug messages, but can be while you are in a console.log-mania.

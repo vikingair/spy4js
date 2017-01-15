@@ -6,7 +6,6 @@ import expect from 'expect';
 import {Spy} from './spy';
 
 describe('Spy - Utils', () => {
-
     it('should not allow to use the constructor of the Spy without new', () => {
         expect(() => Spy()).toThrow(); // eslint-disable-line
     });
@@ -21,7 +20,8 @@ describe('Spy - Utils', () => {
         spy.wasCalledWith(9, 'test', someDate);
     });
 
-    it('should place the Spy on an object and record the call arguments', () => {
+    it('should place the Spy on an object and ' +
+        'record the call arguments', () => {
         const testObject = {someFunc: () => {
             throw new Error('never call this func directly');
         }};
@@ -34,12 +34,18 @@ describe('Spy - Utils', () => {
         spy.wasCalledWith('test', 6, someDate);
     });
 
-    it('should place many Spies on an object and record different call arguments', (cb) => {
+    it('should place many Spies on an object and ' +
+        'record different call arguments', (cb) => {
         const errorThrower = () => {
             throw new Error('never call this func directly');
         };
-        const testObject = {func1: errorThrower, func2: errorThrower, func3: () => cb(), func4: errorThrower};
-        const [spy1, spy2, spy3] = Spy.onMany(testObject, 'func1', 'func2', 'func4');
+        const testObject = {
+            func1: errorThrower,
+            func2: errorThrower,
+            func3: () => cb(),
+            func4: errorThrower};
+        const [spy1, spy2, spy3] =
+            Spy.onMany(testObject, 'func1', 'func2', 'func4');
         testObject.func1('test', 6);
         expect(spy1.getCallArguments()).toEqual(['test', 6]);
         spy1.wasCalledWith('test', 6);
@@ -49,7 +55,8 @@ describe('Spy - Utils', () => {
         testObject.func4();
         expect(spy3.getCallArguments()).toEqual([]);
         spy3.wasCalledWith();
-        // if this would get spied, the test callback would never be called which would make the test fail
+        // if this would get spied, the test callback
+        // would never be called which would make the test fail
         testObject.func3();
     });
 
@@ -57,14 +64,20 @@ describe('Spy - Utils', () => {
         const errorThrower = () => {
             throw new Error('never call this func directly');
         };
-        const testObject = {func1: () => {}, func2: errorThrower, func3: () => cb(), func4: errorThrower};
-        const [spy1, spy2] = Spy.onMany(testObject, 'func1', 'func2', 'func3', 'func4');
+        const testObject = {
+            func1: () => {},
+            func2: errorThrower,
+            func3: () => cb(),
+            func4: errorThrower};
+        const [spy1, spy2] =
+            Spy.onMany(testObject, 'func1', 'func2', 'func3', 'func4');
         testObject.func1('testCall1');
         testObject.func2('testCall2');
         testObject.func3('testCall3');
         testObject.func4('testCall4');
 
-        // this removes all spies from the testObject, but does not destroy their functionality
+        // this removes all spies from the testObject,
+        // but does not destroy their functionality
         Spy.restoreAll();
 
         testObject.func1('testCall5');
@@ -78,7 +91,8 @@ describe('Spy - Utils', () => {
             throw new Error('spy should always be callable');
         }
         spy1.wasCalledWith('testCall7');
-        // if this would get spied, the test callback would never be called which would make the test fail
+        // if this would get spied, the test callback would
+        // never be called which would make the test fail
         testObject.func3('testCall8');
     });
 
@@ -86,8 +100,13 @@ describe('Spy - Utils', () => {
         const errorThrower = () => {
             throw new Error('never call this func directly');
         };
-        const testObject = {func1: () => {}, func2: errorThrower, func3: () => cb(), func4: errorThrower};
-        const [spy1,, spy3] = Spy.onMany(testObject, 'func1', 'func2', 'func3', 'func4');
+        const testObject = {
+            func1: () => {},
+            func2: errorThrower,
+            func3: () => cb(),
+            func4: errorThrower};
+        const [spy1,, spy3] =
+            Spy.onMany(testObject, 'func1', 'func2', 'func3', 'func4');
         testObject.func1('testCall1');
         testObject.func2('testCall2');
         testObject.func3('testCall3');
@@ -105,7 +124,8 @@ describe('Spy - Utils', () => {
         spy3.wasCalledWith('testCall3');
         spy3.wasCalledWith('testCall6');
         spy3.restore();
-        // if this would get spied, the test callback would never be called which would make the test fail
+        // if this would get spied, the test callback
+        // would never be called which would make the test fail
         testObject.func3('testCall8');
     });
 
@@ -135,7 +155,8 @@ describe('Spy - Utils', () => {
         spy.wasCalledWith(testArg1, testArg2);
         expect(() => spy.wasNotCalledWith(testArg1, testArg2)).toThrow();
         spy.wasCalledWith(testArg3, testArg2, testArg1);
-        expect(() => spy.wasNotCalledWith(testArg3, testArg2, testArg1)).toThrow();
+        expect(() => spy.wasNotCalledWith(testArg3, testArg2, testArg1))
+            .toThrow();
         expect(() => spy.wasCalledWith(testArg3)).toThrow();
         spy.wasNotCalledWith(testArg3);
         expect(() => spy.wasCalledWith(testArg3, testArg2)).toThrow();
@@ -196,7 +217,8 @@ describe('Spy - Utils', () => {
         expect(spy({_key: 'callParams2'})).toBe(testObj);
     });
 
-    it('should return given inputs sequentially after the spy was called', () => {
+    it('should return given inputs sequentially' +
+        ' after the spy was called', () => {
         const testObj1 = {_key: 'testObj1'};
         const testObj2 = {_key: 'testObj2'};
         const testObj3 = {_key: 'testObj3'};
@@ -226,7 +248,8 @@ describe('Spy - Utils', () => {
         expect(() => spy({_key: 'callParams2'})).toThrow();
     });
 
-    it('should reset the call arguments on an object spy and NOT removing it (LIKE RESTORE)', (cb) => {
+    it('should reset the call arguments on an object' +
+        ' spy and NOT removing it (LIKE RESTORE)', (cb) => {
         const testObject = {func: () => cb()};
         const spy = Spy.on(testObject, 'func');
         testObject.func('testCall1');
@@ -241,7 +264,8 @@ describe('Spy - Utils', () => {
         expect(() => spy.wasCalledWith('testCall1')).toThrow();
 
         spy.restore();
-        // if this would get spied, the test callback would never be called which would make the test fail
+        // if this would get spied, the test callback
+        // would never be called which would make the test fail
         testObject.func('testCall3');
     });
 
@@ -264,7 +288,8 @@ describe('Spy - Utils', () => {
         expect(testObj._key).toBe('callParams1');
     });
 
-    it('should call the given input-functions sequentially after the spy was called', () => {
+    it('should call the given input-functions ' +
+        'sequentially after the spy was called', () => {
         const testObj = {_key: 'testObj'};
         const spy = new Spy().calls((arg) => {
             testObj._key = arg;
@@ -281,7 +306,8 @@ describe('Spy - Utils', () => {
         expect(testObj._key).toBe('some other callParams3');
     });
 
-    it('should make the spy transparent (mainly for spies on object properties)', () => {
+    it('should make the spy transparent' +
+        ' (mainly for spies on object properties)', () => {
         const testObject = {someFunc: () => {
             throw new Error('never call this func directly');
         }};
@@ -290,14 +316,17 @@ describe('Spy - Utils', () => {
         spy.wasCalledWith('test', 6);
     });
 
-    it('should make the spy transparent after a certain amount of calls', () => {
+    it('should make the spy transparent after' +
+        ' a certain amount of calls', () => {
         const testObject = {someFunc: () => {
             throw new Error('never call this func directly');
         }};
-        const spy = Spy.on(testObject, 'someFunc').returns(12, 13).transparentAfter(2);
+        const spy = Spy.on(testObject, 'someFunc')
+                       .returns(12, 13).transparentAfter(2);
         expect(testObject.someFunc('test1', 42)).toBe(12);
         expect(testObject.someFunc('test2')).toBe(13);
-        expect(() => testObject.someFunc('test3', {testProp: 'test'})).toThrow();
+        expect(() => testObject.someFunc('test3', {testProp: 'test'}))
+            .toThrow();
         expect(() => testObject.someFunc('test4')).toThrow();
 
         spy.wasCalled(4);
@@ -331,13 +360,14 @@ describe('Spy - Utils', () => {
         expect(spy('test7')).toBe(undefined);
     });
 
-    it('should use own "equals" implementations as default, but is able to reconfigure this behaviour', () => {
+    it('should use own "equals" implementations as default, ' +
+        'but is able to reconfigure this behaviour', () => {
         const TestClass = class {
             attr:number;
-            constructor(attr:number) {
+            constructor(attr:number) { // eslint-disable-line require-jsdoc
                 this.attr = attr;
             }
-            equals(other:TestClass):boolean {
+            equals(other:TestClass):boolean { // eslint-disable-line
                 // returning true if both attr are odd or both are even
                 return !((this.attr - other.attr) % 2);
             }

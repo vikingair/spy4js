@@ -24,7 +24,6 @@ const registry = new SpyRegistry();
  *
  */
 const Spy = (function() {
-
     /**
      * This constructor does instantiate a new spy
      * object.
@@ -42,13 +41,14 @@ const Spy = (function() {
      *        Each call adds another entry in the calls array.
      *
      *
-     * @param name:string -> the identifier of the spy.
+     * @param {string} name -> the identifier of the spy.
      *                       Useful for debugging issues.
      * @constructor
      */
     function Spy(name:string = 'the spy') {
         if (!(this instanceof Spy)) {
-            throw new Error('\n\nPlease make sure to use this constructor only with "new" keyword.\n\n');
+            throw new Error('\n\nPlease make sure to use this ' +
+                'constructor only with "new" keyword.\n\n');
         }
         let spy:any = function(...args:Array<any>) {
             spy._calls.push({arguments: args});
@@ -59,7 +59,8 @@ const Spy = (function() {
         spy._calls = [];
         spy._config = {useOwnEquals: true};
         for (let key in Spy.prototype) {
-            if (Spy.prototype instanceof Object && Spy.prototype.hasOwnProperty(key)) {
+            if (Spy.prototype instanceof Object &&
+                Spy.prototype.hasOwnProperty(key)) {
                 spy[key] = Spy.prototype[key];
             }
         }
@@ -78,10 +79,10 @@ const Spy = (function() {
      * The most common use case, will be to mock
      * another function as attribute of the object.
      *
-     * @param obj:Object -> The manipulated object.
-     * @param methodName -> The mocked attributes name.
+     * @param {Object} obj -> The manipulated object.
+     * @param {string} methodName -> The mocked attributes name.
      *
-     * @returns {Spy}
+     * @return {Spy}
      */
     Spy.on = function on(obj:Object, methodName:string):Spy {
         const spy = new Spy('the spy on \'' + methodName + '\'');
@@ -105,13 +106,15 @@ const Spy = (function() {
      * const [spy1, spy2, spy3] =
      *      Spy.onMany(obj, 'methodName1', 'methodName2', 'methodName3')
      *
-     * @param obj:Object -> The manipulated object.
-     * @param methodNames:Array<string> -> Iterative provided attribute
-     *                                     names that will be mocked.
+     * @param {Object} obj -> The manipulated object.
+     * @param {Array<string>} methodNames -> Iterative provided attribute
+     *                                       names that will be mocked.
      *
-     * @returns {Array<Spy>}
+     * @return {Array<Spy>}
      */
-    Spy.onMany = function onMany(obj:Object, ...methodNames:Array<string>):Array<Spy> {
+    Spy.onMany = function onMany(
+        obj:Object, ...methodNames:Array<string>
+    ):Array<Spy> {
         const spies = [];
         for (let i = 0; i < methodNames.length; i++) {
             const spy = Spy.on(obj, methodNames[i]);
@@ -142,11 +145,13 @@ const Spy = (function() {
      *                           matcher, e.g. for comparing
      *                           call params with "wasCalledWith".
      *
-     * @param config:Object <- An object containing attributes
+     * @param {Object} config <- An object containing attributes
      *                         for special configuration
-     * @returns {Spy} <- BuilderPattern.
+     * @return {Spy} <- BuilderPattern.
      */
-    Spy.prototype.configure = function(config:{useOwnEquals: boolean|void}):Spy {
+    Spy.prototype.configure = function(
+        config:{useOwnEquals: boolean|void}
+    ):Spy {
         if (config.useOwnEquals !== undefined) {
             this._config.useOwnEquals = config.useOwnEquals;
         }
@@ -157,13 +162,13 @@ const Spy = (function() {
      * Accepts multiple functions. If called more often,
      * calling always the last supplied function.
      *
-     * @param funcs:Array<Function>
+     * @param {Array<Function>} funcs
      *     -> The iterative provided functions
      *        can be accessed as array.
      *        And will be called one by one
      *        for each made call on the spy.
      *
-     * @returns {Spy} <- BuilderPattern.
+     * @return {Spy} <- BuilderPattern.
      */
     Spy.prototype.calls = function(...funcs:Array<Function>):Spy {
         if (funcs.length === 0) { // no arguments provided
@@ -186,12 +191,12 @@ const Spy = (function() {
      * Accepts multiple return values. If called more often,
      * returns always the last supplied return value.
      *
-     * @param args:Array<any> -> The iterative provided arguments
-     *                           can be accessed as array.
-     *                           And will be returned one by one
-     *                           for each made call.
+     * @param {Array<any>} args -> The iterative provided arguments
+     *                             can be accessed as array.
+     *                             And will be returned one by one
+     *                             for each made call.
      *
-     * @returns {Spy} <- BuilderPattern.
+     * @return {Spy} <- BuilderPattern.
      */
     Spy.prototype.returns = function(...args:Array<any>):Spy {
         const funcs = [];
@@ -207,9 +212,9 @@ const Spy = (function() {
      * Will make the spy throw an Error, if called next time.
      * The error message can be provided as parameter.
      *
-     * @param message:?string -> Will be the error message.
+     * @param {?string} message -> Will be the error message.
      *
-     * @returns {Spy} <- BuilderPattern
+     * @return {Spy} <- BuilderPattern
      */
     Spy.prototype.throws = function(message:?string):Spy {
         this._func = () => {
@@ -221,7 +226,7 @@ const Spy = (function() {
     /**
      * Deletes all notices of made calls with this spy.
      *
-     * @returns {Spy} <- BuilderPattern
+     * @return {Spy} <- BuilderPattern
      */
     Spy.prototype.reset = function():Spy {
         this._calls = [];
@@ -238,7 +243,7 @@ const Spy = (function() {
      * Other than "Spy.restoreAll" this method only removes
      * a maximum of one mock.
      *
-     * @returns {Spy} <- BuilderPattern
+     * @return {Spy} <- BuilderPattern
      */
     Spy.prototype.restore = function():Spy {
         registry.restore(this._index);
@@ -259,7 +264,7 @@ const Spy = (function() {
      * spy.transparent();
      * someObject.someFunc(); // behaves like calling the original method
      *
-     * @returns {Spy} <- BuilderPattern
+     * @return {Spy} <- BuilderPattern
      */
     Spy.prototype.transparent = function():Spy {
         return this.transparentAfter(0);
@@ -281,16 +286,18 @@ const Spy = (function() {
      * someObject.someFunc(); // calls only the spy
      * someObject.someFunc(); // behaves like calling the original method
      *
-     * @param callCount:number <- The number after which the mocked function
-     *                            should be called again.
+     * @param {number} callCount <- The number after which the mocked function
+     *                              should be called again.
      *
-     * @returns {Spy} <- BuilderPattern
+     * @return {Spy} <- BuilderPattern
      */
     Spy.prototype.transparentAfter = function(callCount:number):Spy {
         const oldFunc = this._func;
         this._func = (...args) => {
-            // before the function call is executed, the call arguments were already saved
-            // -> so we are interested if the made calls are more than the call count were we
+            // before the function call is executed,
+            // the call arguments were already saved
+            // -> so we are interested if the made calls
+            //    are more than the call count were we
             //    need to modify the behavior
             if (this._calls.length > callCount) {
                 const originalMethod = registry.getOriginalMethod(this._index);
@@ -312,14 +319,15 @@ const Spy = (function() {
      *
      * Throws an error if the expectation is wrong.
      *
-     * @param callCount:?number -> Is the number of expected calls made.
+     * @param {?number} callCount -> Is the number of expected calls made.
      */
     Spy.prototype.wasCalled = function(callCount:number = 0) {
         const madeCalls = this._calls.length;
         if (callCount) {
             if (madeCalls !== callCount) {
                 throw new Error(
-                    `\n\n${this._name} was called ${madeCalls} times, but there were expected ${callCount} calls.\n\n`
+                    `\n\n${this._name} was called ${madeCalls} times,` +
+                    ` but there were expected ${callCount} calls.\n\n`
                 );
             }
         } else if (madeCalls === 0) {
@@ -340,7 +348,7 @@ const Spy = (function() {
      * spy.wasCalledWith(arg4, arg5); // no error
      * spy.wasCalledWith(arg1); // error!!!
      *
-     * @param args:Array<any> -> The expected arguments
+     * @param {Array<any>} args -> The expected arguments
      *                           for any made call.
      */
     Spy.prototype.wasCalledWith = function(...args:Array<any>) {
@@ -350,14 +358,16 @@ const Spy = (function() {
         }
         const diffInfo = [];
         for (let i = 0; i < madeCalls.length; i++) {
-            const diff = differenceOf(madeCalls[i].arguments, args, this._config);
+            const diff =
+                differenceOf(madeCalls[i].arguments, args, this._config);
             if (!diff) {
                 return;
             }
             diffInfo.push(diff);
         }
         throw new Error(
-            `\n\nFor ${this._name} did not find call arguments:\n\n    --> ${JSON.stringify(args)}\n\n` +
+            `\n\nFor ${this._name} did not find call arguments:\n\n` +
+            `    --> ${JSON.stringify(args)}\n\n` +
             'Actually there were:\n\n' + this.showCallArguments(diffInfo)
         );
     };
@@ -377,8 +387,8 @@ const Spy = (function() {
      * spy.wasCalledWith(arg4, arg3); // no error
      * spy.wasCalledWith(arg4, arg5); // error!!!
      *
-     * @param args:Array<any> -> The not expected arguments
-     *                           for any made call.
+     * @param {Array<any>} args -> The not expected arguments
+     *                             for any made call.
      */
     Spy.prototype.wasNotCalledWith = function(...args:Array<any>) {
         let errorOccurred = false;
@@ -389,7 +399,8 @@ const Spy = (function() {
         }
         if (!errorOccurred) {
             throw new Error(
-                `\n\nFor ${this._name} did find call arguments:\n\n    --> ${JSON.stringify(args)}\n\n` +
+                `\n\nFor ${this._name} did find call arguments:\n\n` +
+                `    --> ${JSON.stringify(args)}\n\n` +
                 'Actually they were not expected!\n\n'
             );
         }
@@ -403,7 +414,8 @@ const Spy = (function() {
         const madeCalls = this._calls;
         if (madeCalls.length !== 0) {
             throw new Error(
-                `\n\nExpected no calls for ${this._name}.\n\nActually there were:\n\n` + this.showCallArguments()
+                `\n\nExpected no calls for ${this._name}.\n\n` +
+                    'Actually there were:\n\n' + this.showCallArguments()
             );
         }
     };
@@ -420,16 +432,17 @@ const Spy = (function() {
      * spy(arg1, arg2, arg3);
      * spy.getCallArguments(); // returns [arg1, arg2, arg3]
      *
-     * @param callNr:number = 0 -> represents the callNr for which
-     *                             the call argument should be returned.
+     * @param {number} callNr -> represents the callNr for which
+     *                           the call argument should be returned.
      *
-     * @returns {Array<any>} -> the call arguments of the (callNr + 1)'th call.
+     * @return {Array<any>} -> the call arguments of the (callNr + 1)'th call.
      */
     Spy.prototype.getCallArguments = function(callNr:number = 0):Array<any> {
         const madeCalls = this._calls;
         if (callNr % 1 !== 0 || callNr >= madeCalls.length) {
             throw new Error(
-                `\n\nThe provided callNr "${callNr}" was not valid.\n\nMade calls for ${this._name}:\n\n` +
+                `\n\nThe provided callNr "${callNr}" was not valid.\n\n` +
+                `Made calls for ${this._name}:\n\n` +
                 this.showCallArguments()
             );
         }
@@ -448,10 +461,10 @@ const Spy = (function() {
      * spy(arg1, arg2, arg3);
      * spy.getFirstCallArgument() === arg1; // true
      *
-     * @param callNr:number = 0 -> represents the callNr for which
-     *                             the first call argument should be returned.
+     * @param {number} callNr -> represents the callNr for which
+     *                           the first call argument should be returned.
      *
-     * @returns {any} -> the first call argument of the (callNr + 1)'th call.
+     * @return {any} -> the first call argument of the (callNr + 1)'th call.
      */
     Spy.prototype.getFirstCallArgument = function(callNr:number = 0):any {
         return this.getCallArguments(callNr)[0];
@@ -468,18 +481,39 @@ const Spy = (function() {
      * call 2: [{"_key":"test3"},{"_key":"test2"},{"_key":"test1"}]
      * call 3: [{"_key":"test2"}]
      *
-     * @returns {string} -> The information about made calls.
+     * If an array of strings is provided, the given strings will
+     * be printed just below params of each call.
+     *
+     * Some sample: additionalInformation = [
+     *     '-> 0 / _key / different string',
+     *     '-> 1 / _key / different object types'
+     * ]
+     *
+     * call 0: [{"_key":"test1"}]
+     *         -> 0 / _key / different string
+     * call 1: [{"_key":"test1"},{"_key":"test2"}]
+     *         -> 1 / _key / different object types
+     * call 2: [{"_key":"test3"},{"_key":"test2"},{"_key":"test1"}]
+     * call 3: [{"_key":"test2"}]
+     *
+     * @param {Array<string>} additionalInformation
+     *      -> will be displayed below each call information
+     *         as additional information.
+     *
+     * @return {string} -> The information about made calls.
      */
-    Spy.prototype.showCallArguments = function(additionalInformation:Array<string> = []):string {
+    Spy.prototype.showCallArguments = function(
+        additionalInformation:Array<string> = []
+    ):string {
         const madeCalls = this._calls;
         if (madeCalls.length === 0) {
             return `${this._name} was never called!\n`;
         }
-        const showAdditionalInformation = additionalInformation.length === madeCalls.length;
         let response = '';
         for (let i = 0; i < madeCalls.length; i++) {
-            response += `call ${i}: ${JSON.stringify(madeCalls[i].arguments)}\n`;
-            if (showAdditionalInformation) {
+            response +=
+                `call ${i}: ${JSON.stringify(madeCalls[i].arguments)}\n`;
+            if (additionalInformation[i]) {
                 response += `        ${additionalInformation[i]}\n`;
             }
         }
