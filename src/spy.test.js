@@ -34,6 +34,32 @@ describe('Spy - Utils', () => {
         spy.wasCalledWith('test', 6, someDate);
     });
 
+    it('should throw if trying to spy other attributes ' +
+        'than functions', () => {
+        const testObject = {
+            attrString: 'string',
+            attrNumber: 12,
+            attrNull: null,
+            attrDate: new Date(),
+            attrObject: {}};
+        expect(() => Spy.on(testObject, 'attrString')).toThrow();
+        expect(() => Spy.on(testObject, 'attrNumber')).toThrow();
+        expect(() => Spy.on(testObject, 'attrNull')).toThrow();
+        expect(() => Spy.on(testObject, 'attrDate')).toThrow();
+        expect(() => Spy.on(testObject, 'attrObject')).toThrow();
+        expect(() => Spy.on(testObject, 'attrUnknown')).toThrow();
+    });
+
+    it('should throw if trying to spy on already spied attributes.', () => {
+        const testObject = {attr: () => {}};
+        const firstSpy = Spy.on(testObject, 'attr');
+        // spying again does throw now
+        expect(() => Spy.on(testObject, 'attr')).toThrow();
+        // after restoring the spy, we can spy there again
+        firstSpy.restore();
+        Spy.on(testObject, 'attr');
+    });
+
     it('should place many Spies on an object and ' +
         'record different call arguments', (cb) => {
         const errorThrower = () => {

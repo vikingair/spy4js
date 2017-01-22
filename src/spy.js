@@ -33,12 +33,14 @@ const Spy = (function() {
      * It holds additional (private) fields:
      * _name:string -> Will be displayed in all displayed
      *                 error messages.
+     * _isSpy:boolean -> Always true for spies.
      * _func:Function -> The internal function, that will
      *                   actually we called, when calling
      *                   the spy.
      * _calls:Array<{arguments:Array<any>}>
      *     -> Stores the arguments with whom the spy was called.
      *        Each call adds another entry in the calls array.
+     * _config = {useOwnEquals: boolean} -> internal spy config.
      *
      *
      * @param {string} name -> the identifier of the spy.
@@ -55,6 +57,7 @@ const Spy = (function() {
             return spy._func(...args);
         };
         spy._name = name;
+        spy._isSpy = true;
         spy._func = () => {};
         spy._calls = [];
         spy._config = {useOwnEquals: true};
@@ -79,6 +82,14 @@ const Spy = (function() {
      * The most common use case, will be to mock
      * another function as attribute of the object.
      *
+     * The method has to met the following conditions:
+     *
+     * - The attribute to spy has to be function itself.
+     * - The attribute to spy should not be spied already.
+     *
+     * If the upper conditions are not fulfilled, this
+     * method will throw to avoid unexpected behaviour.
+     *
      * @param {Object} obj -> The manipulated object.
      * @param {string} methodName -> The mocked attributes name.
      *
@@ -86,6 +97,17 @@ const Spy = (function() {
      */
     Spy.on = function on(obj:Object, methodName:string):Spy {
         const spy = new Spy('the spy on \'' + methodName + '\'');
+        const method = obj[methodName];
+        if (!(method instanceof Function)) {
+            throw new Error(`The object attribute '${methodName}' ` +
+                `was: ${JSON.stringify(method)}\n\n` +
+                'You should only spy on functions!');
+        }
+        if (method._isSpy) {
+            throw new Error(`The objects attribute '${methodName}'` +
+                ' was already spied. Please make sure to spy' +
+                ' only once at a time at any attribute.');
+        }
         spy._index = registry.push(obj, methodName);
         obj[methodName] = spy;
         return spy;
@@ -336,6 +358,20 @@ const Spy = (function() {
     };
 
     /**
+     * Checks that the spy was never called.
+     * Throws an error if the spy was called at least once.
+     */
+    Spy.prototype.wasNotCalled = function() {
+        const madeCalls = this._calls;
+        if (madeCalls.length !== 0) {
+            throw new Error(
+                `\n\nExpected no calls for ${this._name}.\n\n` +
+                'Actually there were:\n\n' + this.showCallArguments()
+            );
+        }
+    };
+
+    /**
      * Checks if the spy was called with the provided arguments.
      *
      * Throws an error if the expectation is wrong.
@@ -402,20 +438,6 @@ const Spy = (function() {
                 `\n\nFor ${this._name} did find call arguments:\n\n` +
                 `    --> ${JSON.stringify(args)}\n\n` +
                 'Actually they were not expected!\n\n'
-            );
-        }
-    };
-
-    /**
-     * Checks that the spy was never called.
-     * Throws an error if the spy was called at least once.
-     */
-    Spy.prototype.wasNotCalled = function() {
-        const madeCalls = this._calls;
-        if (madeCalls.length !== 0) {
-            throw new Error(
-                `\n\nExpected no calls for ${this._name}.\n\n` +
-                    'Actually there were:\n\n' + this.showCallArguments()
             );
         }
     };

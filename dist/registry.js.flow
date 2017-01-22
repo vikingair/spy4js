@@ -16,13 +16,13 @@
  *
  */
 export const SpyRegistry = (function() {
-
     /**
      * @constructor
      */
     function SpyRegistry() {
         if (!(this instanceof SpyRegistry)) {
-            throw new Error('\n\nPlease make sure to use this constructor only with "new" keyword.\n\n');
+            throw new Error('\n\nPlease make sure to use this ' +
+                'constructor only with "new" keyword.\n\n');
         }
         this.register = {};
         this.registerCount = 0;
@@ -34,7 +34,7 @@ export const SpyRegistry = (function() {
      * Meaning that all stored object information will be restored
      * to their individual previous state.
      */
-    SpyRegistry.prototype.restoreAll = function restoreAll() {
+    SpyRegistry.prototype.restoreAll = function() {
         for (let key in this.register) {
             if (this.register.hasOwnProperty(key)) {
                 const {obj, method, methodName} = this.register[key];
@@ -54,9 +54,9 @@ export const SpyRegistry = (function() {
      * If the registry entry for the given index does not exist,
      * nothing will happen.
      *
-     * @param index:number -> the unique identifier of stored information.
+     * @param {number} index -> the unique identifier of stored information.
      */
-    SpyRegistry.prototype.restore = function restore(index:number) {
+    SpyRegistry.prototype.restore = function(index:number) {
         const entry = this.register[index];
         if (entry) {
             const {obj, method, methodName} = entry;
@@ -71,13 +71,16 @@ export const SpyRegistry = (function() {
      * If called, the SpyRegistry will store the given information.
      * The unique identifier index will be returned.
      *
-     * @param obj:Object -> The related object, which will be spied.
-     * @param methodName:string -> The name of the mocked method.
-     * @returns {number} -> The unique store index.
+     * @param {Object} obj -> The related object, which will be spied.
+     * @param {string} methodName -> The name of the mocked method.
+     * @return {number} -> The unique store index.
      */
-    SpyRegistry.prototype.push = function(obj:Object, methodName:string):number {
+    SpyRegistry.prototype.push = function(
+        obj:Object, methodName:string
+    ):number {
         this.registerCount++;
-        this.register[this.registerCount] = {obj, method: obj[methodName], methodName};
+        this.register[this.registerCount] =
+            {obj, method: obj[methodName], methodName};
         return this.registerCount;
     };
 
@@ -86,12 +89,12 @@ export const SpyRegistry = (function() {
      * will be returned. If the registry entry does not exist,
      * undefined will be returned.
      *
-     * @param index:number -> the unique identifier of stored information.
-     * @returns {any} -> Any stored information can be returned.
+     * @param {number} index -> the unique identifier of stored information.
+     * @return {any} -> Any stored information can be returned.
      *                   BUT: Usually this method returns a function or
      *                        undefined.
      */
-    SpyRegistry.prototype.getOriginalMethod = function getOriginalMethod(index:number):any {
+    SpyRegistry.prototype.getOriginalMethod = function(index:number):any {
         const entry = this.register[index];
         if (entry) {
             return entry.method;

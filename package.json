@@ -1,6 +1,6 @@
 {
   "name": "spy4js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Use new Spy() to optimize your tests with helpful debug messages.",
   "main": "dist/spy.js",
   "files": [
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "spy4js"
+    "url": "https://github.com/fdc-viktor-luft/spy4js"
   },
   "keywords": [
     "spy4js",

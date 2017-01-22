@@ -11,15 +11,16 @@ Object.defineProperty(exports, "__esModule", {
  *
  * For example:
  *
- * objectKeys({attr1: 'something', attr2: 123, attr3: {deepAttr: 42}}) === ['attr1', 'attr2', 'attr3']
+ * objectKeys({attr1: 'something', attr2: 123, attr3: {deepAttr: 42}})
+ *     === ['attr1', 'attr2', 'attr3']
  *
  * objectKeys(['something', 123, {attr: 42}]) === ['0', '1', '2']
  *
- * @param arrOrObj:Array<any>|Object <- Array or Object to iterate.
+ * @param {Array<any>|Object} arrOrObj <- Array or Object to iterate.
  *                                      (Flow does not want to iterate
  *                                      over arrays with for-in, so we
  *                                      have to write here any.
- * @returns {Array} <- containing all keys for the input object.
+ * @return {Array} <- containing all keys for the input object.
  */
 var objectKeys = function objectKeys(arrOrObj) {
     var keys = [];
@@ -36,18 +37,19 @@ var objectKeys = function objectKeys(arrOrObj) {
  * "differenceOf". It does recursively call itself.
  * Read more below.
  *
- * @param a <- any param.
- * @param b <- any param to compare with the first param.
- * @param initial <- boolean that is responsible for result
- *                   string building for deep equal checks.
- * @param useOwnEquals <- boolean that enables/disables the usage
- *                        of own "equals" implementations.
- * @param alreadyComparedArray <- All flatly compared objects
- *                                will be temporarily stored
- *                                in this array to resolve
- *                                circular structures.
+ * @param {any} a <- any param.
+ * @param {any} b <- any param to compare with the first param.
+ * @param {boolean} initial <- is responsible for result
+ *                             string building for deep equal checks.
+ * @param {boolean} useOwnEquals <-  enables/disables the usage
+ *                                   of own "equals" implementations.
+ * @param {Array<any>} alreadyComparedArray
+ *      <- All flatly compared objects
+ *         will be temporarily stored
+ *         in this array to resolve
+ *         circular structures.
  *
- * @returns {string|void} <- information about the difference
+ * @return {string|void} <- information about the difference
  *                           of the provided arguments.
  */
 var __diff = function __diff(a, b, initial, useOwnEquals) {
@@ -97,7 +99,7 @@ var __diff = function __diff(a, b, initial, useOwnEquals) {
         if (a['equals'](b)) {
             return;
         }
-        return 'own equals method failed <- ' + 'Maybe you want to disable the usage of own equals implementation? ' + '[ Use: spy.configure({useOwnEquals: false}) ]';
+        return 'own equals method failed <- ' + 'Maybe you want to disable the usage ' + 'of own equals implementation? ' + '[ Use: spy.configure({useOwnEquals: false}) ]';
     }
     if (alreadyComparedArray.indexOf(a) !== -1) {
         return;
@@ -138,12 +140,12 @@ var __diff = function __diff(a, b, initial, useOwnEquals) {
  * Also all circular structures will be resolved and repeating
  * attributes will be assumed to be equal.
  *
- * @param a <- any param.
- * @param b <- any param to compare with the first param.
- * @param config <- {useOwnEquals:boolean} controls the usage of own
- *                  "equals" implementations.
+ * @param {any} a <- any param.
+ * @param {any} b <- any param to compare with the first param.
+ * @param {{useOwnEquals:boolean}} config <- controls the usage of own
+ *                                           "equals" implementations.
  *
- * @returns {string|void} <- information about the difference
+ * @return {string|void} <- information about the difference
  *                           of the provided arguments.
  */
 var differenceOf = function differenceOf(a, b) {
