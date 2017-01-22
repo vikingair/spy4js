@@ -184,7 +184,7 @@ spy.getFirstCallArgument(4); // throws same Exception
 The last method is `showCallArguments`. It is mostly used internally to improve the
 debug messages, but can be while you are in a console.log-mania.
 
-## Method-Details (TODO)
+## Method-Details
 
 ### Constructor
 ```
@@ -307,13 +307,13 @@ to return a string which contains valuable information about the first found dif
 
 If any difference was detected. The fact is broken and a helpful error message will be displayed.
 If using monospaced consoles for the output which do support new lines, there will be really
-neat output. For examples see [showCallArguments](#showCallArguments)
+neat output. For examples see [showCallArguments](#showcallarguments)
 
 ### wasNotCalledWith
 ```
 spy.wasNotCalledWith(...args:Array<any>) => (fact) void
 ```
-This fact displays simply the opposite of [wasCalledWith](#wasCalledWith).
+This fact displays simply the opposite of [wasCalledWith](#wascalledwith).
 
 ### getCallArguments
 ```
@@ -327,7 +327,7 @@ Returns the call arguments that were registered on the given call. Meaning
 ```
 spy.getFirstCallArgument(callNr:number = 0) => any
 ```
-Same as [getCallArguments](#getCallArguments) but returns the only the first entry out
+Same as [getCallArguments](#getcallarguments) but returns the only the first entry out
 of the array of arguments. Most useful in situations where exactly one call param is expected.
 
 ### showCallArguments
