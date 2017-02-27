@@ -155,3 +155,4 @@ var differenceOf = function differenceOf(a, b) {
 };
 
 exports.differenceOf = differenceOf;
+exports.objectKeys = objectKeys;

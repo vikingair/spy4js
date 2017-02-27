@@ -161,4 +161,4 @@ const differenceOf = (
     return __diff(a, b, true, config.useOwnEquals);
 };
 
-export {differenceOf};
+export {differenceOf, objectKeys};

@@ -125,19 +125,20 @@ const spy = new Spy();
 
 spy.wasNotCalled();
 
-// in fact: you never want to call a spy directly for any purpose (therefore using flow this will complain)
+// in fact: you never want to call a spy directly for any purpose
+// -> therefore using flow this line would complain
 spy([1, 'test', {attr: [4]}]);
 
-spy.wasCalled(); // called at least once
-spy.wasCalled(1); // called exctly once
+spy.wasCalled();  // called at least once
+spy.wasCalled(1); // called exactly once
 
 spy('with this text');
 
-spy.wasCalled(2); // called extactly 2 times
+spy.wasCalled(2); // called exactly 2 times
 
-spy.wasCalledWith([1, 'test', {attr: [4]}]); // the spy was called at least once with equal params
+spy.wasCalledWith([1, 'test', {attr: [4]}]);    // the spy was called at least once with equal params
 
-spy.wasNotCalledWith([1, 'test', {attr: [3]}]); // the spy was not called with those params (do you see the difference?)
+spy.wasNotCalledWith([1, 'test', {attr: [3]}]); // the spy was not called with those params
 ```
 
 There is one static method that does restore all existing spies in all tests.
@@ -165,20 +166,20 @@ spy([1, 2, 3]);
 spy();
 spy(null);
 
-spy.getCallArguments(/* default = 0 */); // returns ['string', 1]
+spy.getCallArguments(/* default = 0 */);     // returns ['string', 1]
 spy.getFirstCallArgument(/* default = 0 */); // returns 'string'
 
-spy.getCallArguments(1); // returns [[1, 2, 3]]
-spy.getFirstCallArgument(1); // returns [1, 2, 3]
+spy.getCallArguments(1);                     // returns [[1, 2, 3]]
+spy.getFirstCallArgument(1);                 // returns [1, 2, 3]
 
-spy.getCallArguments(2); // returns []
-spy.getFirstCallArgument(2); // returns undefined
+spy.getCallArguments(2);                     // returns []
+spy.getFirstCallArgument(2);                 // returns undefined
 
-spy.getCallArguments(3); // returns [null]
-spy.getFirstCallArgument(3); // returns null
+spy.getCallArguments(3);                     // returns [null]
+spy.getFirstCallArgument(3);                 // returns null
 
-spy.getCallArguments(4); // throws Exception because less calls were made
-spy.getFirstCallArgument(4); // throws same Exception
+spy.getCallArguments(4);                     // throws Exception because less calls were made
+spy.getFirstCallArgument(4);                 // throws same Exception
 ```
 
 The last method is `showCallArguments`. It is mostly used internally to improve the
@@ -219,12 +220,17 @@ further information.
 
 ### configure
 ```
-spy.configure(config:{useOwnEquals:boolean|void}) => (this) Spy
+spy.configure(config:{useOwnEquals?: boolean, persistent?: boolean}) => (this) Spy
 ```
-With `configure` the spy can be configured. For now the only configuration possibility
+With `configure` the spy can be configured. One configuration possibility
 is to ignore any `equals` methods while comparing objects. There might be libraries which
 come with those methods, but do not support ES6 classes or anything else. By default this
-configuration is set to favor own `equals` implementations while comparing objects.
+configuration is set to favor own `equals` implementations while comparing objects. 
+
+Another possible configuration is to make the spy persist while other spies have to restore
+when ["restoreAll"](#restoreall) was called. This spy can ONLY RESTORE the mocked object when
+you configure it back to be NOT PERSISTENT. This configuration can only be applied to mocking
+spies. For Spies created with `new Spy()` this configuration will throw an exception.
 
 ### calls
 ```
@@ -262,6 +268,8 @@ spy.restore() => (this) Spy
 Restores the spied object, if existing, to its original state. The spy won't lose any
 other information. So it is still aware of made calls, can be plugged anywhere else
 and can still be called anywhere else. But it loses all references to the spied object.
+
+If the spy was configured to be persistent this method will throw an error.
 
 ### transparent
 ```
@@ -386,3 +394,16 @@ different objects you could:
 const callArgs = spy.getCallArguments(0/* for the 0'th call above*/);
 const differentNumber = callArgs[2]['attr2'];
 ```
+
+## Changes
+
+* **1.0.5:**
+  * Switched to es6-Symbols to make the access of private spy properties less accessible.
+  * Added a persistence layer for spies.
+* **1.0.4:**
+  
+## Planned
+
+* *After*-methods for `calls`, `returns` and `throws`.
+* Update of Dev-dependencies.
+* Upgrade of Dev-environment.

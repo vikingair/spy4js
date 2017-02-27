@@ -14,6 +14,14 @@ import {SpyRegistry} from './registry';
  */
 const registry = new SpyRegistry();
 
+const Symbols = {
+    name: Symbol('__Spy_name__'),
+    isSpy: Symbol('__Spy_isSpy__'),
+    func: Symbol('__Spy_func__'),
+    calls: Symbol('__Spy_calls__'),
+    config: Symbol('__Spy_config__'),
+    index: Symbol('__Spy_config__')};
+
 /**
  * @ModifiedOnly by viktor.luft@freiheit.com
  *
@@ -53,14 +61,14 @@ const Spy = (function() {
                 'constructor only with "new" keyword.\n\n');
         }
         let spy:any = function(...args:Array<any>) {
-            spy._calls.push({arguments: args});
-            return spy._func(...args);
+            spy[Symbols.calls].push({arguments: args});
+            return spy[Symbols.func](...args);
         };
-        spy._name = name;
-        spy._isSpy = true;
-        spy._func = () => {};
-        spy._calls = [];
-        spy._config = {useOwnEquals: true};
+        spy[Symbols.name] = name;
+        spy[Symbols.isSpy] = true;
+        spy[Symbols.func] = () => {};
+        spy[Symbols.calls] = [];
+        spy[Symbols.config] = {useOwnEquals: true};
         for (let key in Spy.prototype) {
             if (Spy.prototype instanceof Object &&
                 Spy.prototype.hasOwnProperty(key)) {
@@ -103,12 +111,12 @@ const Spy = (function() {
                 `was: ${JSON.stringify(method)}\n\n` +
                 'You should only spy on functions!');
         }
-        if (method._isSpy) {
+        if (method[Symbols.isSpy]) {
             throw new Error(`The objects attribute '${methodName}'` +
                 ' was already spied. Please make sure to spy' +
                 ' only once at a time at any attribute.');
         }
-        spy._index = registry.push(obj, methodName);
+        spy[Symbols.index] = registry.push(obj, methodName);
         obj[methodName] = spy;
         return spy;
     };
@@ -167,15 +175,30 @@ const Spy = (function() {
      *                           matcher, e.g. for comparing
      *                           call params with "wasCalledWith".
      *
+     * - persistent:boolean -> toggles the persistence of the spy.
+     *                         I.e. making it restorable or not.
+     *                         Throws for not mocking spies.
+     *
      * @param {Object} config <- An object containing attributes
      *                         for special configuration
      * @return {Spy} <- BuilderPattern.
      */
     Spy.prototype.configure = function(
-        config:{useOwnEquals: boolean|void}
+        config:{useOwnEquals?: boolean, persistent?: boolean}
     ):Spy {
         if (config.useOwnEquals !== undefined) {
-            this._config.useOwnEquals = config.useOwnEquals;
+            this[Symbols.config].useOwnEquals = config.useOwnEquals;
+        }
+        if (config.persistent !== undefined) {
+            if (!this[Symbols.index]) {
+                throw new Error(`\n\n${this[Symbols.name]} can not` +
+                    ' be configured to be persistent!' +
+                    ' It does not mock any object.');
+            }
+            this[Symbols.config].persistent = config.persistent;
+            registry.persist(
+                this[Symbols.index],
+                this[Symbols.config].persistent);
         }
         return this;
     };
@@ -194,14 +217,14 @@ const Spy = (function() {
      */
     Spy.prototype.calls = function(...funcs:Array<Function>):Spy {
         if (funcs.length === 0) { // no arguments provided
-            this._func = () => {};
+            this[Symbols.func] = () => {};
             return this;
         }
 
         const max = funcs.length - 1;
         let counter = -1;
 
-        this._func = (...args:Array<any>) => {
+        this[Symbols.func] = (...args:Array<any>) => {
             counter++;
             return funcs[max < counter ? max : counter](...args);
         };
@@ -239,8 +262,9 @@ const Spy = (function() {
      * @return {Spy} <- BuilderPattern
      */
     Spy.prototype.throws = function(message:?string):Spy {
-        this._func = () => {
-            throw new Error(message || `${this._name} was requested to throw`);
+        this[Symbols.func] = () => {
+            throw new Error(message ||
+                `${this[Symbols.name]} was requested to throw`);
         };
         return this;
     };
@@ -251,7 +275,7 @@ const Spy = (function() {
      * @return {Spy} <- BuilderPattern
      */
     Spy.prototype.reset = function():Spy {
-        this._calls = [];
+        this[Symbols.calls] = [];
         return this;
     };
 
@@ -262,13 +286,20 @@ const Spy = (function() {
      * Restoring objects does not disable any
      * other behaviours/features of the spies.
      *
+     * If the spy was configured persistent, than this
+     * method will throw an exception.
+     *
      * Other than "Spy.restoreAll" this method only removes
      * a maximum of one mock.
      *
      * @return {Spy} <- BuilderPattern
      */
     Spy.prototype.restore = function():Spy {
-        registry.restore(this._index);
+        if (this[Symbols.config].persistent) {
+            throw new Error(`\n\n${this[Symbols.name]} can not be restored!` +
+                ' It was configured to be persistent.');
+        }
+        registry.restore(this[Symbols.index]);
         return this;
     };
 
@@ -314,15 +345,16 @@ const Spy = (function() {
      * @return {Spy} <- BuilderPattern
      */
     Spy.prototype.transparentAfter = function(callCount:number):Spy {
-        const oldFunc = this._func;
-        this._func = (...args) => {
+        const oldFunc = this[Symbols.func];
+        this[Symbols.func] = (...args) => {
             // before the function call is executed,
             // the call arguments were already saved
             // -> so we are interested if the made calls
             //    are more than the call count were we
             //    need to modify the behavior
-            if (this._calls.length > callCount) {
-                const originalMethod = registry.getOriginalMethod(this._index);
+            if (this[Symbols.calls].length > callCount) {
+                const originalMethod =
+                    registry.getOriginalMethod(this[Symbols.index]);
                 if (originalMethod) {
                     return originalMethod(...args);
                 }
@@ -344,16 +376,16 @@ const Spy = (function() {
      * @param {?number} callCount -> Is the number of expected calls made.
      */
     Spy.prototype.wasCalled = function(callCount:number = 0) {
-        const madeCalls = this._calls.length;
+        const madeCalls = this[Symbols.calls].length;
         if (callCount) {
             if (madeCalls !== callCount) {
                 throw new Error(
-                    `\n\n${this._name} was called ${madeCalls} times,` +
+                    `\n\n${this[Symbols.name]} was called ${madeCalls} times,` +
                     ` but there were expected ${callCount} calls.\n\n`
                 );
             }
         } else if (madeCalls === 0) {
-            throw new Error(`\n\n${this._name} was never called!\n\n`);
+            throw new Error(`\n\n${this[Symbols.name]} was never called!\n\n`);
         }
     };
 
@@ -362,10 +394,10 @@ const Spy = (function() {
      * Throws an error if the spy was called at least once.
      */
     Spy.prototype.wasNotCalled = function() {
-        const madeCalls = this._calls;
+        const madeCalls = this[Symbols.calls];
         if (madeCalls.length !== 0) {
             throw new Error(
-                `\n\nExpected no calls for ${this._name}.\n\n` +
+                `\n\nExpected no calls for ${this[Symbols.name]}.\n\n` +
                 'Actually there were:\n\n' + this.showCallArguments()
             );
         }
@@ -388,21 +420,24 @@ const Spy = (function() {
      *                           for any made call.
      */
     Spy.prototype.wasCalledWith = function(...args:Array<any>) {
-        const madeCalls = this._calls;
+        const madeCalls = this[Symbols.calls];
         if (madeCalls.length === 0) {
-            throw new Error(`\n\n${this._name} was never called!\n\n`);
+            throw new Error(`\n\n${this[Symbols.name]} was never called!\n\n`);
         }
         const diffInfo = [];
         for (let i = 0; i < madeCalls.length; i++) {
             const diff =
-                differenceOf(madeCalls[i].arguments, args, this._config);
+                differenceOf(
+                    madeCalls[i].arguments,
+                    args,
+                    this[Symbols.config]);
             if (!diff) {
                 return;
             }
             diffInfo.push(diff);
         }
         throw new Error(
-            `\n\nFor ${this._name} did not find call arguments:\n\n` +
+            `\n\nFor ${this[Symbols.name]} did not find call arguments:\n\n` +
             `    --> ${JSON.stringify(args)}\n\n` +
             'Actually there were:\n\n' + this.showCallArguments(diffInfo)
         );
@@ -435,7 +470,7 @@ const Spy = (function() {
         }
         if (!errorOccurred) {
             throw new Error(
-                `\n\nFor ${this._name} did find call arguments:\n\n` +
+                `\n\nFor ${this[Symbols.name]} did find call arguments:\n\n` +
                 `    --> ${JSON.stringify(args)}\n\n` +
                 'Actually they were not expected!\n\n'
             );
@@ -460,11 +495,11 @@ const Spy = (function() {
      * @return {Array<any>} -> the call arguments of the (callNr + 1)'th call.
      */
     Spy.prototype.getCallArguments = function(callNr:number = 0):Array<any> {
-        const madeCalls = this._calls;
+        const madeCalls = this[Symbols.calls];
         if (callNr % 1 !== 0 || callNr >= madeCalls.length) {
             throw new Error(
                 `\n\nThe provided callNr "${callNr}" was not valid.\n\n` +
-                `Made calls for ${this._name}:\n\n` +
+                `Made calls for ${this[Symbols.name]}:\n\n` +
                 this.showCallArguments()
             );
         }
@@ -527,9 +562,9 @@ const Spy = (function() {
     Spy.prototype.showCallArguments = function(
         additionalInformation:Array<string> = []
     ):string {
-        const madeCalls = this._calls;
+        const madeCalls = this[Symbols.calls];
         if (madeCalls.length === 0) {
-            return `${this._name} was never called!\n`;
+            return `${this[Symbols.name]} was never called!\n`;
         }
         let response = '';
         for (let i = 0; i < madeCalls.length; i++) {

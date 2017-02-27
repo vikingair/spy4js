@@ -4,6 +4,7 @@
 
 import expect from 'expect';
 import {SpyRegistry} from './registry';
+import {objectKeys} from './equality';
 
 /**
  * The tests are written not method specific.
@@ -105,5 +106,46 @@ describe('Spy - Utils', () => {
         expect(testObject.attr1).toBe(someFunc);
         expect(testObject.attr2).toBe(undefined);
         expect(testObject.attr3).toBe(someDate);
+    });
+
+    it('is able to make stored information persistent', () => {
+        const testObject = {
+            func1: () => 'testObjectFunc1',
+            func2: () => 'testObjectFunc1'};
+        const reg:any = new SpyRegistry();
+
+        expect(objectKeys(reg.register).length).toBe(0);
+        expect(objectKeys(reg.persReg).length).toBe(0);
+
+        const registerEntry1 = reg.push(testObject, 'func1');
+        reg.push(testObject, 'func2');
+
+        expect(objectKeys(reg.register).length).toBe(2);
+        expect(objectKeys(reg.persReg).length).toBe(0);
+
+        reg.persist(registerEntry1, true);
+
+        expect(objectKeys(reg.register).length).toBe(1);
+        expect(objectKeys(reg.persReg).length).toBe(1);
+
+        reg.restore(registerEntry1);
+
+        expect(objectKeys(reg.register).length).toBe(1);
+        expect(objectKeys(reg.persReg).length).toBe(1);
+
+        reg.restoreAll();
+
+        expect(objectKeys(reg.register).length).toBe(0);
+        expect(objectKeys(reg.persReg).length).toBe(1);
+
+        reg.persist(registerEntry1, false);
+
+        expect(objectKeys(reg.register).length).toBe(1);
+        expect(objectKeys(reg.persReg).length).toBe(0);
+
+        reg.restoreAll();
+
+        expect(objectKeys(reg.register).length).toBe(0);
+        expect(objectKeys(reg.persReg).length).toBe(0);
     });
 });

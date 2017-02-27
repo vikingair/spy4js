@@ -25,6 +25,7 @@ export const SpyRegistry = (function() {
                 'constructor only with "new" keyword.\n\n');
         }
         this.register = {};
+        this.persReg = {};
         this.registerCount = 0;
     }
 
@@ -34,7 +35,7 @@ export const SpyRegistry = (function() {
      * Meaning that all stored object information will be restored
      * to their individual previous state.
      */
-    SpyRegistry.prototype.restoreAll = function() {
+    SpyRegistry.prototype.restoreAll = function():void {
         for (let key in this.register) {
             if (this.register.hasOwnProperty(key)) {
                 const {obj, method, methodName} = this.register[key];
@@ -56,7 +57,7 @@ export const SpyRegistry = (function() {
      *
      * @param {number} index -> the unique identifier of stored information.
      */
-    SpyRegistry.prototype.restore = function(index:number) {
+    SpyRegistry.prototype.restore = function(index:number):void {
         const entry = this.register[index];
         if (entry) {
             const {obj, method, methodName} = entry;
@@ -76,7 +77,8 @@ export const SpyRegistry = (function() {
      * @return {number} -> The unique store index.
      */
     SpyRegistry.prototype.push = function(
-        obj:Object, methodName:string
+        obj:Object,
+        methodName:string
     ):number {
         this.registerCount++;
         this.register[this.registerCount] =
@@ -98,6 +100,28 @@ export const SpyRegistry = (function() {
         const entry = this.register[index];
         if (entry) {
             return entry.method;
+        }
+    };
+
+    /**
+     * If called, the stored method will be moved from the standard
+     * registry into the persistent registry or vice versa.
+     * This can make restore and restoreAll having no effect anymore.
+     *
+     * @param {number} index -> the unique identifier of stored information.
+     * @param {boolean} intoPersReg -> boolean to determine the moving
+     *                                 direction.
+     */
+    SpyRegistry.prototype.persist = function(
+        index:number,
+        intoPersReg:boolean
+    ):void {
+        const fromReg = intoPersReg ? this.register : this.persReg;
+        const toReg = intoPersReg ? this.persReg : this.register;
+        const entry = fromReg[index];
+        if (entry) {
+            toReg[index] = entry;
+            delete fromReg[index];
         }
     };
 

@@ -6,6 +6,8 @@ import expect from 'expect';
 import {Spy} from './spy';
 
 describe('Spy - Utils', () => {
+    afterEach(Spy.restoreAll);
+
     it('should not allow to use the constructor of the Spy without new', () => {
         expect(() => Spy()).toThrow(); // eslint-disable-line
     });
@@ -420,5 +422,77 @@ describe('Spy - Utils', () => {
         spy.wasCalledWith(test2);
         spy.wasNotCalledWith(test3);
         spy.wasNotCalledWith(test4);
+    });
+
+    it('does not allow direct access to the internal ' +
+        'properties of each Spy', () => {
+        const testObj = {myFunc: () => {}};
+        const spy = Spy.on(testObj, 'myFunc');
+
+        const allowedProps = [
+            'configure',
+            'calls',
+            'returns',
+            'throws',
+            'reset',
+            'restore',
+            'transparent',
+            'transparentAfter',
+            'wasCalled',
+            'wasNotCalled',
+            'wasCalledWith',
+            'wasNotCalledWith',
+            'getCallArguments',
+            'getFirstCallArgument',
+            'showCallArguments'];
+
+        for (let prop in spy) {
+            if (!allowedProps.includes(prop)) {
+                throw new Error('Received not allowed prop: ' + prop);
+            }
+        }
+    });
+
+    it('does not allow to configure not mocking spies to be persistent', () => {
+        const spy = new Spy('spy that does not mock any object');
+
+        expect(() => spy.configure({persistent: true})).toThrow();
+        expect(() => spy.configure({persistent: false})).toThrow();
+    });
+
+    it('does not allow to restore persistent spies', () => {
+        const testObj = {myFunc: () => 'originalFunc'};
+        const spy = Spy.on(testObj, 'myFunc').configure({persistent: true});
+
+        expect(() => spy.restore()).toThrow();
+
+        spy.configure({persistent: false});
+        expect(testObj.myFunc()).toBe(undefined);
+
+        spy.restore();
+        expect(testObj.myFunc()).toBe('originalFunc');
+    });
+
+    it('does not restore persistent spies when restoreAll gets called', () => {
+        const testObj = {myFunc1: () => 'func1', myFunc2: () => 'func2'};
+        const spy1 = Spy.on(testObj, 'myFunc1')
+                        .configure({persistent: true})
+                        .returns('spy1');
+        Spy.on(testObj, 'myFunc2').returns('spy2');
+
+        expect(testObj.myFunc1()).toBe('spy1');
+        expect(testObj.myFunc2()).toBe('spy2');
+
+        Spy.restoreAll();
+
+        expect(testObj.myFunc1()).toBe('spy1');
+        expect(testObj.myFunc2()).toBe('func2');
+
+        spy1.configure({persistent: false});
+
+        Spy.restoreAll();
+
+        expect(testObj.myFunc1()).toBe('func1');
+        expect(testObj.myFunc2()).toBe('func2');
     });
 });

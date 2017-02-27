@@ -27,6 +27,7 @@ var SpyRegistry = exports.SpyRegistry = function () {
             throw new Error('\n\nPlease make sure to use this ' + 'constructor only with "new" keyword.\n\n');
         }
         this.register = {};
+        this.persReg = {};
         this.registerCount = 0;
     }
 
@@ -104,6 +105,25 @@ var SpyRegistry = exports.SpyRegistry = function () {
         var entry = this.register[index];
         if (entry) {
             return entry.method;
+        }
+    };
+
+    /**
+     * If called, the stored method will be moved from the standard
+     * registry into the persistent registry or vice versa.
+     * This can make restore and restoreAll having no effect anymore.
+     *
+     * @param {number} index -> the unique identifier of stored information.
+     * @param {boolean} intoPersReg -> boolean to determine the moving
+     *                                 direction.
+     */
+    SpyRegistry.prototype.persist = function (index, intoPersReg) {
+        var fromReg = intoPersReg ? this.register : this.persReg;
+        var toReg = intoPersReg ? this.persReg : this.register;
+        var entry = fromReg[index];
+        if (entry) {
+            toReg[index] = entry;
+            delete fromReg[index];
         }
     };
 
