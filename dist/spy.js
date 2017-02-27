@@ -5,9 +5,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Spy = undefined;
 
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
+var _symbol = require('babel-runtime/core-js/symbol');
+
+var _symbol2 = _interopRequireDefault(_symbol);
+
 var _equality = require('./equality');
 
 var _registry = require('./registry');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  *
@@ -19,12 +29,12 @@ var _registry = require('./registry');
 var registry = new _registry.SpyRegistry();
 
 var Symbols = {
-    name: Symbol('__Spy_name__'),
-    isSpy: Symbol('__Spy_isSpy__'),
-    func: Symbol('__Spy_func__'),
-    calls: Symbol('__Spy_calls__'),
-    config: Symbol('__Spy_config__'),
-    index: Symbol('__Spy_config__') };
+    name: (0, _symbol2.default)('__Spy_name__'),
+    isSpy: (0, _symbol2.default)('__Spy_isSpy__'),
+    func: (0, _symbol2.default)('__Spy_func__'),
+    calls: (0, _symbol2.default)('__Spy_calls__'),
+    config: (0, _symbol2.default)('__Spy_config__'),
+    index: (0, _symbol2.default)('__Spy_config__') };
 
 /**
  * @ModifiedOnly by viktor.luft@freiheit.com
@@ -115,7 +125,7 @@ var Spy = function () {
         var spy = new Spy('the spy on \'' + methodName + '\'');
         var method = obj[methodName];
         if (!(method instanceof Function)) {
-            throw new Error('The object attribute \'' + methodName + '\' ' + ('was: ' + JSON.stringify(method) + '\n\n') + 'You should only spy on functions!');
+            throw new Error('The object attribute \'' + methodName + '\' ' + ('was: ' + (0, _stringify2.default)(method) + '\n\n') + 'You should only spy on functions!');
         }
         if (method[Symbols.isSpy]) {
             throw new Error('The objects attribute \'' + methodName + '\'' + ' was already spied. Please make sure to spy' + ' only once at a time at any attribute.');
@@ -450,7 +460,7 @@ var Spy = function () {
             }
             diffInfo.push(diff);
         }
-        throw new Error('\n\nFor ' + this[Symbols.name] + ' did not find call arguments:\n\n' + ('    --> ' + JSON.stringify(args) + '\n\n') + 'Actually there were:\n\n' + this.showCallArguments(diffInfo));
+        throw new Error('\n\nFor ' + this[Symbols.name] + ' did not find call arguments:\n\n' + ('    --> ' + (0, _stringify2.default)(args) + '\n\n') + 'Actually there were:\n\n' + this.showCallArguments(diffInfo));
     };
 
     /**
@@ -484,7 +494,7 @@ var Spy = function () {
             errorOccurred = true;
         }
         if (!errorOccurred) {
-            throw new Error('\n\nFor ' + this[Symbols.name] + ' did find call arguments:\n\n' + ('    --> ' + JSON.stringify(args) + '\n\n') + 'Actually they were not expected!\n\n');
+            throw new Error('\n\nFor ' + this[Symbols.name] + ' did find call arguments:\n\n' + ('    --> ' + (0, _stringify2.default)(args) + '\n\n') + 'Actually they were not expected!\n\n');
         }
     };
 
@@ -579,7 +589,7 @@ var Spy = function () {
         }
         var response = '';
         for (var i = 0; i < madeCalls.length; i++) {
-            response += 'call ' + i + ': ' + JSON.stringify(madeCalls[i].arguments) + '\n';
+            response += 'call ' + i + ': ' + (0, _stringify2.default)(madeCalls[i].arguments) + '\n';
             if (additionalInformation[i]) {
                 response += '        ' + additionalInformation[i] + '\n';
             }

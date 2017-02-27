@@ -397,10 +397,13 @@ const differentNumber = callArgs[2]['attr2'];
 
 ## Changes
 
+* **1.0.6:**
+  * Updated Babel and transpiled es6-Symbols for older browsers.
 * **1.0.5:**
   * Switched to es6-Symbols to make the access of private spy properties less accessible.
   * Added a persistence layer for spies.
 * **1.0.4:**
+  * Added checks to avoid spying on spies.
   
 ## Planned
 

@@ -43,7 +43,10 @@ gulp.task('flow-dist', () => {
 
 gulp.task('compile-babel', () => {
     return gulp.src(srcs)
-               .pipe(babel())
+               .pipe(babel({
+                   plugins: ["transform-flow-strip-types", "add-module-exports", "transform-runtime"],
+                   presets: ["es2015", "stage-0"]
+               }))
                .pipe(gulp.dest(dist));
 });
 

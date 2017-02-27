@@ -6,17 +6,12 @@ module.exports = function(config) {
             require('karma-browserify'),
             require('karma-babel-preprocessor'),
             require('karma-chrome-launcher'),
-            require('karma-mocha')
-        ],
+            require('karma-mocha')],
         files: [
-            'src/**/*.js'
-        ],
+            'src/**/*.js'],
         preprocessors: {
-            'src/**/*.js': ['babel', 'browserify']
-        },
+            'src/**/*.js': ['babel', 'browserify']},
         browserify: {
             debug: true,
-            transform: ['babelify']
-        }
-    });
+            transform: ['babelify']}});
 };
