@@ -8,7 +8,7 @@ const clean = require('gulp-clean');
 const exec = require('child_process').exec;
 const chalk = require('chalk');
 
-const srcs = ['src/*.js', 'src/**/*.js', '!src/**/*test.js'];
+const srcs = ['src/*.js', '!src/*test.js'];
 const dist = './dist';
 
 gulp.task('dist', (cb) => {

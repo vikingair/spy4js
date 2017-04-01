@@ -156,6 +156,7 @@ which the spy was called.
 
   - `getCallArguments` (returns all call arguments for a specified call in an array)
   - `getFirstCallArgument` (same as getCallArguments, but returns only the first element of the array)
+  - `getCallCount` (returns the number of made calls)
     
 ```js
 const spy = new Spy();
@@ -338,6 +339,12 @@ spy.getFirstCallArgument(callNr:number = 0) => any
 Same as [getCallArguments](#getcallarguments) but returns the only the first entry out
 of the array of arguments. Most useful in situations where exactly one call param is expected.
 
+### getCallCount
+```
+spy.getCallCount() => number
+```
+This method simply returns the number of made calls on the spy.
+
 ### showCallArguments
 ```
 spy.showCallArguments(additionalInformation:Array<string> = []) => string
@@ -397,6 +404,10 @@ const differentNumber = callArgs[2]['attr2'];
 
 ## Changes
 
+* **1.0.7:**
+  * Removed expect-dev-dependency.
+  * Added `getCallCount`.
+  * Updated some debug messages. 
 * **1.0.6:**
   * Updated Babel and transpiled es6-Symbols for older browsers.
 * **1.0.5:**

@@ -2,7 +2,7 @@
  * @flow
  */
 
-import {differenceOf} from './equality';
+import {differenceOf} from './utils';
 import {SpyRegistry} from './registry';
 
 /**
@@ -397,7 +397,8 @@ const Spy = (function() {
         const madeCalls = this[Symbols.calls];
         if (madeCalls.length !== 0) {
             throw new Error(
-                `\n\nExpected no calls for ${this[Symbols.name]}.\n\n` +
+                `\n\n${this[Symbols.name]} was not` +
+                ' considered to be called.\n\n' +
                 'Actually there were:\n\n' + this.showCallArguments()
             );
         }
@@ -437,7 +438,8 @@ const Spy = (function() {
             diffInfo.push(diff);
         }
         throw new Error(
-            `\n\nFor ${this[Symbols.name]} did not find call arguments:\n\n` +
+            `\n\n${this[Symbols.name]} was considered` +
+            ' to be called with the following arguments:\n\n' +
             `    --> ${JSON.stringify(args)}\n\n` +
             'Actually there were:\n\n' + this.showCallArguments(diffInfo)
         );
@@ -470,9 +472,9 @@ const Spy = (function() {
         }
         if (!errorOccurred) {
             throw new Error(
-                `\n\nFor ${this[Symbols.name]} did find call arguments:\n\n` +
-                `    --> ${JSON.stringify(args)}\n\n` +
-                'Actually they were not expected!\n\n'
+                `\n\n${this[Symbols.name]} was called` +
+                ' unexpectedly with the following arguments:\n\n' +
+                `    --> ${JSON.stringify(args)}\n\n`
             );
         }
     };
@@ -525,6 +527,15 @@ const Spy = (function() {
      */
     Spy.prototype.getFirstCallArgument = function(callNr:number = 0):any {
         return this.getCallArguments(callNr)[0];
+    };
+
+    /**
+     * This method returns the number of made calls on the spy.
+     *
+     * @return {number} -> the number of made calls.
+     */
+    Spy.prototype.getCallCount = function():number {
+        return this[Symbols.calls].length;
     };
 
     /**

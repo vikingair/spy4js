@@ -1,11 +1,11 @@
 {
   "name": "spy4js",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Use new Spy() to optimize your tests with helpful debug messages.",
   "main": "dist/spy.js",
   "files": [
-    "dist/equality.js",
-    "dist/equality.js.flow",
+    "dist/utils.js",
+    "dist/utils.js.flow",
     "dist/registry.js",
     "dist/registry.js.flow",
     "dist/spy.js",
@@ -45,7 +45,6 @@
     "eslint": "3.13.1",
     "eslint-config-google": "0.7.1",
     "eslint-plugin-flow-vars": "0.4.0",
-    "expect": "1.16.0",
     "flow-bin": "0.37.4",
     "gulp": "3.9.1",
     "gulp-babel": "6.1.2",

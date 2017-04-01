@@ -13,7 +13,7 @@ var _symbol = require('babel-runtime/core-js/symbol');
 
 var _symbol2 = _interopRequireDefault(_symbol);
 
-var _equality = require('./equality');
+var _utils = require('./utils');
 
 var _registry = require('./registry');
 
@@ -422,7 +422,7 @@ var Spy = function () {
     Spy.prototype.wasNotCalled = function () {
         var madeCalls = this[Symbols.calls];
         if (madeCalls.length !== 0) {
-            throw new Error('\n\nExpected no calls for ' + this[Symbols.name] + '.\n\n' + 'Actually there were:\n\n' + this.showCallArguments());
+            throw new Error('\n\n' + this[Symbols.name] + ' was not' + ' considered to be called.\n\n' + 'Actually there were:\n\n' + this.showCallArguments());
         }
     };
 
@@ -454,13 +454,13 @@ var Spy = function () {
         }
 
         for (var i = 0; i < madeCalls.length; i++) {
-            var diff = (0, _equality.differenceOf)(madeCalls[i].arguments, args, this[Symbols.config]);
+            var diff = (0, _utils.differenceOf)(madeCalls[i].arguments, args, this[Symbols.config]);
             if (!diff) {
                 return;
             }
             diffInfo.push(diff);
         }
-        throw new Error('\n\nFor ' + this[Symbols.name] + ' did not find call arguments:\n\n' + ('    --> ' + (0, _stringify2.default)(args) + '\n\n') + 'Actually there were:\n\n' + this.showCallArguments(diffInfo));
+        throw new Error('\n\n' + this[Symbols.name] + ' was considered' + ' to be called with the following arguments:\n\n' + ('    --> ' + (0, _stringify2.default)(args) + '\n\n') + 'Actually there were:\n\n' + this.showCallArguments(diffInfo));
     };
 
     /**
@@ -494,7 +494,7 @@ var Spy = function () {
             errorOccurred = true;
         }
         if (!errorOccurred) {
-            throw new Error('\n\nFor ' + this[Symbols.name] + ' did find call arguments:\n\n' + ('    --> ' + (0, _stringify2.default)(args) + '\n\n') + 'Actually they were not expected!\n\n');
+            throw new Error('\n\n' + this[Symbols.name] + ' was called' + ' unexpectedly with the following arguments:\n\n' + ('    --> ' + (0, _stringify2.default)(args) + '\n\n'));
         }
     };
 
@@ -546,6 +546,15 @@ var Spy = function () {
         var callNr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
 
         return this.getCallArguments(callNr)[0];
+    };
+
+    /**
+     * This method returns the number of made calls on the spy.
+     *
+     * @return {number} -> the number of made calls.
+     */
+    Spy.prototype.getCallCount = function () {
+        return this[Symbols.calls].length;
     };
 
     /**

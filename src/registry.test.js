@@ -2,9 +2,9 @@
  * @flow
  */
 
-import expect from 'expect';
+import {equals, throws} from './test-utils/test.utils';
 import {SpyRegistry} from './registry';
-import {objectKeys} from './equality';
+import {objectKeys} from './utils';
 
 /**
  * The tests are written not method specific.
@@ -14,7 +14,7 @@ import {objectKeys} from './equality';
  */
 describe('Spy - Utils', () => {
     it('should not allow to use the constructor of the Spy without new', () => {
-        expect(() => SpyRegistry()).toThrow(); // eslint-disable-line
+        throws(SpyRegistry);
     });
 
     it('should register an arbitrary object attribute correctly', () => {
@@ -23,11 +23,11 @@ describe('Spy - Utils', () => {
 
         const returnedRegisterCount = reg.push(testObject, 'attr1');
 
-        expect(reg.registerCount).toBe(1);
-        expect(returnedRegisterCount).toBe(1);
-        expect(reg.register[1].obj).toBe(testObject);
-        expect(reg.register[1].method).toBe(testObject.attr1);
-        expect(reg.register[1].methodName).toBe('attr1');
+        equals(reg.registerCount, 1);
+        equals(returnedRegisterCount, 1);
+        equals(reg.register[1].obj, testObject);
+        equals(reg.register[1].method, testObject.attr1);
+        equals(reg.register[1].methodName, 'attr1');
     });
 
     it('should be able to restore a registered object', () => {
@@ -42,21 +42,21 @@ describe('Spy - Utils', () => {
         testObject.attr1 = someFunc;
         delete testObject.attr2;
 
-        expect(testObject.attr1).toBe(someFunc);
-        expect(testObject.attr2).toBe(undefined);
-        expect(testObject.attr3).toBe(someDate);
+        equals(testObject.attr1, someFunc);
+        equals(testObject.attr2, undefined);
+        equals(testObject.attr3, someDate);
 
         reg.restore(registerEntry1);
 
-        expect(testObject.attr1).toBe('string');
-        expect(testObject.attr2).toBe(undefined);
-        expect(testObject.attr3).toBe(someDate);
+        equals(testObject.attr1, 'string');
+        equals(testObject.attr2, undefined);
+        equals(testObject.attr3, someDate);
 
         reg.restore(registerEntry2);
 
-        expect(testObject.attr1).toBe('string');
-        expect(testObject.attr2).toBe(88);
-        expect(testObject.attr3).toBe(someDate);
+        equals(testObject.attr1, 'string');
+        equals(testObject.attr2, 88);
+        equals(testObject.attr3, someDate);
     });
 
     it('should be able to restore all ' +
@@ -72,15 +72,15 @@ describe('Spy - Utils', () => {
         testObject.attr1 = someFunc;
         delete testObject.attr2;
 
-        expect(testObject.attr1).toBe(someFunc);
-        expect(testObject.attr2).toBe(undefined);
-        expect(testObject.attr3).toBe(someDate);
+        equals(testObject.attr1, someFunc);
+        equals(testObject.attr2, undefined);
+        equals(testObject.attr3, someDate);
 
         reg.restoreAll();
 
-        expect(testObject.attr1).toBe('string');
-        expect(testObject.attr2).toBe(88);
-        expect(testObject.attr3).toBe(someDate);
+        equals(testObject.attr1, 'string');
+        equals(testObject.attr2, 88);
+        equals(testObject.attr3, someDate);
     });
 
     it('should be able to to return the stored value' +
@@ -96,16 +96,16 @@ describe('Spy - Utils', () => {
         testObject.attr1 = someFunc;
         delete testObject.attr2;
 
-        expect(testObject.attr1).toBe(someFunc);
-        expect(testObject.attr2).toBe(undefined);
-        expect(testObject.attr3).toBe(someDate);
+        equals(testObject.attr1, someFunc);
+        equals(testObject.attr2, undefined);
+        equals(testObject.attr3, someDate);
 
-        expect(reg.getOriginalMethod(registerEntry1)).toBe('string');
-        expect(reg.getOriginalMethod(registerEntry2)).toBe(88);
+        equals(reg.getOriginalMethod(registerEntry1), 'string');
+        equals(reg.getOriginalMethod(registerEntry2), 88);
 
-        expect(testObject.attr1).toBe(someFunc);
-        expect(testObject.attr2).toBe(undefined);
-        expect(testObject.attr3).toBe(someDate);
+        equals(testObject.attr1, someFunc);
+        equals(testObject.attr2, undefined);
+        equals(testObject.attr3, someDate);
     });
 
     it('is able to make stored information persistent', () => {
@@ -114,38 +114,38 @@ describe('Spy - Utils', () => {
             func2: () => 'testObjectFunc1'};
         const reg:any = new SpyRegistry();
 
-        expect(objectKeys(reg.register).length).toBe(0);
-        expect(objectKeys(reg.persReg).length).toBe(0);
+        equals(objectKeys(reg.register).length, 0);
+        equals(objectKeys(reg.persReg).length, 0);
 
         const registerEntry1 = reg.push(testObject, 'func1');
         reg.push(testObject, 'func2');
 
-        expect(objectKeys(reg.register).length).toBe(2);
-        expect(objectKeys(reg.persReg).length).toBe(0);
+        equals(objectKeys(reg.register).length, 2);
+        equals(objectKeys(reg.persReg).length, 0);
 
         reg.persist(registerEntry1, true);
 
-        expect(objectKeys(reg.register).length).toBe(1);
-        expect(objectKeys(reg.persReg).length).toBe(1);
+        equals(objectKeys(reg.register).length, 1);
+        equals(objectKeys(reg.persReg).length, 1);
 
         reg.restore(registerEntry1);
 
-        expect(objectKeys(reg.register).length).toBe(1);
-        expect(objectKeys(reg.persReg).length).toBe(1);
+        equals(objectKeys(reg.register).length, 1);
+        equals(objectKeys(reg.persReg).length, 1);
 
         reg.restoreAll();
 
-        expect(objectKeys(reg.register).length).toBe(0);
-        expect(objectKeys(reg.persReg).length).toBe(1);
+        equals(objectKeys(reg.register).length, 0);
+        equals(objectKeys(reg.persReg).length, 1);
 
         reg.persist(registerEntry1, false);
 
-        expect(objectKeys(reg.register).length).toBe(1);
-        expect(objectKeys(reg.persReg).length).toBe(0);
+        equals(objectKeys(reg.register).length, 1);
+        equals(objectKeys(reg.persReg).length, 0);
 
         reg.restoreAll();
 
-        expect(objectKeys(reg.register).length).toBe(0);
-        expect(objectKeys(reg.persReg).length).toBe(0);
+        equals(objectKeys(reg.register).length, 0);
+        equals(objectKeys(reg.persReg).length, 0);
     });
 });
