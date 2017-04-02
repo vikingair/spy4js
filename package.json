@@ -1,6 +1,6 @@
 {
   "name": "spy4js",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "Use new Spy() to optimize your tests with helpful debug messages.",
   "main": "dist/spy.js",
   "files": [

@@ -37,6 +37,16 @@ var Symbols = {
     index: (0, _symbol2.default)('__Spy_config__') };
 
 /**
+ * Initial default settings for every
+ * spy instance. Can be modified only
+ * implicitly by "Spy.configure".
+ *
+ * @type {{useOwnEquals: boolean}}
+ */
+var DefaultSettings = {
+    useOwnEquals: true };
+
+/**
  * @ModifiedOnly by viktor.luft@freiheit.com
  *
  * This class is a stand-alone spy-framework.
@@ -87,7 +97,7 @@ var Spy = function () {
         spy[Symbols.isSpy] = true;
         spy[Symbols.func] = function () {};
         spy[Symbols.calls] = [];
-        spy[Symbols.config] = { useOwnEquals: true };
+        spy[Symbols.config] = { useOwnEquals: DefaultSettings.useOwnEquals };
         for (var key in Spy.prototype) {
             if (Spy.prototype instanceof Object && Spy.prototype.hasOwnProperty(key)) {
                 spy[key] = Spy.prototype[key];
@@ -97,7 +107,26 @@ var Spy = function () {
     }
 
     /**
+     * This static method can be used to configure
+     * the default behaviour of created spy instances.
      *
+     * For example,
+     *
+     * Spy.configure({useOwnEquals: false});
+     *
+     * would initially configure every spy to not
+     * favor own "equals" implementation while
+     * comparing any objects.
+     *
+     * @param {Object} config <- Holds the configuration params.
+     */
+    Spy.configure = function configure(config) {
+        if (config.useOwnEquals !== undefined) {
+            DefaultSettings.useOwnEquals = config.useOwnEquals;
+        }
+    };
+
+    /**
      * This static method is an alternative way to
      * create a Spy which mocks the an objects attribute.
      *
@@ -526,26 +555,38 @@ var Spy = function () {
     };
 
     /**
-     * This method returns the first call argument of the
+     * This method returns the m'th call argument of the
      * n'th made call. If less than n calls were made, it will throw
      * an error.
      *
      * By default n = 1. This corresponds to callNr = 0.
+     * By default m = 1. This corresponds to argNr = 0.
      *
      * For example:
      * const spy = new Spy();
      * spy(arg1, arg2, arg3);
-     * spy.getFirstCallArgument() === arg1; // true
+     * spy(arg4, arg5, arg6);
+     * spy.getCallArgument() === arg1; // true
+     * spy.getCallArgument(1) === arg4; // true
+     * spy.getCallArgument(0, 2) === arg3; // true
+     * spy.getCallArgument(1, 1) === arg5; // true
+     *
+     * spy.getCallArgument(1, 5) === undefined; // true
+     * spy.getCallArgument(2); // throws an exception
      *
      * @param {number} callNr -> represents the callNr for which
-     *                           the first call argument should be returned.
+     *                           a call argument should be returned.
+     * @param {number} argNr -> represents position of the argument
+     *                          when the corresponding call was made.
      *
-     * @return {any} -> the first call argument of the (callNr + 1)'th call.
+     * @return {any} -> the (argNr + 1)'th call argument
+     *                  of the (callNr + 1)'th call.
      */
-    Spy.prototype.getFirstCallArgument = function () {
+    Spy.prototype.getCallArgument = function () {
         var callNr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var argNr = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
-        return this.getCallArguments(callNr)[0];
+        return this.getCallArguments(callNr)[argNr];
     };
 
     /**

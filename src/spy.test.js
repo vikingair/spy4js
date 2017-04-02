@@ -202,17 +202,23 @@ describe('Spy - Utils', () => {
 
         equals(spy.getCallArguments(), [testArg1]);
         equals(spy.getCallArguments(0), [testArg1]);
-        equals(spy.getFirstCallArgument(), testArg1);
-        equals(spy.getFirstCallArgument(0), testArg1);
+        equals(spy.getCallArgument(), testArg1);
+        equals(spy.getCallArgument(0), testArg1);
+        equals(spy.getCallArgument(undefined, 1), undefined);
 
         equals(spy.getCallArguments(1), [testArg1, testArg2]);
-        equals(spy.getFirstCallArgument(1), testArg1);
+        equals(spy.getCallArgument(1), testArg1);
+        equals(spy.getCallArgument(1, 1), testArg2);
+        equals(spy.getCallArgument(1, 2), undefined);
 
         equals(spy.getCallArguments(2), [testArg3, testArg2, testArg1]);
-        equals(spy.getFirstCallArgument(2), testArg3);
+        equals(spy.getCallArgument(2), testArg3);
+        equals(spy.getCallArgument(2, 1), testArg2);
+        equals(spy.getCallArgument(2, 2), testArg1);
+        equals(spy.getCallArgument(2, 3), undefined);
 
         equals(spy.getCallArguments(3), [testArg2]);
-        equals(spy.getFirstCallArgument(3), testArg2);
+        equals(spy.getCallArgument(3), testArg2);
     });
 
     it('does return the call count of the Spy correctly', () => {
@@ -399,40 +405,97 @@ describe('Spy - Utils', () => {
         equals(spy('test7'), undefined);
     });
 
+    const TestClass = class {
+        attr:number;
+        constructor(attr:number) { // eslint-disable-line require-jsdoc
+            this.attr = attr;
+        }
+        equals(other:TestClass):boolean { // eslint-disable-line
+            // returning true if both attr are odd or both are even
+            return !((this.attr - other.attr) % 2);
+        }
+    };
+
+    const testInstance1 = new TestClass(2);
+    const testInstance2 = new TestClass(2);
+    const testInstance3 = new TestClass(4);
+    const testInstance4 = new TestClass(5);
+
     it('should use own "equals" implementations as default, ' +
         'but is able to reconfigure this behaviour', () => {
-        const TestClass = class {
-            attr:number;
-            constructor(attr:number) { // eslint-disable-line require-jsdoc
-                this.attr = attr;
-            }
-            equals(other:TestClass):boolean { // eslint-disable-line
-                // returning true if both attr are odd or both are even
-                return !((this.attr - other.attr) % 2);
-            }
-        };
-        const test1 = new TestClass(2);
-        const test2 = new TestClass(2);
-        const test3 = new TestClass(4);
-        const test4 = new TestClass(5);
-
         const spy = new Spy();
 
-        spy(test1);
+        spy(testInstance1);
 
         // default config
-        spy.wasCalledWith(test1);
-        spy.wasCalledWith(test2);
-        spy.wasCalledWith(test3);
-        spy.wasNotCalledWith(test4);
+        spy.wasCalledWith(testInstance1);
+        spy.wasCalledWith(testInstance2);
+        spy.wasCalledWith(testInstance3);
+        spy.wasNotCalledWith(testInstance4);
 
         spy.configure({useOwnEquals: false});
 
         // after configuration
-        spy.wasCalledWith(test1);
-        spy.wasCalledWith(test2);
-        spy.wasNotCalledWith(test3);
-        spy.wasNotCalledWith(test4);
+        spy.wasCalledWith(testInstance1);
+        spy.wasCalledWith(testInstance2);
+        spy.wasNotCalledWith(testInstance3);
+        spy.wasNotCalledWith(testInstance4);
+    });
+
+    it('does override the default behaviour for the use of' +
+        'own "equals" implementations. ', () => {
+        const testObj1 = {func1: () => {}};
+        const testObj2 = {func2: () => {}};
+        const testObj3 = {func3: () => {}};
+        // still the initial default config
+        const defaultSpy1 = new Spy('defaultSpy1');
+        // using configure without the "useOwnEquals"-config
+        // does not effect the behaviour
+        Spy.configure({});
+        const defaultSpy2 = Spy.on(testObj1, 'func1');
+
+        // make the new configuration for all spies
+        Spy.configure({useOwnEquals: false});
+        const configuredSpy1 = new Spy('configuredSpy1');
+        const configuredSpy2 = Spy.on(testObj2, 'func2');
+
+        // configure it back to the initial config
+        Spy.configure({useOwnEquals: true});
+        const reconfiguredSpy1 = new Spy('reconfiguredSpy1');
+        const reconfiguredSpy2 = Spy.on(testObj3, 'func3');
+
+        // call all spies with the same object
+        defaultSpy1(testInstance1);
+        testObj1.func1(testInstance1);
+        configuredSpy1(testInstance1);
+        testObj2.func2(testInstance1);
+        reconfiguredSpy1(testInstance1);
+        testObj3.func3(testInstance1);
+
+        const wasCalledChecksForOwnEquals = (spy:Spy) => {
+            // default config
+            spy.wasCalledWith(testInstance1);
+            spy.wasCalledWith(testInstance2);
+            spy.wasCalledWith(testInstance3);
+            spy.wasNotCalledWith(testInstance4);
+        };
+
+        const wasCalledChecksForNotOwnEquals = (spy:Spy) => {
+            // after configuration
+            spy.wasCalledWith(testInstance1);
+            spy.wasCalledWith(testInstance2);
+            spy.wasNotCalledWith(testInstance3);
+            spy.wasNotCalledWith(testInstance4);
+        };
+
+        wasCalledChecksForOwnEquals(defaultSpy1);
+        wasCalledChecksForOwnEquals(defaultSpy2);
+
+        wasCalledChecksForNotOwnEquals(configuredSpy1);
+        wasCalledChecksForNotOwnEquals(configuredSpy2);
+
+        wasCalledChecksForOwnEquals(reconfiguredSpy1);
+        wasCalledChecksForOwnEquals(reconfiguredSpy2);
     });
 
     it('does not allow direct access to the internal ' +
@@ -454,7 +517,7 @@ describe('Spy - Utils', () => {
             'wasCalledWith',
             'wasNotCalledWith',
             'getCallArguments',
-            'getFirstCallArgument',
+            'getCallArgument',
             'getCallCount',
             'showCallArguments'];
 

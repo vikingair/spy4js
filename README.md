@@ -55,9 +55,15 @@ const someObject = new Date(2017, 1, 15);
 const [spy4, spy5, spy6] = Spy.onMany(someObject, 'toJSON', 'toString', 'getDate');
 ```
 
+Any spy instance can be configured by overriding the default configuration. For
+example if you want to configure all spies not to favor own "equals" implementations.
+```js
+Spy.configure({useOwnEquals: false});
+```
+
 You may apply additional behaviour to every spy. The valid operations here are:
     
-  - `configure` (some external librarys may use own "equals" implementations in an unexpected way)
+  - `configure` (some external libraries may use own "equals" implementations in an unexpected way)
   - `calls` (does make the spy call the provided functions sequentially)
   - `returns` (does make the spy return the provided params sequentially)
   - `throws` (does make the spy throw an error when called)
@@ -155,7 +161,7 @@ And also sometimes it is necessary to have access to some of the call arguments 
 which the spy was called.
 
   - `getCallArguments` (returns all call arguments for a specified call in an array)
-  - `getFirstCallArgument` (same as getCallArguments, but returns only the first element of the array)
+  - `getCallArgument` (same as getCallArguments, but returns only a single element of the array)
   - `getCallCount` (returns the number of made calls)
     
 ```js
@@ -168,19 +174,20 @@ spy();
 spy(null);
 
 spy.getCallArguments(/* default = 0 */);     // returns ['string', 1]
-spy.getFirstCallArgument(/* default = 0 */); // returns 'string'
+spy.getCallArgument(/* defaults = (0, 0) */); // returns 'string'
+spy.getCallArgument(0, 1); // returns 1
 
 spy.getCallArguments(1);                     // returns [[1, 2, 3]]
-spy.getFirstCallArgument(1);                 // returns [1, 2, 3]
+spy.getCallArgument(1);                 // returns [1, 2, 3]
 
 spy.getCallArguments(2);                     // returns []
-spy.getFirstCallArgument(2);                 // returns undefined
+spy.getCallArgument(2);                 // returns undefined
 
 spy.getCallArguments(3);                     // returns [null]
-spy.getFirstCallArgument(3);                 // returns null
+spy.getCallArgument(3);                 // returns null
 
 spy.getCallArguments(4);                     // throws Exception because less calls were made
-spy.getFirstCallArgument(4);                 // throws same Exception
+spy.getCallArgument(4);                 // throws same Exception
 ```
 
 The last method is `showCallArguments`. It is mostly used internally to improve the
@@ -193,6 +200,14 @@ debug messages, but can be while you are in a console.log-mania.
 Spy(spyName:string = 'the spy') => Spy
 ```
 The returned Spy instance has his own name-attribute (only) for debugging purpose.
+
+### configure (static)
+```
+Spy.configure(config:{useOwnEquals?:boolean}) => void
+```
+Using this function you may edit the default behaviour of every spy instance. The only
+configuration possibility for now is "useOwnEquals". See [configure](#configure) for more
+details.
 
 ### on (static)
 ```
@@ -331,13 +346,15 @@ spy.getCallArguments(callNr:number = 0) => Array<any>
 Returns the call arguments that were registered on the given call. Meaning
 `spy.getCallArguments(num)` does return the (num + 1)'th call arguments.
 
+Throws an exception if the provided (`callNr` - 1) is bigger than the made calls.
 
-### getFirstCallArgument
+### getCallArgument
 ```
-spy.getFirstCallArgument(callNr:number = 0) => any
+spy.getCallArgument(callNr:number = 0, argNr:number = 0) => any
 ```
-Same as [getCallArguments](#getcallarguments) but returns the only the first entry out
+Same as [getCallArguments](#getcallarguments) but returns only a single entry out
 of the array of arguments. Most useful in situations where exactly one call param is expected.
+If `argNr` is given, it returns the (argNr + 1)'th argument of the call.
 
 ### getCallCount
 ```
@@ -404,6 +421,10 @@ const differentNumber = callArgs[2]['attr2'];
 
 ## Changes
 
+* **1.1.0:**
+  * Implemented `getCallArgument` as extension of `getFirstCallArgument`.
+  * Removed `getFirstCallArgument`.
+  * Added global configuration possibility on Spy.
 * **1.0.7:**
   * Removed expect-dev-dependency.
   * Added `getCallCount`.
