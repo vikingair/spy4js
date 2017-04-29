@@ -421,6 +421,8 @@ const differentNumber = callArgs[2]['attr2'];
 
 ## Changes
 
+* **1.1.1**
+  * Connected Coverage-Reporter and restructured files.
 * **1.1.0:**
   * Implemented `getCallArgument` as extension of `getFirstCallArgument`.
   * Removed `getFirstCallArgument`.
