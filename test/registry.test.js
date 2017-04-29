@@ -2,9 +2,9 @@
  * @flow
  */
 
-import {equals, throws} from './test-utils/test.utils';
-import {SpyRegistry} from './registry';
-import {objectKeys} from './utils';
+import {equals, throws} from '../util/facts';
+import {SpyRegistry} from '../src/registry';
+import {objectKeys} from '../src/utils';
 
 /**
  * The tests are written not method specific.

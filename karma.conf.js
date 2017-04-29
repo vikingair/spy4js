@@ -1,17 +1,22 @@
 module.exports = function(config) {
     config.set({
-        browsers: ['Chrome'],
+        browsers: ['PhantomJS'],
         frameworks: ['browserify', 'mocha'],
+        reporters: ['progress', 'coverage'],
         plugins: [
-            require('karma-browserify'),
-            require('karma-babel-preprocessor'),
-            require('karma-chrome-launcher'),
-            require('karma-mocha')],
-        files: [
-            'src/**/*.js'],
+            'karma-browserify',
+            'karma-babel-preprocessor',
+            'karma-chrome-launcher',
+            'karma-coverage',
+            'karma-phantomjs-launcher',
+            'karma-mocha'],
+        files: ['src/**/*.js', 'util/**/*.js', 'test/**/*.js'],
         preprocessors: {
-            'src/**/*.js': ['babel', 'browserify']},
+            'test/**/*.js': ['babel', 'browserify'],
+            'src/**/*.js': ['babel', 'browserify', 'coverage'],
+            'util/**/*.js': ['babel', 'browserify', 'coverage']},
         browserify: {
             debug: true,
-            transform: ['babelify']}});
+            transform: ['babelify']}
+    });
 };

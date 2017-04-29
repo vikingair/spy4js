@@ -21,6 +21,14 @@ gulp.task('dist', (cb) => {
         cb);
 });
 
+gulp.task('check', (cb) => {
+    return runSequence(
+        'flow-check',
+        'eslint-check',
+        'test',
+        cb);
+});
+
 gulp.task('clean', () => {
     return gulp.src(dist, {read: false})
                .pipe(clean());
@@ -30,7 +38,8 @@ gulp.task('test', (cb) => {
     const KarmaServer = require('karma').Server;
     new KarmaServer({
         configFile: __dirname + '/karma.conf.js',
-        singleRun: true
+        singleRun: true,
+        reporters: []
     }).start();
     cb();
 });

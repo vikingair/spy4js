@@ -2,8 +2,8 @@
  * @flow
  */
 
-import {equals, throws} from './test-utils/test.utils';
-import {Spy} from './spy';
+import {equals, throws} from '../util/facts';
+import {Spy} from '../src/spy';
 
 describe('Spy - Utils', () => {
     afterEach(Spy.restoreAll);
@@ -521,8 +521,14 @@ describe('Spy - Utils', () => {
             'getCallCount',
             'showCallArguments'];
 
-        for (let prop in spy) {
-            if (!allowedProps.includes(prop)) {
+        for (let prop in spy) { // eslint-disable-line
+            let propUnknown = true;
+            for (let i = 0; i < allowedProps.length; i++) {
+                if (prop === allowedProps[i]) {
+                    propUnknown = false;
+                }
+            }
+            if (propUnknown) {
                 throw new Error('Received not allowed prop: ' + prop);
             }
         }

@@ -2,7 +2,7 @@
  * @flow
  */
 
-import {differenceOf} from './utils';
+import {differenceOf} from '../src/utils';
 
 // I am comparing here with those basic comparators,
 // because I want to decouple my testing from any external

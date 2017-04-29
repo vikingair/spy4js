@@ -2,8 +2,8 @@
  * @flow
  */
 
-import {differenceOf} from '../utils';
-import {equals, throws} from './test.utils';
+import {differenceOf} from '../src/utils';
+import {equals, throws} from '../util/facts';
 
 describe('Test-Utils', () => {
     it('does throw no exception if an exception' +
