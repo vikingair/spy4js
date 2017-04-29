@@ -6,6 +6,31 @@ Object.defineProperty(exports, "__esModule", {
 
 
 /**
+ * This function takes a handler as second argument to process
+ * all key-value-pairs of the given object through this handler.
+ *
+ * For example:
+ *
+ * forEach({attr1: 'str1', attr2: 123}, (k, v) => {
+ *      console.log(k + 'has value: ' + v);
+ * });
+ *
+ * @param {Array<any>|Object} arrOrObj <- Array or Object to iterate.
+ *                                      (Flow does not want to iterate
+ *                                      over arrays with for-in, so we
+ *                                      have to write here any.)
+ * @param {Function} handler <- Handler function to process all values.
+ *
+ */
+var forEach = function forEach(arrOrObj, handler) {
+    for (var key in arrOrObj) {
+        if (arrOrObj.hasOwnProperty(key)) {
+            handler(key, arrOrObj[key]);
+        }
+    }
+};
+
+/**
  * This function returns all own keys for the given
  * object or array as array.
  *
@@ -24,11 +49,9 @@ Object.defineProperty(exports, "__esModule", {
  */
 var objectKeys = function objectKeys(arrOrObj) {
     var keys = [];
-    for (var key in arrOrObj) {
-        if (arrOrObj.hasOwnProperty(key)) {
-            keys.push(key);
-        }
-    }
+    forEach(arrOrObj, function (key) {
+        return keys.push(key);
+    });
     return keys;
 };
 
@@ -155,4 +178,5 @@ var differenceOf = function differenceOf(a, b) {
 };
 
 exports.differenceOf = differenceOf;
+exports.forEach = forEach;
 exports.objectKeys = objectKeys;

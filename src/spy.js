@@ -2,7 +2,7 @@
  * @flow
  */
 
-import {differenceOf} from './utils';
+import {differenceOf, forEach} from './utils';
 import {SpyRegistry} from './registry';
 
 /**
@@ -79,12 +79,9 @@ const Spy = (function() {
         spy[Symbols.func] = () => {};
         spy[Symbols.calls] = [];
         spy[Symbols.config] = {useOwnEquals: DefaultSettings.useOwnEquals};
-        for (let key in Spy.prototype) {
-            if (Spy.prototype instanceof Object &&
-                Spy.prototype.hasOwnProperty(key)) {
-                spy[key] = Spy.prototype[key];
-            }
-        }
+        forEach(Spy.prototype, (key, value) => {
+            spy[key] = value;
+        });
         return spy;
     }
 

@@ -3,6 +3,31 @@
  */
 
 /**
+ * This function takes a handler as second argument to process
+ * all key-value-pairs of the given object through this handler.
+ *
+ * For example:
+ *
+ * forEach({attr1: 'str1', attr2: 123}, (k, v) => {
+ *      console.log(k + 'has value: ' + v);
+ * });
+ *
+ * @param {Array<any>|Object} arrOrObj <- Array or Object to iterate.
+ *                                      (Flow does not want to iterate
+ *                                      over arrays with for-in, so we
+ *                                      have to write here any.)
+ * @param {Function} handler <- Handler function to process all values.
+ *
+ */
+const forEach = (arrOrObj:any, handler:(string, any) => any):void => {
+    for (let key in arrOrObj) {
+        if (arrOrObj.hasOwnProperty(key)) {
+            handler(key, arrOrObj[key]);
+        }
+    }
+};
+
+/**
  * This function returns all own keys for the given
  * object or array as array.
  *
@@ -21,11 +46,7 @@
  */
 const objectKeys = (arrOrObj:any):Array<string> => {
     const keys = [];
-    for (let key in arrOrObj) {
-        if (arrOrObj.hasOwnProperty(key)) {
-            keys.push(key);
-        }
-    }
+    forEach(arrOrObj, (key:string) => keys.push(key));
     return keys;
 };
 
@@ -161,4 +182,4 @@ const differenceOf = (
     return __diff(a, b, true, config.useOwnEquals);
 };
 
-export {differenceOf, objectKeys};
+export {differenceOf, forEach, objectKeys};

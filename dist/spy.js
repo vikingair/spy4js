@@ -98,11 +98,9 @@ var Spy = function () {
         spy[Symbols.func] = function () {};
         spy[Symbols.calls] = [];
         spy[Symbols.config] = { useOwnEquals: DefaultSettings.useOwnEquals };
-        for (var key in Spy.prototype) {
-            if (Spy.prototype instanceof Object && Spy.prototype.hasOwnProperty(key)) {
-                spy[key] = Spy.prototype[key];
-            }
-        }
+        (0, _utils.forEach)(Spy.prototype, function (key, value) {
+            spy[key] = value;
+        });
         return spy;
     }
 

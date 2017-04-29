@@ -3,7 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.SpyRegistry = undefined;
 
+var _utils = require('./utils');
 
 /**
  * @ModifiedOnly by viktor.luft@freiheit.com
@@ -18,7 +20,7 @@ Object.defineProperty(exports, "__esModule", {
  * for spied objects.
  *
  */
-var SpyRegistry = exports.SpyRegistry = function () {
+var SpyRegistry = function () {
     /**
      * @constructor
      */
@@ -38,18 +40,15 @@ var SpyRegistry = exports.SpyRegistry = function () {
      * to their individual previous state.
      */
     SpyRegistry.prototype.restoreAll = function () {
-        for (var key in this.register) {
-            if (this.register.hasOwnProperty(key)) {
-                var _register$key = this.register[key],
-                    obj = _register$key.obj,
-                    method = _register$key.method,
-                    methodName = _register$key.methodName;
+        (0, _utils.forEach)(this.register, function (ignored, value) {
+            var obj = value.obj,
+                method = value.method,
+                methodName = value.methodName;
 
-                if (obj) {
-                    obj[methodName] = method;
-                }
+            if (obj) {
+                obj[methodName] = method;
             }
-        }
+        });
         this.register = {};
     };
 
@@ -129,3 +128,5 @@ var SpyRegistry = exports.SpyRegistry = function () {
 
     return SpyRegistry;
 }();
+
+exports.SpyRegistry = SpyRegistry;

@@ -2,6 +2,8 @@
  * @flow
  */
 
+import {forEach} from './utils';
+
 /**
  * @ModifiedOnly by viktor.luft@freiheit.com
  *
@@ -15,7 +17,7 @@
  * for spied objects.
  *
  */
-export const SpyRegistry = (function() {
+const SpyRegistry = (function() {
     /**
      * @constructor
      */
@@ -36,14 +38,12 @@ export const SpyRegistry = (function() {
      * to their individual previous state.
      */
     SpyRegistry.prototype.restoreAll = function():void {
-        for (let key in this.register) {
-            if (this.register.hasOwnProperty(key)) {
-                const {obj, method, methodName} = this.register[key];
-                if (obj) {
-                    obj[methodName] = method;
-                }
+        forEach(this.register, (ignored, value) => {
+            const {obj, method, methodName} = value;
+            if (obj) {
+                obj[methodName] = method;
             }
-        }
+        });
         this.register = {};
     };
 
@@ -127,3 +127,5 @@ export const SpyRegistry = (function() {
 
     return SpyRegistry;
 })();
+
+export {SpyRegistry};

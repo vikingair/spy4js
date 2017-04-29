@@ -2,7 +2,8 @@
  * @flow
  */
 
-import {differenceOf} from '../src/utils';
+import {differenceOf, forEach} from '../src/utils';
+import {equals} from '../util/facts';
 
 // I am comparing here with those basic comparators,
 // because I want to decouple my testing from any external
@@ -22,6 +23,32 @@ const isNot = (p1:any, p2:any) : void => {
 };
 
 describe('Spy - Equality', () => {
+    it('foreach iterates over arrays', () => {
+        const results = [];
+        forEach([123, 'someString', {attr: 456}],
+            (key, value) => results.push([key, value]));
+        equals(results.length, 3);
+        equals(results[0], ['0', 123]);
+        equals(results[1], ['1', 'someString']);
+        equals(results[2], ['2', {attr: 456}]);
+    });
+
+    it('foreach iterates over objects', () => {
+        const results = [];
+        forEach({attr1: 'someString', attr2: 123},
+            (key, value) => results.push([key, value]));
+        equals(results.length, 2);
+        equals(results[0], ['attr1', 'someString']);
+        equals(results[1], ['attr2', 123]);
+    });
+
+    it('foreach ignores not own properties on objects', () => {
+        const results = [];
+        forEach({attr1: 'someString', attr2: 123, hasOwnProperty: () => false},
+            (key, value) => results.push([key, value]));
+        equals(results.length, 0);
+    });
+
     it('should make an equality check for classes correctly', () => {
         const TestClass = class {
             attr1:string;
@@ -58,6 +85,8 @@ describe('Spy - Equality', () => {
         is(differenceOf(undefined, undefined), undefined);
         is(differenceOf(null, 'test2'), 'null or undefined did not match');
         is(differenceOf(undefined, null), 'null or undefined did not match');
+        // different types
+        is(differenceOf('test', 123), 'different object types');
         // string
         is(differenceOf('test', 'test'), undefined);
         is(differenceOf('test1', 'test2'), 'different string');

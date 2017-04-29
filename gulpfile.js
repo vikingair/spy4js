@@ -39,7 +39,7 @@ gulp.task('test', (cb) => {
     new KarmaServer({
         configFile: __dirname + '/karma.conf.js',
         singleRun: true,
-        reporters: []
+        reporters: ['progress']
     }).start();
     cb();
 });
