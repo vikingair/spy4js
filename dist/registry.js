@@ -7,6 +7,16 @@ exports.SpyRegistry = undefined;
 
 var _utils = require('./utils');
 
+var restoreAttributeForEntry = function restoreAttributeForEntry(value) {
+    var obj = value.obj,
+        method = value.method,
+        methodName = value.methodName;
+
+    if (obj) {
+        obj[methodName] = method;
+    }
+};
+
 /**
  * @ModifiedOnly by viktor.luft@freiheit.com
  *
@@ -20,6 +30,8 @@ var _utils = require('./utils');
  * for spied objects.
  *
  */
+
+
 var SpyRegistry = function () {
     /**
      * @constructor
@@ -40,14 +52,8 @@ var SpyRegistry = function () {
      * to their individual previous state.
      */
     SpyRegistry.prototype.restoreAll = function () {
-        (0, _utils.forEach)(this.register, function (ignored, value) {
-            var obj = value.obj,
-                method = value.method,
-                methodName = value.methodName;
-
-            if (obj) {
-                obj[methodName] = method;
-            }
+        (0, _utils.forEach)(this.register, function (ignored, entry) {
+            restoreAttributeForEntry(entry);
         });
         this.register = {};
     };
@@ -65,13 +71,7 @@ var SpyRegistry = function () {
     SpyRegistry.prototype.restore = function (index) {
         var entry = this.register[index];
         if (entry) {
-            var obj = entry.obj,
-                method = entry.method,
-                methodName = entry.methodName;
-
-            if (obj) {
-                obj[methodName] = method;
-            }
+            restoreAttributeForEntry(entry);
             delete this.register[index];
         }
     };

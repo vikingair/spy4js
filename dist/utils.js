@@ -23,9 +23,9 @@ Object.defineProperty(exports, "__esModule", {
  *
  */
 var forEach = function forEach(arrOrObj, handler) {
-    for (var key in arrOrObj) {
-        if (arrOrObj.hasOwnProperty(key)) {
-            handler(key, arrOrObj[key]);
+    for (var _key in arrOrObj) {
+        if (arrOrObj.hasOwnProperty(_key)) {
+            handler(_key, arrOrObj[_key]);
         }
     }
 };
@@ -129,10 +129,10 @@ var __diff = function __diff(a, b, initial, useOwnEquals) {
     }
     alreadyComparedArray.push(a);
     for (var i = 0; i < aKeys.length; i++) {
-        var key = aKeys[i];
-        var diffStr = __diff(a[key], b[key], false, useOwnEquals, alreadyComparedArray);
+        var _key2 = aKeys[i];
+        var diffStr = __diff(a[_key2], b[_key2], false, useOwnEquals, alreadyComparedArray);
         if (diffStr !== undefined) {
-            return (initial ? '--> ' + key : '' + key) + ' / ' + diffStr;
+            return (initial ? '--> ' + _key2 : '' + _key2) + ' / ' + diffStr;
         }
     }
 };

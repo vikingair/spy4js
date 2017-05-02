@@ -425,6 +425,9 @@ const differentNumber = callArgs[2]['attr2'];
 
 ## Changes
 
+* **1.1.4**
+  * Lifted Code-Coverage to 100 %.
+  * Fixed a flow compatibility issue.
 * **1.1.2**
   * Connected travis.ci and improved code coverage slightly.
 * **1.1.1**

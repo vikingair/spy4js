@@ -417,7 +417,7 @@ describe('Spy - Utils', () => {
         const testObject = {someFunc: () => {
             throw new Error('never call this func directly');
         }};
-        const spy = Spy.on(testObject, 'someFunc').transparentAfter(3);
+        const spy:any = Spy.on(testObject, 'someFunc').transparentAfter(3);
         testObject.someFunc('test1', 42);
         testObject.someFunc();
         testObject.someFunc();
