@@ -1,5 +1,6 @@
- 
-# spy4js [![npm package][npm-badge]][npm] [![Travis][build-badge]][build]
+[![npm package][npm-badge]][npm] [![Travis][build-badge]][build]
+
+# spy4js
 
 [build-badge]: https://img.shields.io/travis/fdc-viktor-luft/spy4js/master.svg?style=flat-square
 [build]: https://travis-ci.org/fdc-viktor-luft/spy4js
@@ -449,3 +450,4 @@ const differentNumber = callArgs[2]['attr2'];
 * *After*-methods for `calls`, `returns` and `throws`.
 * Update of Dev-dependencies.
 * Upgrade of Dev-environment.
+* Upgrade flow but make also compatibility checks for older versions of flow.

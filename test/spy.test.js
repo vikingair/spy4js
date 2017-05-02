@@ -2,14 +2,14 @@
  * @flow
  */
 
-import {equals, throws} from '../util/facts';
+import {equals, equalsNot, throws} from '../util/facts';
 import {Spy} from '../src/spy';
 
 describe('Spy - Utils', () => {
     afterEach(Spy.restoreAll);
 
     it('should not allow to use the constructor of the Spy without new', () => {
-        throws(Spy);
+        throws(Spy, {partOfMessage: 'only with "new" keyword'});
     });
 
     it('should call the Spy and record the call arguments', () => {
@@ -19,6 +19,13 @@ describe('Spy - Utils', () => {
         equals(spy.getCallArguments(), [9, 'test', someDate]);
         // and more general
         spy.wasCalledWith(9, 'test', someDate);
+    });
+
+    it('throws an exception that the spy was never called if not called' +
+        ' when wasCalledWith or wasCalled gets called', () => {
+        const spy = new Spy();
+        throws(() => spy.wasCalled(), {partOfMessage: 'was never called!'});
+        throws(() => spy.wasCalledWith(), {partOfMessage: 'was never called!'});
     });
 
     it('should place the Spy on an object and ' +
@@ -42,19 +49,26 @@ describe('Spy - Utils', () => {
             attrNull: null,
             attrDate: new Date(),
             attrObject: {}};
-        throws(() => Spy.on(testObject, 'attrString'));
-        throws(() => Spy.on(testObject, 'attrNumber'));
-        throws(() => Spy.on(testObject, 'attrNull'));
-        throws(() => Spy.on(testObject, 'attrDate'));
-        throws(() => Spy.on(testObject, 'attrObject'));
-        throws(() => Spy.on(testObject, 'attrUnknown'));
+        throws(() => Spy.on(testObject, 'attrString'),
+            {partOfMessage: 'only spy on functions!'});
+        throws(() => Spy.on(testObject, 'attrNumber'),
+            {partOfMessage: 'only spy on functions!'});
+        throws(() => Spy.on(testObject, 'attrNull'),
+            {partOfMessage: 'only spy on functions!'});
+        throws(() => Spy.on(testObject, 'attrDate'),
+            {partOfMessage: 'only spy on functions!'});
+        throws(() => Spy.on(testObject, 'attrObject'),
+            {partOfMessage: 'only spy on functions!'});
+        throws(() => Spy.on(testObject, 'attrUnknown'),
+            {partOfMessage: 'only spy on functions!'});
     });
 
     it('should throw if trying to spy on already spied attributes.', () => {
         const testObject = {attr: () => {}};
         const firstSpy = Spy.on(testObject, 'attr');
         // spying again does throw now
-        throws(() => Spy.on(testObject, 'attr'));
+        throws(() => Spy.on(testObject, 'attr'),
+            {partOfMessage: 'was already spied'});
         // after restoring the spy, we can spy there again
         firstSpy.restore();
         Spy.on(testObject, 'attr');
@@ -84,6 +98,13 @@ describe('Spy - Utils', () => {
         // if this would get spied, the test callback
         // would never be called which would make the test fail
         testObject.func3();
+    });
+
+    it('throws an exception if getCallArguments gets called with float', () => {
+        const spy = new Spy();
+        spy(123);
+        throws(() => spy.getCallArguments(0.5),
+            {partOfMessage: 'callNr "0.5" was not valid'});
     });
 
     it('should restore all Spies', (cb) => {
@@ -160,7 +181,8 @@ describe('Spy - Utils', () => {
         spy.wasNotCalled();
         spy({_key: 'test'});
         spy.wasCalledWith({_key: 'test'});
-        throws(spy.wasNotCalled);
+        throws(() => spy.wasNotCalled(),
+            {partOfMessage: 'was not considered to be called'});
     });
 
     it('should inspect calls for given arguments of the Spy correctly', () => {
@@ -172,6 +194,7 @@ describe('Spy - Utils', () => {
         spy(testArg1, testArg2);
         spy(testArg3, testArg2, testArg1);
         spy(testArg2);
+        spy.wasCalled();
         throws(() => spy.wasCalled(2));
         spy.wasCalled(4);
         spy.wasCalledWith(testArg1);
@@ -242,9 +265,14 @@ describe('Spy - Utils', () => {
         spy({_key: 'myTestArguments'});
         spy({_key: 'someOtherArguments'}, 42);
         const displayString = spy.showCallArguments();
-        throws(() => equals(displayString.indexOf('myTestArguments'), -1));
-        throws(() => equals(displayString.indexOf('someOtherArguments'), -1));
-        throws(() => equals(displayString.indexOf('42'), -1));
+        equalsNot(displayString.indexOf('myTestArguments'), -1);
+        equalsNot(displayString.indexOf('someOtherArguments'), -1);
+        equalsNot(displayString.indexOf('42'), -1);
+    });
+
+    it('shows that the spy was not called if this is the fact', () => {
+        const spy = new Spy();
+        equals(spy.showCallArguments(), 'the spy was never called!\n');
     });
 
     it('should return undefined if no return value is supplied', () => {
@@ -289,9 +317,10 @@ describe('Spy - Utils', () => {
 
     it('should throw if requested and called', () => {
         const spy = new Spy().throws('errorMessage');
-        throws(() => spy({_key: 'callParams1'}), 'errorMessage');
+        throws(() => spy({_key: 'callParams1'}), {message: 'errorMessage'});
         spy.throws(null);
-        throws(() => spy({_key: 'callParams2'}));
+        throws(() => spy({_key: 'callParams2'},
+            {partOfMessage: 'was requested to throw'}));
     });
 
     it('should reset the call arguments on an object' +
@@ -358,7 +387,8 @@ describe('Spy - Utils', () => {
             throw new Error('never call this func directly');
         }};
         const spy = Spy.on(testObject, 'someFunc').transparent();
-        throws(() => testObject.someFunc('test', 6));
+        throws(() => testObject.someFunc('test', 6),
+            {message: 'never call this func directly'});
         spy.wasCalledWith('test', 6);
     });
 
@@ -371,8 +401,10 @@ describe('Spy - Utils', () => {
                        .returns(12, 13).transparentAfter(2);
         equals(testObject.someFunc('test1', 42), 12);
         equals(testObject.someFunc('test2'), 13);
-        throws(() => testObject.someFunc('test3', {testProp: 'test'}));
-        throws(() => testObject.someFunc('test4'));
+        throws(() => testObject.someFunc('test3', {testProp: 'test'}),
+            {message: 'never call this func directly'});
+        throws(() => testObject.someFunc('test4'),
+            {message: 'never call this func directly'});
 
         spy.wasCalled(4);
         spy.wasCalledWith('test1', 42);
@@ -385,22 +417,27 @@ describe('Spy - Utils', () => {
         const testObject = {someFunc: () => {
             throw new Error('never call this func directly');
         }};
-        const spy:any = Spy.on(testObject, 'someFunc').transparentAfter(3);
+        const spy = Spy.on(testObject, 'someFunc').transparentAfter(3);
         testObject.someFunc('test1', 42);
         testObject.someFunc();
         testObject.someFunc();
-        throws(() => testObject.someFunc('test4'));
-        throws(() => testObject.someFunc('test5'));
-
-        spy.restore();
-
-        throws(() => testObject.someFunc('test6'));
+        throws(() => testObject.someFunc('test4'),
+            {message: 'never call this func directly'});
+        throws(() => testObject.someFunc('test5'),
+            {message: 'never call this func directly'});
 
         spy.wasCalled(5);
         spy.wasCalledWith('test1', 42);
         spy.wasCalledWith('test4');
         spy.wasCalledWith('test5');
         spy.wasNotCalledWith('test6');
+
+        spy.restore();
+
+        throws(() => testObject.someFunc('test6'),
+            {message: 'never call this func directly'});
+
+        spy.wasCalled(5);
 
         equals(spy('test7'), undefined);
     });
@@ -537,15 +574,18 @@ describe('Spy - Utils', () => {
     it('does not allow to configure not mocking spies to be persistent', () => {
         const spy = new Spy('spy that does not mock any object');
 
-        throws(() => spy.configure({persistent: true}));
-        throws(() => spy.configure({persistent: false}));
+        throws(() => spy.configure({persistent: true}),
+            {partOfMessage: 'does not mock any object'});
+        throws(() => spy.configure({persistent: false}),
+            {partOfMessage: 'does not mock any object'});
     });
 
     it('does not allow to restore persistent spies', () => {
         const testObj = {myFunc: () => 'originalFunc'};
         const spy = Spy.on(testObj, 'myFunc').configure({persistent: true});
 
-        throws(spy.restore);
+        throws(() => spy.restore(),
+            {partOfMessage: 'was configured to be persistent'});
 
         spy.configure({persistent: false});
         equals(testObj.myFunc(), undefined);

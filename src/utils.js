@@ -19,7 +19,7 @@
  * @param {Function} handler <- Handler function to process all values.
  *
  */
-const forEach = (arrOrObj:any, handler:(string, any) => any):void => {
+const forEach = (arrOrObj:any, handler:(key:string, value:any) => any):void => {
     for (let key in arrOrObj) {
         if (arrOrObj.hasOwnProperty(key)) {
             handler(key, arrOrObj[key]);

@@ -14,7 +14,7 @@ import {objectKeys} from '../src/utils';
  */
 describe('Spy - Utils', () => {
     it('should not allow to use the constructor of the Spy without new', () => {
-        throws(SpyRegistry);
+        throws(SpyRegistry, {partOfMessage: 'only with "new" keyword'});
     });
 
     it('should register an arbitrary object attribute correctly', () => {
@@ -28,6 +28,30 @@ describe('Spy - Utils', () => {
         equals(reg.register[1].obj, testObject);
         equals(reg.register[1].method, testObject.attr1);
         equals(reg.register[1].methodName, 'attr1');
+    });
+
+    it('does nothing on restore for not existing key', () => {
+        const testObject = {func: () => {}};
+        const expectedRegisterEntry = {
+            obj: testObject,
+            method: testObject.func,
+            methodName: 'func'};
+
+        const reg:any = new SpyRegistry();
+
+        const key = reg.push(testObject, 'func');
+        equals(reg.register, {[key]: expectedRegisterEntry});
+
+        reg.restore(123);
+        equals(reg.register, {[key]: expectedRegisterEntry});
+    });
+
+    it('does only delete the register entry on restore if stored' +
+        ' object has invalid structure', () => {
+        const reg:any = new SpyRegistry();
+        reg.register[1] = {noObjKey: 'here'};
+        reg.restore(1);
+        equals(reg.register, {});
     });
 
     it('should be able to restore a registered object', () => {
@@ -147,5 +171,17 @@ describe('Spy - Utils', () => {
 
         equals(objectKeys(reg.register).length, 0);
         equals(objectKeys(reg.persReg).length, 0);
+    });
+
+    it('does nothing on persist for not existing key', () => {
+        const testObject = {func: () => {}};
+
+        const reg:any = new SpyRegistry();
+
+        const key = reg.push(testObject, 'func');
+        equals(reg.register[key].obj, testObject);
+
+        reg.persist(123, true);
+        equals(reg.register[key].obj, testObject);
     });
 });

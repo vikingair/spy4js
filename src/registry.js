@@ -4,6 +4,13 @@
 
 import {forEach} from './utils';
 
+const restoreAttributeForEntry = (value:Object):void => {
+    const {obj, method, methodName} = value;
+    if (obj) {
+        obj[methodName] = method;
+    }
+};
+
 /**
  * @ModifiedOnly by viktor.luft@freiheit.com
  *
@@ -38,11 +45,8 @@ const SpyRegistry = (function() {
      * to their individual previous state.
      */
     SpyRegistry.prototype.restoreAll = function():void {
-        forEach(this.register, (ignored, value) => {
-            const {obj, method, methodName} = value;
-            if (obj) {
-                obj[methodName] = method;
-            }
+        forEach(this.register, (ignored, entry) => {
+            restoreAttributeForEntry(entry);
         });
         this.register = {};
     };
@@ -60,10 +64,7 @@ const SpyRegistry = (function() {
     SpyRegistry.prototype.restore = function(index:number):void {
         const entry = this.register[index];
         if (entry) {
-            const {obj, method, methodName} = entry;
-            if (obj) {
-                obj[methodName] = method;
-            }
+            restoreAttributeForEntry(entry);
             delete this.register[index];
         }
     };

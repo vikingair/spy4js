@@ -3,7 +3,7 @@
  */
 
 import {differenceOf} from '../src/utils';
-import {equals, throws} from '../util/facts';
+import {equals, equalsNot, throws} from '../util/facts';
 
 describe('Test-Utils', () => {
     it('does throw no exception if an exception' +
@@ -19,7 +19,15 @@ describe('Test-Utils', () => {
         const throwingFunc = () => {
             throw new Error('here it comes');
         };
-        throws(throwingFunc, 'here it comes');
+        throws(throwingFunc, {message: 'here it comes'});
+    });
+
+    it('does throw no exception if an exception' +
+        'with correct message part will be thrown in "throws"', () => {
+        const throwingFunc = () => {
+            throw new Error('here it comes');
+        };
+        throws(throwingFunc, {partOfMessage: 'comes'});
     });
 
     it('does throw an exception if an exception' +
@@ -38,7 +46,19 @@ describe('Test-Utils', () => {
             throw new Error('here it comes');
         };
         try {
-            throws(throwingFunc, 'what does come?');
+            throws(throwingFunc, {message: 'what does come?'});
+        } catch (expectedException) {
+            done();
+        }
+    });
+
+    it('does throw an exception if an exception' +
+        'without message part will be thrown in "throws"', (done) => {
+        const throwingFunc = () => {
+            throw new Error('here it comes');
+        };
+        try {
+            throws(throwingFunc, {partOfMessage: 'NOT IN THERE'});
         } catch (expectedException) {
             done();
         }
@@ -49,6 +69,9 @@ describe('Test-Utils', () => {
         const firstObj = {attr1: 'string', attr2: 12};
         const secondObj = {attr1: 'string', attr2: 12};
         equals(firstObj, secondObj);
+        // but does throw using "equalsNot"
+        throws(() => equalsNot(firstObj, secondObj),
+            {message: 'The given inputs were equal!'});
     });
 
     it('does throw an exception if an comparison' +
@@ -58,6 +81,8 @@ describe('Test-Utils', () => {
         try {
             equals(firstObj, secondObj);
         } catch (expectedException) {
+            // but does not throw using "equalsNot"
+            equalsNot(firstObj, secondObj);
             done();
         }
     });
@@ -76,6 +101,8 @@ describe('Test-Utils', () => {
         try {
             equals(firstObj, secondObj);
         } catch (expectedException) {
+            // but does not throw using "equalsNot"
+            equalsNot(firstObj, secondObj);
             done();
         }
     });
