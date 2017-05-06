@@ -50,13 +50,13 @@ const spy1 = new Spy();
 const spy2 = new Spy('special spy for me');
 
 // initialize by mocking another objects attribute (usually this attribute is a function)
-const someObject = new Date(2017, 1, 15);
-const spy3 = Spy.on(someObject, 'toJSON');
+const someObject1 = new Date(2017, 1, 15);
+const spy3 = Spy.on(someObject1, 'toJSON');
 // (spy name will be accordingly: 'the spy on \'toJSON\'')
 
 // initialize many by mocking another objects attributes
-const someObject = new Date(2017, 1, 15);
-const [spy4, spy5, spy6] = Spy.onMany(someObject, 'toJSON', 'toString', 'getDate');
+const someObject2 = new Date(2017, 1, 15);
+const [spy4, spy5, spy6] = Spy.onMany(someObject2, 'toJSON', 'toString', 'getDate');
 ```
 
 Any spy instance can be configured by overriding the default configuration. For
@@ -152,8 +152,8 @@ spy.wasNotCalledWith([1, 'test', {attr: [3]}]); // the spy was not called with t
 ```
 
 There is one static method that does restore all existing spies in all tests.
-This is extremly useful to clean up all still existing mocks and also
-a very comfortable to this automaticly after every test (like in an "afterEach").
+This is extremely useful to clean up all still existing mocks and also
+a very comfortable to this automatically after every test (like in an "afterEach").
     
   - `restoreAll` (does restore every existing spy)
 
@@ -425,6 +425,10 @@ const differentNumber = callArgs[2]['attr2'];
 
 ## Changes
 
+* **1.2.0**
+  * Changed license to MIT.
+  * Restructured code base and moved initialization totally into the constructor.
+  * Fixed a flow issue were not-mocking spies were implicitly casted to any.
 * **1.1.4**
   * Lifted Code-Coverage to 100 %.
   * Fixed a flow compatibility issue.

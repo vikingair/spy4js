@@ -1,20 +1,11 @@
 {
   "name": "spy4js",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "description": "Use new Spy() to optimize your tests with helpful debug messages.",
   "main": "dist/spy.js",
-  "files": [
-    "dist/utils.js",
-    "dist/utils.js.flow",
-    "dist/registry.js",
-    "dist/registry.js.flow",
-    "dist/spy.js",
-    "dist/spy.js.flow"
-  ],
+  "files": ["dist"],
   "nyc": {
-    "require": [
-      "babel-register"
-    ],
+    "require": ["babel-register"],
     "sourceMap": false,
     "instrument": false
   },
@@ -35,7 +26,7 @@
     "es6"
   ],
   "author": "Viktor Luft",
-  "license": "LGPL-3.0",
+  "license": "MIT",
   "dependencies": {},
   "devDependencies": {
     "babel-core": "6.23.1",
