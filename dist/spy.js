@@ -69,10 +69,14 @@ var DefaultSettings = {
  *
  * @param {string} name -> the identifier of the spy.
  *                       Useful for debugging issues.
+ * @private
+ * @param {string} __mock -> DO NOT USE.
+ *
  * @constructor
  */
 function Spy() {
     var name = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'the spy';
+    var __mock = arguments[1];
 
     if (!(this instanceof Spy)) {
         throw new Error('\n\nPlease make sure to use this ' + 'constructor only with "new" keyword.\n\n');
@@ -85,7 +89,6 @@ function Spy() {
         spy[Symbols.calls].push({ arguments: args });
         return spy[Symbols.func].apply(spy, args);
     };
-    var __mock = arguments[1]; // eslint-disable-line
     if (__mock && !__LOCK__) {
         spy[Symbols.index] = registry.push(__mock.obj, __mock.methodName);
     } else {

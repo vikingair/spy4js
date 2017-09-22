@@ -1,11 +1,15 @@
 {
   "name": "spy4js",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Use new Spy() to optimize your tests with helpful debug messages.",
   "main": "dist/spy.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "nyc": {
-    "require": ["babel-register"],
+    "require": [
+      "babel-register"
+    ],
     "sourceMap": false,
     "instrument": false
   },
@@ -46,7 +50,7 @@
     "eslint": "3.13.1",
     "eslint-config-google": "0.7.1",
     "eslint-plugin-flow-vars": "0.4.0",
-    "flow-bin": "0.37.4",
+    "flow-bin": "^0.54.0",
     "gulp": "3.9.1",
     "gulp-babel": "6.1.2",
     "gulp-clean": "0.3.2",

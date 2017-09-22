@@ -425,6 +425,8 @@ const differentNumber = callArgs[2]['attr2'];
 
 ## Changes
 
+* **1.2.1**
+  * Updated flow to latest version and fixed production errors.
 * **1.2.0**
   * Changed license to MIT.
   * Restructured code base and moved initialization totally into the constructor.
