@@ -2,10 +2,10 @@
  * @flow
  */
 
-import {forEach} from './utils';
+import { forEach } from './utils';
 
-const restoreAttributeForEntry = (value:Object):void => {
-    const {obj, method, methodName} = value;
+const restoreAttributeForEntry = (value: Object): void => {
+    const { obj, method, methodName } = value;
     if (obj) {
         obj[methodName] = method;
     }
@@ -25,8 +25,7 @@ const restoreAttributeForEntry = (value:Object):void => {
  */
 function SpyRegistry() {
     if (!(this instanceof SpyRegistry)) {
-        throw new Error('\n\nPlease make sure to use this ' +
-            'constructor only with "new" keyword.\n\n');
+        throw new Error('\n\nPlease make sure to use this constructor only with "new" keyword.\n\n');
     }
     this.register = {};
     this.persReg = {};
@@ -39,7 +38,7 @@ function SpyRegistry() {
  * Meaning that all stored object information will be restored
  * to their individual previous state.
  */
-SpyRegistry.prototype.restoreAll = function():void {
+SpyRegistry.prototype.restoreAll = function(): void {
     forEach(this.register, (ignored, entry) => {
         restoreAttributeForEntry(entry);
     });
@@ -56,7 +55,7 @@ SpyRegistry.prototype.restoreAll = function():void {
  *
  * @param {number} index -> the unique identifier of stored information.
  */
-SpyRegistry.prototype.restore = function(index:number):void {
+SpyRegistry.prototype.restore = function(index: number): void {
     const entry = this.register[index];
     if (entry) {
         restoreAttributeForEntry(entry);
@@ -72,13 +71,9 @@ SpyRegistry.prototype.restore = function(index:number):void {
  * @param {string} methodName -> The name of the mocked method.
  * @return {number} -> The unique store index.
  */
-SpyRegistry.prototype.push = function(
-    obj:Object,
-    methodName:string
-):number {
-    this.registerCount++;
-    this.register[this.registerCount] =
-        {obj, method: obj[methodName], methodName};
+SpyRegistry.prototype.push = function(obj: Object, methodName: string): number {
+    this.registerCount += 1;
+    this.register[this.registerCount] = { obj, method: obj[methodName], methodName };
     return this.registerCount;
 };
 
@@ -92,7 +87,7 @@ SpyRegistry.prototype.push = function(
  *                   BUT: Usually this method returns a function or
  *                        undefined.
  */
-SpyRegistry.prototype.getOriginalMethod = function(index:number):any {
+SpyRegistry.prototype.getOriginalMethod = function(index: number): any {
     const entry = this.register[index];
     if (entry) {
         return entry.method;
@@ -108,10 +103,7 @@ SpyRegistry.prototype.getOriginalMethod = function(index:number):any {
  * @param {boolean} intoPersReg -> boolean to determine the moving
  *                                 direction.
  */
-SpyRegistry.prototype.persist = function(
-    index:number,
-    intoPersReg:boolean
-):void {
+SpyRegistry.prototype.persist = function(index: number, intoPersReg: boolean): void {
     const fromReg = intoPersReg ? this.register : this.persReg;
     const toReg = intoPersReg ? this.persReg : this.register;
     const entry = fromReg[index];
@@ -121,4 +113,4 @@ SpyRegistry.prototype.persist = function(
     }
 };
 
-export {SpyRegistry};
+export { SpyRegistry };

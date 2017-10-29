@@ -33,7 +33,7 @@ var restoreAttributeForEntry = function restoreAttributeForEntry(value) {
 
 function SpyRegistry() {
     if (!(this instanceof SpyRegistry)) {
-        throw new Error('\n\nPlease make sure to use this ' + 'constructor only with "new" keyword.\n\n');
+        throw new Error('\n\nPlease make sure to use this constructor only with "new" keyword.\n\n');
     }
     this.register = {};
     this.persReg = {};
@@ -80,7 +80,7 @@ SpyRegistry.prototype.restore = function (index) {
  * @return {number} -> The unique store index.
  */
 SpyRegistry.prototype.push = function (obj, methodName) {
-    this.registerCount++;
+    this.registerCount += 1;
     this.register[this.registerCount] = { obj: obj, method: obj[methodName], methodName: methodName };
     return this.registerCount;
 };

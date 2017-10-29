@@ -1,9 +1,4 @@
 {
-  "plugins": ["transform-flow-strip-types", "add-module-exports", "transform-runtime"],
-  "presets": ["es2015", "stage-0"],
-  "env": {
-    "test": {
-      "plugins": [ "istanbul" ]
-    }
-  }
+  "presets": ["es2015", "flow"],
+  "plugins": ["transform-runtime"]
 }

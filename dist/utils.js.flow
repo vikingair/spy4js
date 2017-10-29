@@ -19,7 +19,7 @@
  * @param {Function} handler <- Handler function to process all values.
  *
  */
-const forEach = (arrOrObj:any, handler:(key:string, value:any) => any):void => {
+const forEach = (arrOrObj: any, handler: (key: string, value: any) => any): void => {
     for (let key in arrOrObj) {
         if (arrOrObj.hasOwnProperty(key)) {
             handler(key, arrOrObj[key]);
@@ -44,9 +44,9 @@ const forEach = (arrOrObj:any, handler:(key:string, value:any) => any):void => {
  *                                      have to write here any.
  * @return {Array} <- containing all keys for the input object.
  */
-const objectKeys = (arrOrObj:any):Array<string> => {
+const objectKeys = (arrOrObj: any): Array<string> => {
     const keys = [];
-    forEach(arrOrObj, (key:string) => keys.push(key));
+    forEach(arrOrObj, (key: string) => keys.push(key));
     return keys;
 };
 
@@ -71,12 +71,12 @@ const objectKeys = (arrOrObj:any):Array<string> => {
  *                           of the provided arguments.
  */
 const __diff = (
-    a:any,
-    b:any,
-    initial:boolean,
-    useOwnEquals:boolean,
-    alreadyComparedArray:Array<any> = []
-):string|void => {
+    a: any,
+    b: any,
+    initial: boolean,
+    useOwnEquals: boolean,
+    alreadyComparedArray: Array<any> = []
+): string | void => {
     if (a === b) {
         return;
     }
@@ -95,6 +95,8 @@ const __diff = (
             return 'different regexp';
         case '[object String]':
             return 'different string';
+        case '[object Function]':
+            return 'different function';
         case '[object Number]':
             if (isNaN(a) && isNaN(b)) {
                 return;
@@ -121,10 +123,12 @@ const __diff = (
         if (a['equals'](b)) {
             return;
         }
-        return 'own equals method failed <- ' +
+        return (
+            'own equals method failed <- ' +
             'Maybe you want to disable the usage ' +
             'of own equals implementation? ' +
-            '[ Use: spy.configure({useOwnEquals: false}) ]';
+            '[ Use: spy.configure({useOwnEquals: false}) ]'
+        );
     }
     if (alreadyComparedArray.indexOf(a) !== -1) {
         return;
@@ -132,8 +136,7 @@ const __diff = (
     alreadyComparedArray.push(a);
     for (let i = 0; i < aKeys.length; i++) {
         const key = aKeys[i];
-        const diffStr =
-            __diff(a[key], b[key], false, useOwnEquals, alreadyComparedArray);
+        const diffStr = __diff(a[key], b[key], false, useOwnEquals, alreadyComparedArray);
         if (diffStr !== undefined) {
             return `${initial ? `--> ${key}` : `${key}`} / ${diffStr}`;
         }
@@ -174,12 +177,8 @@ const __diff = (
  * @return {string|void} <- information about the difference
  *                           of the provided arguments.
  */
-const differenceOf = (
-    a:any,
-    b:any,
-    config:{useOwnEquals:boolean} = {useOwnEquals: true}
-):string|void => {
+const differenceOf = (a: any, b: any, config: { useOwnEquals: boolean } = { useOwnEquals: true }): string | void => {
     return __diff(a, b, true, config.useOwnEquals);
 };
 
-export {differenceOf, forEach, objectKeys};
+export { differenceOf, forEach, objectKeys };

@@ -36,7 +36,8 @@ var Symbols = {
     func: (0, _symbol2.default)('__Spy_func__'),
     calls: (0, _symbol2.default)('__Spy_calls__'),
     config: (0, _symbol2.default)('__Spy_config__'),
-    index: (0, _symbol2.default)('__Spy_config__') };
+    index: (0, _symbol2.default)('__Spy_config__')
+};
 
 /**
  * Initial default settings for every
@@ -46,7 +47,8 @@ var Symbols = {
  * @type {{useOwnEquals: boolean}}
  */
 var DefaultSettings = {
-    useOwnEquals: true };
+    useOwnEquals: true
+};
 
 /**
  * This constructor does instantiate a new spy
@@ -79,7 +81,7 @@ function Spy() {
     var __mock = arguments[1];
 
     if (!(this instanceof Spy)) {
-        throw new Error('\n\nPlease make sure to use this ' + 'constructor only with "new" keyword.\n\n');
+        throw new Error('\n\nPlease make sure to use this constructor only with "new" keyword.\n\n');
     }
     var spy = function spy() {
         for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -158,7 +160,7 @@ Spy.on = function on(obj, methodName) {
         throw new Error('The objects attribute \'' + methodName + '\'' + ' was already spied. Please make sure to spy' + ' only once at a time at any attribute.');
     }
     __LOCK__ = false;
-    var spy = new Spy('the spy on \'' + methodName + '\'', { obj: obj, methodName: methodName });
+    var spy = new Spy("the spy on '" + methodName + "'", { obj: obj, methodName: methodName });
     __LOCK__ = true;
     obj[methodName] = spy;
     return spy;

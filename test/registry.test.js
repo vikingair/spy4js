@@ -2,9 +2,9 @@
  * @flow
  */
 
-import {equals, throws} from '../util/facts';
-import {SpyRegistry} from '../src/registry';
-import {objectKeys} from '../src/utils';
+import { equals, throws } from '../util/facts';
+import { SpyRegistry } from '../src/registry';
+import { objectKeys } from '../src/utils';
 
 /**
  * The tests are written not method specific.
@@ -14,12 +14,12 @@ import {objectKeys} from '../src/utils';
  */
 describe('Spy - Utils', () => {
     it('should not allow to use the constructor of the Spy without new', () => {
-        throws(SpyRegistry, {partOfMessage: 'only with "new" keyword'});
+        throws(SpyRegistry, { partOfMessage: 'only with "new" keyword' });
     });
 
     it('should register an arbitrary object attribute correctly', () => {
-        const testObject = {attr1: 'string', attr2: 88, attr3: new Date()};
-        const reg:any = new SpyRegistry();
+        const testObject = { attr1: 'string', attr2: 88, attr3: new Date() };
+        const reg: any = new SpyRegistry();
 
         const returnedRegisterCount = reg.push(testObject, 'attr1');
 
@@ -31,38 +31,38 @@ describe('Spy - Utils', () => {
     });
 
     it('does nothing on restore for not existing key', () => {
-        const testObject = {func: () => {}};
+        const testObject = { func: () => {} };
         const expectedRegisterEntry = {
             obj: testObject,
             method: testObject.func,
-            methodName: 'func'};
+            methodName: 'func',
+        };
 
-        const reg:any = new SpyRegistry();
+        const reg: any = new SpyRegistry();
 
         const key = reg.push(testObject, 'func');
-        equals(reg.register, {[key]: expectedRegisterEntry});
+        equals(reg.register, { [key]: expectedRegisterEntry });
 
         reg.restore(123);
-        equals(reg.register, {[key]: expectedRegisterEntry});
+        equals(reg.register, { [key]: expectedRegisterEntry });
     });
 
-    it('does only delete the register entry on restore if stored' +
-        ' object has invalid structure', () => {
-        const reg:any = new SpyRegistry();
-        reg.register[1] = {noObjKey: 'here'};
+    it('does only delete the register entry on restore if stored object has invalid structure', () => {
+        const reg: any = new SpyRegistry();
+        reg.register[1] = { noObjKey: 'here' };
         reg.restore(1);
         equals(reg.register, {});
     });
 
     it('should be able to restore a registered object', () => {
         const someDate = new Date();
-        const testObject = {attr1: 'string', attr2: 88, attr3: someDate};
-        const reg:any = new SpyRegistry();
+        const testObject = { attr1: 'string', attr2: 88, attr3: someDate };
+        const reg: any = new SpyRegistry();
 
         const registerEntry1 = reg.push(testObject, 'attr1');
         const registerEntry2 = reg.push(testObject, 'attr2');
 
-        const someFunc:any = () => {};
+        const someFunc: any = () => {};
         testObject.attr1 = someFunc;
         delete testObject.attr2;
 
@@ -83,16 +83,15 @@ describe('Spy - Utils', () => {
         equals(testObject.attr3, someDate);
     });
 
-    it('should be able to restore all ' +
-        'registered objects properties at once', () => {
+    it('should be able to restore all registered objects properties at once', () => {
         const someDate = new Date();
-        const testObject = {attr1: 'string', attr2: 88, attr3: someDate};
-        const reg:any = new SpyRegistry();
+        const testObject = { attr1: 'string', attr2: 88, attr3: someDate };
+        const reg: any = new SpyRegistry();
 
         reg.push(testObject, 'attr1');
         reg.push(testObject, 'attr2');
 
-        const someFunc:any = () => {};
+        const someFunc: any = () => {};
         testObject.attr1 = someFunc;
         delete testObject.attr2;
 
@@ -107,16 +106,15 @@ describe('Spy - Utils', () => {
         equals(testObject.attr3, someDate);
     });
 
-    it('should be able to to return the stored value' +
-        ' without restoring the object', () => {
+    it('should be able to to return the stored value without restoring the object', () => {
         const someDate = new Date();
-        const testObject = {attr1: 'string', attr2: 88, attr3: someDate};
-        const reg:any = new SpyRegistry();
+        const testObject = { attr1: 'string', attr2: 88, attr3: someDate };
+        const reg: any = new SpyRegistry();
 
         const registerEntry1 = reg.push(testObject, 'attr1');
         const registerEntry2 = reg.push(testObject, 'attr2');
 
-        const someFunc:any = () => {};
+        const someFunc: any = () => {};
         testObject.attr1 = someFunc;
         delete testObject.attr2;
 
@@ -135,8 +133,9 @@ describe('Spy - Utils', () => {
     it('is able to make stored information persistent', () => {
         const testObject = {
             func1: () => 'testObjectFunc1',
-            func2: () => 'testObjectFunc1'};
-        const reg:any = new SpyRegistry();
+            func2: () => 'testObjectFunc1',
+        };
+        const reg: any = new SpyRegistry();
 
         equals(objectKeys(reg.register).length, 0);
         equals(objectKeys(reg.persReg).length, 0);
@@ -174,9 +173,9 @@ describe('Spy - Utils', () => {
     });
 
     it('does nothing on persist for not existing key', () => {
-        const testObject = {func: () => {}};
+        const testObject = { func: () => {} };
 
-        const reg:any = new SpyRegistry();
+        const reg: any = new SpyRegistry();
 
         const key = reg.push(testObject, 'func');
         equals(reg.register[key].obj, testObject);

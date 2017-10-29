@@ -2,8 +2,8 @@
  * @flow
  */
 
-import {differenceOf, forEach} from './utils';
-import {SpyRegistry} from './registry';
+import { differenceOf, forEach } from './utils';
+import { SpyRegistry } from './registry';
 
 /**
  *
@@ -22,7 +22,8 @@ const Symbols = {
     func: Symbol('__Spy_func__'),
     calls: Symbol('__Spy_calls__'),
     config: Symbol('__Spy_config__'),
-    index: Symbol('__Spy_config__')};
+    index: Symbol('__Spy_config__'),
+};
 
 /**
  * Initial default settings for every
@@ -32,7 +33,8 @@ const Symbols = {
  * @type {{useOwnEquals: boolean}}
  */
 const DefaultSettings = {
-    useOwnEquals: true};
+    useOwnEquals: true,
+};
 
 /**
  * This constructor does instantiate a new spy
@@ -60,13 +62,12 @@ const DefaultSettings = {
  *
  * @constructor
  */
-function Spy(name:string = 'the spy', __mock:any) {
+function Spy(name: string = 'the spy', __mock: any) {
     if (!(this instanceof Spy)) {
-        throw new Error('\n\nPlease make sure to use this ' +
-            'constructor only with "new" keyword.\n\n');
+        throw new Error('\n\nPlease make sure to use this constructor only with "new" keyword.\n\n');
     }
-    let spy:any = function(...args:Array<any>) {
-        spy[Symbols.calls].push({arguments: args});
+    let spy: any = function(...args: Array<any>) {
+        spy[Symbols.calls].push({ arguments: args });
         return spy[Symbols.func](...args);
     };
     if (__mock && !__LOCK__) {
@@ -78,7 +79,7 @@ function Spy(name:string = 'the spy', __mock:any) {
     spy[Symbols.isSpy] = true;
     spy[Symbols.func] = () => {};
     spy[Symbols.calls] = [];
-    spy[Symbols.config] = {useOwnEquals: DefaultSettings.useOwnEquals};
+    spy[Symbols.config] = { useOwnEquals: DefaultSettings.useOwnEquals };
     forEach(Spy.prototype, (key, value) => {
         spy[key] = value;
     });
@@ -99,7 +100,7 @@ function Spy(name:string = 'the spy', __mock:any) {
  *
  * @param {Object} config <- Holds the configuration params.
  */
-Spy.configure = function configure(config: {useOwnEquals?:boolean}):void {
+Spy.configure = function configure(config: { useOwnEquals?: boolean }): void {
     if (config.useOwnEquals !== undefined) {
         DefaultSettings.useOwnEquals = config.useOwnEquals;
     }
@@ -129,23 +130,24 @@ Spy.configure = function configure(config: {useOwnEquals?:boolean}):void {
  *
  * @return {Spy}
  */
-Spy.on = function on(obj:Object, methodName:string):Spy {
+Spy.on = function on(obj: Object, methodName: string): Spy {
     const method = obj[methodName];
     if (!(method instanceof Function)) {
-        throw new Error(`The object attribute '${methodName}' ` +
-            `was: ${JSON.stringify(method)}\n\n` +
-            'You should only spy on functions!');
+        throw new Error(
+            `The object attribute '${methodName}' ` +
+                `was: ${JSON.stringify(method)}\n\n` +
+                'You should only spy on functions!'
+        );
     }
     if (method[Symbols.isSpy]) {
-        throw new Error(`The objects attribute '${methodName}'` +
-            ' was already spied. Please make sure to spy' +
-            ' only once at a time at any attribute.');
+        throw new Error(
+            `The objects attribute '${methodName}'` +
+                ' was already spied. Please make sure to spy' +
+                ' only once at a time at any attribute.'
+        );
     }
     __LOCK__ = false;
-    const spy = new Spy(
-        'the spy on \'' + methodName + '\'',
-        {obj, methodName}
-    );
+    const spy = new Spy("the spy on '" + methodName + "'", { obj, methodName });
     __LOCK__ = true;
     obj[methodName] = spy;
     return spy;
@@ -172,9 +174,7 @@ Spy.on = function on(obj:Object, methodName:string):Spy {
  *
  * @return {Array<Spy>}
  */
-Spy.onMany = function onMany(
-    obj:Object, ...methodNames:Array<string>
-):Array<Spy> {
+Spy.onMany = function onMany(obj: Object, ...methodNames: Array<string>): Array<Spy> {
     const spies = [];
     for (let i = 0; i < methodNames.length; i++) {
         const spy = Spy.on(obj, methodNames[i]);
@@ -191,7 +191,7 @@ Spy.onMany = function onMany(
  * Restoring objects does not disable any
  * other behaviours/features of the spies.
  */
-Spy.restoreAll = function restoreAll():void {
+Spy.restoreAll = function restoreAll(): void {
     registry.restoreAll();
 };
 
@@ -213,22 +213,20 @@ Spy.restoreAll = function restoreAll():void {
  *                         for special configuration
  * @return {Spy} <- BuilderPattern.
  */
-Spy.prototype.configure = function(
-    config:{useOwnEquals?: boolean, persistent?: boolean}
-):Spy {
+Spy.prototype.configure = function(config: { useOwnEquals?: boolean, persistent?: boolean }): Spy {
     if (config.useOwnEquals !== undefined) {
         this[Symbols.config].useOwnEquals = config.useOwnEquals;
     }
     if (config.persistent !== undefined) {
         if (!this[Symbols.index]) {
-            throw new Error(`\n\n${this[Symbols.name]} can not` +
-                ' be configured to be persistent!' +
-                ' It does not mock any object.');
+            throw new Error(
+                `\n\n${this[Symbols.name]} can not` +
+                    ' be configured to be persistent!' +
+                    ' It does not mock any object.'
+            );
         }
         this[Symbols.config].persistent = config.persistent;
-        registry.persist(
-            this[Symbols.index],
-            this[Symbols.config].persistent);
+        registry.persist(this[Symbols.index], this[Symbols.config].persistent);
     }
     return this;
 };
@@ -245,8 +243,9 @@ Spy.prototype.configure = function(
  *
  * @return {Spy} <- BuilderPattern.
  */
-Spy.prototype.calls = function(...funcs:Array<Function>):Spy {
-    if (funcs.length === 0) { // no arguments provided
+Spy.prototype.calls = function(...funcs: Array<Function>): Spy {
+    if (funcs.length === 0) {
+        // no arguments provided
         this[Symbols.func] = () => {};
         return this;
     }
@@ -254,7 +253,7 @@ Spy.prototype.calls = function(...funcs:Array<Function>):Spy {
     const max = funcs.length - 1;
     let counter = -1;
 
-    this[Symbols.func] = (...args:Array<any>) => {
+    this[Symbols.func] = (...args: Array<any>) => {
         counter++;
         return funcs[max < counter ? max : counter](...args);
     };
@@ -273,7 +272,7 @@ Spy.prototype.calls = function(...funcs:Array<Function>):Spy {
  *
  * @return {Spy} <- BuilderPattern.
  */
-Spy.prototype.returns = function(...args:Array<any>):Spy {
+Spy.prototype.returns = function(...args: Array<any>): Spy {
     const funcs = [];
 
     for (let i = 0; i < args.length; i++) {
@@ -291,10 +290,9 @@ Spy.prototype.returns = function(...args:Array<any>):Spy {
  *
  * @return {Spy} <- BuilderPattern
  */
-Spy.prototype.throws = function(message:?string):Spy {
+Spy.prototype.throws = function(message: ?string): Spy {
     this[Symbols.func] = () => {
-        throw new Error(message ||
-            `${this[Symbols.name]} was requested to throw`);
+        throw new Error(message || `${this[Symbols.name]} was requested to throw`);
     };
     return this;
 };
@@ -304,7 +302,7 @@ Spy.prototype.throws = function(message:?string):Spy {
  *
  * @return {Spy} <- BuilderPattern
  */
-Spy.prototype.reset = function():Spy {
+Spy.prototype.reset = function(): Spy {
     this[Symbols.calls] = [];
     return this;
 };
@@ -324,10 +322,9 @@ Spy.prototype.reset = function():Spy {
  *
  * @return {Spy} <- BuilderPattern
  */
-Spy.prototype.restore = function():Spy {
+Spy.prototype.restore = function(): Spy {
     if (this[Symbols.config].persistent) {
-        throw new Error(`\n\n${this[Symbols.name]} can not be restored!` +
-            ' It was configured to be persistent.');
+        throw new Error(`\n\n${this[Symbols.name]} can not be restored!` + ' It was configured to be persistent.');
     }
     registry.restore(this[Symbols.index]);
     return this;
@@ -349,7 +346,7 @@ Spy.prototype.restore = function():Spy {
  *
  * @return {Spy} <- BuilderPattern
  */
-Spy.prototype.transparent = function():Spy {
+Spy.prototype.transparent = function(): Spy {
     return this.transparentAfter(0);
 };
 
@@ -374,7 +371,7 @@ Spy.prototype.transparent = function():Spy {
  *
  * @return {Spy} <- BuilderPattern
  */
-Spy.prototype.transparentAfter = function(callCount:number):Spy {
+Spy.prototype.transparentAfter = function(callCount: number): Spy {
     const oldFunc = this[Symbols.func];
     this[Symbols.func] = (...args) => {
         // before the function call is executed,
@@ -383,8 +380,7 @@ Spy.prototype.transparentAfter = function(callCount:number):Spy {
         //    are more than the call count were we
         //    need to modify the behavior
         if (this[Symbols.calls].length > callCount) {
-            const originalMethod =
-                registry.getOriginalMethod(this[Symbols.index]);
+            const originalMethod = registry.getOriginalMethod(this[Symbols.index]);
             if (originalMethod) {
                 return originalMethod(...args);
             }
@@ -405,13 +401,13 @@ Spy.prototype.transparentAfter = function(callCount:number):Spy {
  *
  * @param {?number} callCount -> Is the number of expected calls made.
  */
-Spy.prototype.wasCalled = function(callCount:number = 0) {
+Spy.prototype.wasCalled = function(callCount: number = 0) {
     const madeCalls = this[Symbols.calls].length;
     if (callCount) {
         if (madeCalls !== callCount) {
             throw new Error(
                 `\n\n${this[Symbols.name]} was called ${madeCalls} times,` +
-                ` but there were expected ${callCount} calls.\n\n`
+                    ` but there were expected ${callCount} calls.\n\n`
             );
         }
     } else if (madeCalls === 0) {
@@ -428,8 +424,9 @@ Spy.prototype.wasNotCalled = function() {
     if (madeCalls.length !== 0) {
         throw new Error(
             `\n\n${this[Symbols.name]} was not` +
-            ' considered to be called.\n\n' +
-            'Actually there were:\n\n' + this.showCallArguments()
+                ' considered to be called.\n\n' +
+                'Actually there were:\n\n' +
+                this.showCallArguments()
         );
     }
 };
@@ -450,18 +447,14 @@ Spy.prototype.wasNotCalled = function() {
  * @param {Array<any>} args -> The expected arguments
  *                           for any made call.
  */
-Spy.prototype.wasCalledWith = function(...args:Array<any>) {
+Spy.prototype.wasCalledWith = function(...args: Array<any>) {
     const madeCalls = this[Symbols.calls];
     if (madeCalls.length === 0) {
         throw new Error(`\n\n${this[Symbols.name]} was never called!\n\n`);
     }
     const diffInfo = [];
     for (let i = 0; i < madeCalls.length; i++) {
-        const diff =
-            differenceOf(
-                madeCalls[i].arguments,
-                args,
-                this[Symbols.config]);
+        const diff = differenceOf(madeCalls[i].arguments, args, this[Symbols.config]);
         if (!diff) {
             return;
         }
@@ -469,9 +462,10 @@ Spy.prototype.wasCalledWith = function(...args:Array<any>) {
     }
     throw new Error(
         `\n\n${this[Symbols.name]} was considered` +
-        ' to be called with the following arguments:\n\n' +
-        `    --> ${JSON.stringify(args)}\n\n` +
-        'Actually there were:\n\n' + this.showCallArguments(diffInfo)
+            ' to be called with the following arguments:\n\n' +
+            `    --> ${JSON.stringify(args)}\n\n` +
+            'Actually there were:\n\n' +
+            this.showCallArguments(diffInfo)
     );
 };
 
@@ -493,7 +487,7 @@ Spy.prototype.wasCalledWith = function(...args:Array<any>) {
  * @param {Array<any>} args -> The not expected arguments
  *                             for any made call.
  */
-Spy.prototype.wasNotCalledWith = function(...args:Array<any>) {
+Spy.prototype.wasNotCalledWith = function(...args: Array<any>) {
     let errorOccurred = false;
     try {
         this.wasCalledWith(...args);
@@ -503,8 +497,8 @@ Spy.prototype.wasNotCalledWith = function(...args:Array<any>) {
     if (!errorOccurred) {
         throw new Error(
             `\n\n${this[Symbols.name]} was called` +
-            ' unexpectedly with the following arguments:\n\n' +
-            `    --> ${JSON.stringify(args)}\n\n`
+                ' unexpectedly with the following arguments:\n\n' +
+                `    --> ${JSON.stringify(args)}\n\n`
         );
     }
 };
@@ -526,13 +520,13 @@ Spy.prototype.wasNotCalledWith = function(...args:Array<any>) {
  *
  * @return {Array<any>} -> the call arguments of the (callNr + 1)'th call.
  */
-Spy.prototype.getCallArguments = function(callNr:number = 0):Array<any> {
+Spy.prototype.getCallArguments = function(callNr: number = 0): Array<any> {
     const madeCalls = this[Symbols.calls];
     if (callNr % 1 !== 0 || callNr >= madeCalls.length) {
         throw new Error(
             `\n\nThe provided callNr "${callNr}" was not valid.\n\n` +
-            `Made calls for ${this[Symbols.name]}:\n\n` +
-            this.showCallArguments()
+                `Made calls for ${this[Symbols.name]}:\n\n` +
+                this.showCallArguments()
         );
     }
     return madeCalls[callNr].arguments;
@@ -566,10 +560,7 @@ Spy.prototype.getCallArguments = function(callNr:number = 0):Array<any> {
  * @return {any} -> the (argNr + 1)'th call argument
  *                  of the (callNr + 1)'th call.
  */
-Spy.prototype.getCallArgument = function(
-    callNr:number = 0,
-    argNr:number = 0
-):any {
+Spy.prototype.getCallArgument = function(callNr: number = 0, argNr: number = 0): any {
     return this.getCallArguments(callNr)[argNr];
 };
 
@@ -578,7 +569,7 @@ Spy.prototype.getCallArgument = function(
  *
  * @return {number} -> the number of made calls.
  */
-Spy.prototype.getCallCount = function():number {
+Spy.prototype.getCallCount = function(): number {
     return this[Symbols.calls].length;
 };
 
@@ -614,17 +605,14 @@ Spy.prototype.getCallCount = function():number {
  *
  * @return {string} -> The information about made calls.
  */
-Spy.prototype.showCallArguments = function(
-    additionalInformation:Array<string> = []
-):string {
+Spy.prototype.showCallArguments = function(additionalInformation: Array<string> = []): string {
     const madeCalls = this[Symbols.calls];
     if (madeCalls.length === 0) {
         return `${this[Symbols.name]} was never called!\n`;
     }
     let response = '';
     for (let i = 0; i < madeCalls.length; i++) {
-        response +=
-            `call ${i}: ${JSON.stringify(madeCalls[i].arguments)}\n`;
+        response += `call ${i}: ${JSON.stringify(madeCalls[i].arguments)}\n`;
         if (additionalInformation[i]) {
             response += `        ${additionalInformation[i]}\n`;
         }
@@ -632,4 +620,4 @@ Spy.prototype.showCallArguments = function(
     return response;
 };
 
-export {Spy};
+export { Spy };

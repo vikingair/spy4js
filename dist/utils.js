@@ -96,6 +96,8 @@ var __diff = function __diff(a, b, initial, useOwnEquals) {
             return 'different regexp';
         case '[object String]':
             return 'different string';
+        case '[object Function]':
+            return 'different function';
         case '[object Number]':
             if (isNaN(a) && isNaN(b)) {
                 return;
