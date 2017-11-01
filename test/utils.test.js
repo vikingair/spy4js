@@ -25,7 +25,9 @@ const isNot = (p1: any, p2: any): void => {
 describe('Spy - Equality', () => {
     it('foreach iterates over arrays', () => {
         const results = [];
-        forEach([123, 'someString', { attr: 456 }], (key, value) => results.push([key, value]));
+        forEach([123, 'someString', { attr: 456 }], (key, value) =>
+            results.push([key, value])
+        );
         equals(results.length, 3);
         equals(results[0], ['0', 123]);
         equals(results[1], ['1', 'someString']);
@@ -34,7 +36,9 @@ describe('Spy - Equality', () => {
 
     it('foreach iterates over objects', () => {
         const results = [];
-        forEach({ attr1: 'someString', attr2: 123 }, (key, value) => results.push([key, value]));
+        forEach({ attr1: 'someString', attr2: 123 }, (key, value) =>
+            results.push([key, value])
+        );
         equals(results.length, 2);
         equals(results[0], ['attr1', 'someString']);
         equals(results[1], ['attr2', 123]);
@@ -42,8 +46,9 @@ describe('Spy - Equality', () => {
 
     it('foreach ignores not own properties on objects', () => {
         const results = [];
-        forEach({ attr1: 'someString', attr2: 123, hasOwnProperty: () => false }, (key, value) =>
-            results.push([key, value])
+        forEach(
+            { attr1: 'someString', attr2: 123, hasOwnProperty: () => false },
+            (key, value) => results.push([key, value])
         );
         equals(results.length, 0);
     });
@@ -63,17 +68,32 @@ describe('Spy - Equality', () => {
 
             method(): string {
                 // eslint-disable-line require-jsdoc
-                return this.attr1 + this.attr2.toString() + this.attr3.toDateString();
+                return (
+                    this.attr1 +
+                    this.attr2.toString() +
+                    this.attr3.toDateString()
+                );
             }
         };
 
         const someInstance = new TestClass('test', 42, new Date(2016, 12, 24));
-        const someOtherInstance = new TestClass('test', 42, new Date(2016, 12, 24));
-        const someDifferentInstance = new TestClass('test', 42, new Date(2016, 12, 23));
+        const someOtherInstance = new TestClass(
+            'test',
+            42,
+            new Date(2016, 12, 24)
+        );
+        const someDifferentInstance = new TestClass(
+            'test',
+            42,
+            new Date(2016, 12, 23)
+        );
 
         isNot(someInstance, someOtherInstance);
         is(differenceOf(someInstance, someOtherInstance), undefined);
-        is(differenceOf(someInstance, someDifferentInstance), '--> attr3 / different date');
+        is(
+            differenceOf(someInstance, someDifferentInstance),
+            '--> attr3 / different date'
+        );
     });
 
     it('should detect flat differences correctly', () => {
@@ -100,8 +120,14 @@ describe('Spy - Equality', () => {
         is(differenceOf(NaN, 123), 'different number');
         is(differenceOf(12, -13), 'different number');
         // date
-        is(differenceOf(new Date(2016, 12, 24), new Date(2016, 12, 24)), undefined);
-        is(differenceOf(new Date(2016, 12, 24), new Date(2017, 12, 24)), 'different date');
+        is(
+            differenceOf(new Date(2016, 12, 24), new Date(2016, 12, 24)),
+            undefined
+        );
+        is(
+            differenceOf(new Date(2016, 12, 24), new Date(2017, 12, 24)),
+            'different date'
+        );
         // boolean
         is(differenceOf(true, true), undefined);
         is(differenceOf(true, false), 'different bool');
@@ -122,8 +148,20 @@ describe('Spy - Equality', () => {
                 this.attr = attr;
             }
         };
-        is(differenceOf(new TestClass1('some String'), new TestClass1('some String')), undefined);
-        is(differenceOf(new TestClass1('some String'), new TestClass2('some String')), 'different constructor');
+        is(
+            differenceOf(
+                new TestClass1('some String'),
+                new TestClass1('some String')
+            ),
+            undefined
+        );
+        is(
+            differenceOf(
+                new TestClass1('some String'),
+                new TestClass2('some String')
+            ),
+            'different constructor'
+        );
     });
 
     it('should flatly detect different keys length correctly', () => {
@@ -148,7 +186,12 @@ describe('Spy - Equality', () => {
         // we want to use substr, so return a string for flow
         const diff = differenceOf(new TestClass(2), new TestClass(5)) || '';
         is(diff.substr(0, 24), 'own equals method failed');
-        is(differenceOf(new TestClass(2), new TestClass(4), { useOwnEquals: false }), '--> attr / different number');
+        is(
+            differenceOf(new TestClass(2), new TestClass(4), {
+                useOwnEquals: false,
+            }),
+            '--> attr / different number'
+        );
     });
 
     it('should default circular structures as compared without failure', () => {

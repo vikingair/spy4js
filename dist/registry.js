@@ -81,7 +81,11 @@ SpyRegistry.prototype.restore = function (index) {
  */
 SpyRegistry.prototype.push = function (obj, methodName) {
     this.registerCount += 1;
-    this.register[this.registerCount] = { obj: obj, method: obj[methodName], methodName: methodName };
+    this.register[this.registerCount] = {
+        obj: obj,
+        method: obj[methodName],
+        methodName: methodName
+    };
     return this.registerCount;
 };
 

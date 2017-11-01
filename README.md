@@ -32,9 +32,14 @@ fits more to the rest of the written code.
 are treated as class instances and come with a lot of useful features. See below for more.
 
 ### Installation
-
-Like every other npm package. You may `npm install spy4js --save-dev` to save the
-latest version to your dev dependencies.
+##### With yarn
+```
+yarn add --dev spy4js
+```
+##### With npm
+```
+npm install --save-dev spy4js
+```
 
 ### Interface
 
@@ -425,6 +430,8 @@ const differentNumber = callArgs[2]['attr2'];
 
 ## Changes
 
+* **1.2.2**
+  * Updated development environment and fixed a comparison issue with functions.
 * **1.2.1**
   * Updated flow to latest version and fixed production errors.
 * **1.2.0**

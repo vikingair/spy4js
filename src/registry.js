@@ -25,7 +25,9 @@ const restoreAttributeForEntry = (value: Object): void => {
  */
 function SpyRegistry() {
     if (!(this instanceof SpyRegistry)) {
-        throw new Error('\n\nPlease make sure to use this constructor only with "new" keyword.\n\n');
+        throw new Error(
+            '\n\nPlease make sure to use this constructor only with "new" keyword.\n\n'
+        );
     }
     this.register = {};
     this.persReg = {};
@@ -73,7 +75,11 @@ SpyRegistry.prototype.restore = function(index: number): void {
  */
 SpyRegistry.prototype.push = function(obj: Object, methodName: string): number {
     this.registerCount += 1;
-    this.register[this.registerCount] = { obj, method: obj[methodName], methodName };
+    this.register[this.registerCount] = {
+        obj,
+        method: obj[methodName],
+        methodName,
+    };
     return this.registerCount;
 };
 
@@ -103,7 +109,10 @@ SpyRegistry.prototype.getOriginalMethod = function(index: number): any {
  * @param {boolean} intoPersReg -> boolean to determine the moving
  *                                 direction.
  */
-SpyRegistry.prototype.persist = function(index: number, intoPersReg: boolean): void {
+SpyRegistry.prototype.persist = function(
+    index: number,
+    intoPersReg: boolean
+): void {
     const fromReg = intoPersReg ? this.register : this.persReg;
     const toReg = intoPersReg ? this.persReg : this.register;
     const entry = fromReg[index];

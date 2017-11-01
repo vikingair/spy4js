@@ -19,7 +19,10 @@
  * @param {Function} handler <- Handler function to process all values.
  *
  */
-const forEach = (arrOrObj: any, handler: (key: string, value: any) => any): void => {
+const forEach = (
+    arrOrObj: any,
+    handler: (key: string, value: any) => any
+): void => {
     for (let key in arrOrObj) {
         if (arrOrObj.hasOwnProperty(key)) {
             handler(key, arrOrObj[key]);
@@ -136,7 +139,13 @@ const __diff = (
     alreadyComparedArray.push(a);
     for (let i = 0; i < aKeys.length; i++) {
         const key = aKeys[i];
-        const diffStr = __diff(a[key], b[key], false, useOwnEquals, alreadyComparedArray);
+        const diffStr = __diff(
+            a[key],
+            b[key],
+            false,
+            useOwnEquals,
+            alreadyComparedArray
+        );
         if (diffStr !== undefined) {
             return `${initial ? `--> ${key}` : `${key}`} / ${diffStr}`;
         }
@@ -177,7 +186,11 @@ const __diff = (
  * @return {string|void} <- information about the difference
  *                           of the provided arguments.
  */
-const differenceOf = (a: any, b: any, config: { useOwnEquals: boolean } = { useOwnEquals: true }): string | void => {
+const differenceOf = (
+    a: any,
+    b: any,
+    config: { useOwnEquals: boolean } = { useOwnEquals: true }
+): string | void => {
     return __diff(a, b, true, config.useOwnEquals);
 };
 

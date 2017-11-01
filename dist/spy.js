@@ -30,6 +30,9 @@ var registry = new _registry.SpyRegistry();
 
 var __LOCK__ = true;
 
+/**
+ * Those symbols are used to protect the private spy properties from outer manipulation by mistake.
+ */
 var Symbols = {
     name: (0, _symbol2.default)('__Spy_name__'),
     isSpy: (0, _symbol2.default)('__Spy_isSpy__'),
@@ -160,7 +163,7 @@ Spy.on = function on(obj, methodName) {
         throw new Error('The objects attribute \'' + methodName + '\'' + ' was already spied. Please make sure to spy' + ' only once at a time at any attribute.');
     }
     __LOCK__ = false;
-    var spy = new Spy("the spy on '" + methodName + "'", { obj: obj, methodName: methodName });
+    var spy = new Spy('the spy on \'' + methodName + '\'', { obj: obj, methodName: methodName });
     __LOCK__ = true;
     obj[methodName] = spy;
     return spy;

@@ -16,7 +16,10 @@ const registry = new SpyRegistry();
 
 let __LOCK__ = true;
 
-const Symbols = {
+/**
+ * Those symbols are used to protect the private spy properties from outer manipulation by mistake.
+ */
+const Symbols: any = {
     name: Symbol('__Spy_name__'),
     isSpy: Symbol('__Spy_isSpy__'),
     func: Symbol('__Spy_func__'),
@@ -64,7 +67,9 @@ const DefaultSettings = {
  */
 function Spy(name: string = 'the spy', __mock: any) {
     if (!(this instanceof Spy)) {
-        throw new Error('\n\nPlease make sure to use this constructor only with "new" keyword.\n\n');
+        throw new Error(
+            '\n\nPlease make sure to use this constructor only with "new" keyword.\n\n'
+        );
     }
     let spy: any = function(...args: Array<any>) {
         spy[Symbols.calls].push({ arguments: args });
@@ -147,7 +152,7 @@ Spy.on = function on(obj: Object, methodName: string): Spy {
         );
     }
     __LOCK__ = false;
-    const spy = new Spy("the spy on '" + methodName + "'", { obj, methodName });
+    const spy = new Spy(`the spy on '${methodName}'`, { obj, methodName });
     __LOCK__ = true;
     obj[methodName] = spy;
     return spy;
@@ -174,7 +179,10 @@ Spy.on = function on(obj: Object, methodName: string): Spy {
  *
  * @return {Array<Spy>}
  */
-Spy.onMany = function onMany(obj: Object, ...methodNames: Array<string>): Array<Spy> {
+Spy.onMany = function onMany(
+    obj: Object,
+    ...methodNames: Array<string>
+): Array<Spy> {
     const spies = [];
     for (let i = 0; i < methodNames.length; i++) {
         const spy = Spy.on(obj, methodNames[i]);
@@ -213,7 +221,10 @@ Spy.restoreAll = function restoreAll(): void {
  *                         for special configuration
  * @return {Spy} <- BuilderPattern.
  */
-Spy.prototype.configure = function(config: { useOwnEquals?: boolean, persistent?: boolean }): Spy {
+Spy.prototype.configure = function(config: {
+    useOwnEquals?: boolean,
+    persistent?: boolean,
+}): Spy {
     if (config.useOwnEquals !== undefined) {
         this[Symbols.config].useOwnEquals = config.useOwnEquals;
     }
@@ -292,7 +303,9 @@ Spy.prototype.returns = function(...args: Array<any>): Spy {
  */
 Spy.prototype.throws = function(message: ?string): Spy {
     this[Symbols.func] = () => {
-        throw new Error(message || `${this[Symbols.name]} was requested to throw`);
+        throw new Error(
+            message || `${this[Symbols.name]} was requested to throw`
+        );
     };
     return this;
 };
@@ -324,7 +337,10 @@ Spy.prototype.reset = function(): Spy {
  */
 Spy.prototype.restore = function(): Spy {
     if (this[Symbols.config].persistent) {
-        throw new Error(`\n\n${this[Symbols.name]} can not be restored!` + ' It was configured to be persistent.');
+        throw new Error(
+            `\n\n${this[Symbols.name]} can not be restored!` +
+                ' It was configured to be persistent.'
+        );
     }
     registry.restore(this[Symbols.index]);
     return this;
@@ -380,7 +396,9 @@ Spy.prototype.transparentAfter = function(callCount: number): Spy {
         //    are more than the call count were we
         //    need to modify the behavior
         if (this[Symbols.calls].length > callCount) {
-            const originalMethod = registry.getOriginalMethod(this[Symbols.index]);
+            const originalMethod = registry.getOriginalMethod(
+                this[Symbols.index]
+            );
             if (originalMethod) {
                 return originalMethod(...args);
             }
@@ -454,7 +472,11 @@ Spy.prototype.wasCalledWith = function(...args: Array<any>) {
     }
     const diffInfo = [];
     for (let i = 0; i < madeCalls.length; i++) {
-        const diff = differenceOf(madeCalls[i].arguments, args, this[Symbols.config]);
+        const diff = differenceOf(
+            madeCalls[i].arguments,
+            args,
+            this[Symbols.config]
+        );
         if (!diff) {
             return;
         }
@@ -560,7 +582,10 @@ Spy.prototype.getCallArguments = function(callNr: number = 0): Array<any> {
  * @return {any} -> the (argNr + 1)'th call argument
  *                  of the (callNr + 1)'th call.
  */
-Spy.prototype.getCallArgument = function(callNr: number = 0, argNr: number = 0): any {
+Spy.prototype.getCallArgument = function(
+    callNr: number = 0,
+    argNr: number = 0
+): any {
     return this.getCallArguments(callNr)[argNr];
 };
 
@@ -605,7 +630,9 @@ Spy.prototype.getCallCount = function(): number {
  *
  * @return {string} -> The information about made calls.
  */
-Spy.prototype.showCallArguments = function(additionalInformation: Array<string> = []): string {
+Spy.prototype.showCallArguments = function(
+    additionalInformation: Array<string> = []
+): string {
     const madeCalls = this[Symbols.calls];
     if (madeCalls.length === 0) {
         return `${this[Symbols.name]} was never called!\n`;
