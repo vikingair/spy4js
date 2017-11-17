@@ -2,7 +2,7 @@
  * @flow
  */
 
-import { differenceOf, forEach } from './utils';
+import { differenceOf, forEach, IGNORE, JsonStringifyReplacer } from './utils';
 import { SpyRegistry } from './registry';
 
 /**
@@ -112,6 +112,12 @@ Spy.configure = function configure(config: { useOwnEquals?: boolean }): void {
 };
 
 /**
+ * This static attribute can be used to ignore the match
+ * of a specific argument when using "wasCalledWith".
+ */
+Spy.IGNORE = IGNORE;
+
+/**
  * This static method is an alternative way to
  * create a Spy which mocks the an objects attribute.
  *
@@ -140,7 +146,7 @@ Spy.on = function on(obj: Object, methodName: string): Spy {
     if (!(method instanceof Function)) {
         throw new Error(
             `The object attribute '${methodName}' ` +
-                `was: ${JSON.stringify(method)}\n\n` +
+                `was: ${JSON.stringify(method, JsonStringifyReplacer)}\n\n` +
                 'You should only spy on functions!'
         );
     }
@@ -485,7 +491,7 @@ Spy.prototype.wasCalledWith = function(...args: Array<any>) {
     throw new Error(
         `\n\n${this[Symbols.name]} was considered` +
             ' to be called with the following arguments:\n\n' +
-            `    --> ${JSON.stringify(args)}\n\n` +
+            `    --> ${JSON.stringify(args, JsonStringifyReplacer)}\n\n` +
             'Actually there were:\n\n' +
             this.showCallArguments(diffInfo)
     );
@@ -520,7 +526,7 @@ Spy.prototype.wasNotCalledWith = function(...args: Array<any>) {
         throw new Error(
             `\n\n${this[Symbols.name]} was called` +
                 ' unexpectedly with the following arguments:\n\n' +
-                `    --> ${JSON.stringify(args)}\n\n`
+                `    --> ${JSON.stringify(args, JsonStringifyReplacer)}\n\n`
         );
     }
 };
@@ -639,7 +645,11 @@ Spy.prototype.showCallArguments = function(
     }
     let response = '';
     for (let i = 0; i < madeCalls.length; i++) {
-        response += `call ${i}: ${JSON.stringify(madeCalls[i].arguments)}\n`;
+        const args = JSON.stringify(
+            madeCalls[i].arguments,
+            JsonStringifyReplacer
+        );
+        response += `call ${i}: ${args}\n`;
         if (additionalInformation[i]) {
             response += `        ${additionalInformation[i]}\n`;
         }

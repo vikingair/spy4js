@@ -60,7 +60,11 @@ const objectKeys = (arrOrObj: any): Array<string> => {
 const IGNORE = Symbol('__Spy_IGNORE__');
 
 /**
+ * This replacer is used to recognize some special
+ * values as something else than the default would display.
  *
+ * It is used to modify the render behaviour of
+ * JSON.stringify as long as no other renderer will be used.
  */
 const JsonStringifyReplacer = (k: any, v: any): any => {
     if (v === IGNORE) {

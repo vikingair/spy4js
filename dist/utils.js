@@ -3,7 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.JsonStringifyReplacer = exports.IGNORE = exports.objectKeys = exports.forEach = exports.differenceOf = undefined;
 
+var _symbol = require('babel-runtime/core-js/symbol');
+
+var _symbol2 = _interopRequireDefault(_symbol);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * This function takes a handler as second argument to process
@@ -56,6 +62,29 @@ var objectKeys = function objectKeys(arrOrObj) {
 };
 
 /**
+ * This symbol serves as replacement to ignore any
+ * inequality and skip further comparisons.
+ */
+var IGNORE = (0, _symbol2.default)('__Spy_IGNORE__');
+
+/**
+ * This replacer is used to recognize some special
+ * values as something else than the default would display.
+ *
+ * It is used to modify the render behaviour of
+ * JSON.stringify as long as no other renderer will be used.
+ */
+var JsonStringifyReplacer = function JsonStringifyReplacer(k, v) {
+    if (v === IGNORE) {
+        return 'Spy.IGNORE';
+    }
+    if (v === undefined) {
+        return 'UNDEFINED';
+    }
+    return v;
+};
+
+/**
  * This function is the internal representation of
  * "differenceOf". It does recursively call itself.
  * Read more below.
@@ -78,6 +107,9 @@ var objectKeys = function objectKeys(arrOrObj) {
 var __diff = function __diff(a, b, initial, useOwnEquals) {
     var alreadyComparedArray = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
 
+    if (a === IGNORE || b === IGNORE) {
+        return;
+    }
     if (a === b) {
         return;
     }
@@ -182,3 +214,5 @@ var differenceOf = function differenceOf(a, b) {
 exports.differenceOf = differenceOf;
 exports.forEach = forEach;
 exports.objectKeys = objectKeys;
+exports.IGNORE = IGNORE;
+exports.JsonStringifyReplacer = JsonStringifyReplacer;
