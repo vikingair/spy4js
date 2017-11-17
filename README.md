@@ -1,34 +1,25 @@
-[![npm package][npm-badge]][npm] [![Travis][build-badge]][build]
+[![npm package][npm-image]][npm-url] 
+[![Travis][build-image]][build-url]
+[![Coverage Status][coveralls-image]][coveralls-url]
 
 # spy4js
 
-[build-badge]: https://img.shields.io/travis/fdc-viktor-luft/spy4js/master.svg?style=flat-square
-[build]: https://travis-ci.org/fdc-viktor-luft/spy4js
-
-[npm-badge]: https://img.shields.io/npm/v/spy4js.svg?style=flat-square
-[npm]: https://www.npmjs.org/package/spy4js
-
 ### Benefits
 
-  - Well tested
+  - Flow
+  - Performance
+  - No dependencies
+  - Optimized error messages
+  - Customizable
+  - Intuitive
   - Used in production of large projects
-  - Flow support (therefore autocompletion in some IDEs)
-  - Without dependecies nor boilerplate
-  - Helpful Debug-Messages
-  - Supports own "equals" implementation on objects
-  - A lot of useful operations on spys
 
 ### Introduction
 
 **spy4js** provides a stand-alone spy framework. It is decoupled by any dependencies
-and other assertion frameworks. Other than most test frameworks it uses a different -
-maybe you will need to get used to - test notation. It does not make assertion,
-which are expected to be fulfilled on runtime, but displays facts, that are
-considered to be fulfilled on runtime. And if this fact is not true, it will
-throw an exception. I consider the way of writing facts more regular because it
-fits more to the rest of the written code.
+and other assertion frameworks.
 
-**spy4js** comes with the one interesting (es6 like) class `Spy`. The spy instances
+**spy4js** exports only one object called `Spy`. The spy instances
 are treated as class instances and come with a lot of useful features. See below for more.
 
 ### Installation
@@ -464,6 +455,11 @@ const differentNumber = callArgs[2]['attr2'];
 ## Planned
 
 * *After*-methods for `calls`, `returns` and `throws`.
-* Update of Dev-dependencies.
-* Upgrade of Dev-environment.
-* Upgrade flow but make also compatibility checks for older versions of flow.
+* Integrate automatic checks on older flow versions to determine the oldest compatible flow version.
+
+[build-image]: https://img.shields.io/travis/fdc-viktor-luft/spy4js/master.svg?style=flat-square
+[build-url]: https://travis-ci.org/fdc-viktor-luft/spy4js
+[npm-image]: https://img.shields.io/npm/v/spy4js.svg?style=flat-square
+[npm-url]: https://www.npmjs.org/package/spy4js
+[coveralls-image]: https://coveralls.io/repos/github/fdc-viktor-luft/spy4js/badge.svg?branch=master
+[coveralls-url]: https://coveralls.io/github/fdc-viktor-luft/spy4js?branch=master
