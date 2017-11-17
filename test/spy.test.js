@@ -87,37 +87,33 @@ describe('Spy - Utils', () => {
         Spy.on(testObject, 'attr');
     });
 
-    it(
-        'should place many Spies on an object and ' +
-            'record different call arguments',
-        cb => {
-            const testObject = {
-                func1: errorThrower,
-                func2: errorThrower,
-                func3: () => cb(),
-                func4: errorThrower,
-            };
+    it('should place many Spies on an object and record different call arguments', cb => {
+        const testObject = {
+            func1: errorThrower,
+            func2: errorThrower,
+            func3: () => cb(),
+            func4: errorThrower,
+        };
 
-            const [spy1, spy2, spy3] = Spy.onMany(
-                testObject,
-                'func1',
-                'func2',
-                'func4'
-            );
-            testObject.func1('test', 6);
-            equals(spy1.getCallArguments(), ['test', 6]);
-            spy1.wasCalledWith('test', 6);
-            testObject.func2('', 7);
-            equals(spy2.getCallArguments(), ['', 7]);
-            spy2.wasCalledWith('', 7);
-            testObject.func4();
-            equals(spy3.getCallArguments(), []);
-            spy3.wasCalledWith();
-            // if this would get spied, the test callback
-            // would never be called which would make the test fail
-            testObject.func3();
-        }
-    );
+        const [spy1, spy2, spy3] = Spy.onMany(
+            testObject,
+            'func1',
+            'func2',
+            'func4'
+        );
+        testObject.func1('test', 6);
+        equals(spy1.getCallArguments(), ['test', 6]);
+        spy1.wasCalledWith('test', 6);
+        testObject.func2('', 7);
+        equals(spy2.getCallArguments(), ['', 7]);
+        spy2.wasCalledWith('', 7);
+        testObject.func4();
+        equals(spy3.getCallArguments(), []);
+        spy3.wasCalledWith();
+        // if this would get spied, the test callback
+        // would never be called which would make the test fail
+        testObject.func3();
+    });
 
     it('throws an exception if getCallArguments gets called with float', () => {
         const spy = new Spy();
@@ -406,66 +402,73 @@ describe('Spy - Utils', () => {
         equals(testObj._key, 'callParams1');
     });
 
-    it(
-        'should call the given input-functions ' +
-            'sequentially after the spy was called',
-        () => {
-            const testObj = { _key: 'testObj' };
-            const spy = new Spy().calls(
-                arg => {
-                    testObj._key = arg;
-                    return null;
-                },
-                arg => {
-                    testObj._key = 'some other ' + arg;
-                    return 42;
-                }
-            );
-            equals(spy('callParams1'), null);
-            equals(testObj._key, 'callParams1');
-            equals(spy('callParams2'), 42);
-            equals(testObj._key, 'some other callParams2');
-            equals(spy('callParams3'), 42);
-            equals(testObj._key, 'some other callParams3');
-        }
-    );
+    it('ignores specified arguments when using Spy.IGNORE together with wasCalledWith', () => {
+        const testObj = {
+            _key: 'some hard to construct and/or uninteresting value',
+            prop: 'whatever',
+        };
+        const spy = new Spy();
+        spy(testObj, 42);
 
-    it(
-        'should make the spy transparent' +
-            ' (mainly for spies on object properties)',
-        () => {
-            const testObject = { someFunc: errorThrower };
-            const spy = Spy.on(testObject, 'someFunc').transparent();
-            throws(() => testObject.someFunc('test', 6), {
-                message: 'never call this func directly',
-            });
-            spy.wasCalledWith('test', 6);
-        }
-    );
+        spy.wasCalledWith(Spy.IGNORE, Spy.IGNORE); // this is typically non-sense, but test it anyway
+        spy.wasCalledWith(Spy.IGNORE, 42);
+        spy.wasCalledWith({ _key: Spy.IGNORE, prop: 'whatever' }, 42);
+        spy.wasCalledWith({ _key: Spy.IGNORE, prop: 'whatever' }, Spy.IGNORE);
+        spy.wasCalledWith({ _key: Spy.IGNORE, prop: Spy.IGNORE }, Spy.IGNORE);
+        throws(() =>
+            spy.wasCalledWith({ _key: Spy.IGNORE, prop: 'FAILURE' }, Spy.IGNORE)
+        );
+    });
 
-    it(
-        'should make the spy transparent after' + ' a certain amount of calls',
-        () => {
-            const testObject = { someFunc: errorThrower };
-            const spy = Spy.on(testObject, 'someFunc')
-                .returns(12, 13)
-                .transparentAfter(2);
-            equals(testObject.someFunc('test1', 42), 12);
-            equals(testObject.someFunc('test2'), 13);
-            throws(() => testObject.someFunc('test3', { testProp: 'test' }), {
-                message: 'never call this func directly',
-            });
-            throws(() => testObject.someFunc('test4'), {
-                message: 'never call this func directly',
-            });
+    it('should call the given input-functions sequentially after the spy was called', () => {
+        const testObj = { _key: 'testObj' };
+        const spy = new Spy().calls(
+            arg => {
+                testObj._key = arg;
+                return null;
+            },
+            arg => {
+                testObj._key = 'some other ' + arg;
+                return 42;
+            }
+        );
+        equals(spy('callParams1'), null);
+        equals(testObj._key, 'callParams1');
+        equals(spy('callParams2'), 42);
+        equals(testObj._key, 'some other callParams2');
+        equals(spy('callParams3'), 42);
+        equals(testObj._key, 'some other callParams3');
+    });
 
-            spy.wasCalled(4);
-            spy.wasCalledWith('test1', 42);
-            spy.wasCalledWith('test2');
-            spy.wasCalledWith('test3', { testProp: 'test' });
-            spy.wasCalledWith('test4');
-        }
-    );
+    it('should make the spy transparent (mainly for spies on object properties)', () => {
+        const testObject = { someFunc: errorThrower };
+        const spy = Spy.on(testObject, 'someFunc').transparent();
+        throws(() => testObject.someFunc('test', 6), {
+            message: 'never call this func directly',
+        });
+        spy.wasCalledWith('test', 6);
+    });
+
+    it('should make the spy transparent after a certain amount of calls', () => {
+        const testObject = { someFunc: errorThrower };
+        const spy = Spy.on(testObject, 'someFunc')
+            .returns(12, 13)
+            .transparentAfter(2);
+        equals(testObject.someFunc('test1', 42), 12);
+        equals(testObject.someFunc('test2'), 13);
+        throws(() => testObject.someFunc('test3', { testProp: 'test' }), {
+            message: 'never call this func directly',
+        });
+        throws(() => testObject.someFunc('test4'), {
+            message: 'never call this func directly',
+        });
+
+        spy.wasCalled(4);
+        spy.wasCalledWith('test1', 42);
+        spy.wasCalledWith('test2');
+        spy.wasCalledWith('test3', { testProp: 'test' });
+        spy.wasCalledWith('test4');
+    });
 
     it('should do nothing after for transparent restored spy', () => {
         const testObject = { someFunc: errorThrower };
@@ -518,88 +521,80 @@ describe('Spy - Utils', () => {
     const testInstance3 = new TestClass(4);
     const testInstance4 = new TestClass(5);
 
-    it(
-        'should use own "equals" implementations as default, ' +
-            'but is able to reconfigure this behaviour',
-        () => {
-            const spy = new Spy();
+    it('should use own "equals" implementations as default, but is able to reconfigure this behaviour', () => {
+        const spy = new Spy();
 
-            spy(testInstance1);
+        spy(testInstance1);
 
+        // default config
+        spy.wasCalledWith(testInstance1);
+        spy.wasCalledWith(testInstance2);
+        spy.wasCalledWith(testInstance3);
+        spy.wasNotCalledWith(testInstance4);
+
+        spy.configure({ useOwnEquals: false });
+
+        // after configuration
+        spy.wasCalledWith(testInstance1);
+        spy.wasCalledWith(testInstance2);
+        spy.wasNotCalledWith(testInstance3);
+        spy.wasNotCalledWith(testInstance4);
+    });
+
+    it('does override the default behaviour for the use of own "equals" implementations. ', () => {
+        const testObj1 = { func1: noop };
+        const testObj2 = { func2: noop };
+        const testObj3 = { func3: noop };
+        // still the initial default config
+        const defaultSpy1 = new Spy('defaultSpy1');
+        // using configure without the "useOwnEquals"-config
+        // does not effect the behaviour
+        Spy.configure({});
+        const defaultSpy2 = Spy.on(testObj1, 'func1');
+
+        // make the new configuration for all spies
+        Spy.configure({ useOwnEquals: false });
+        const configuredSpy1 = new Spy('configuredSpy1');
+        const configuredSpy2 = Spy.on(testObj2, 'func2');
+
+        // configure it back to the initial config
+        Spy.configure({ useOwnEquals: true });
+        const reconfiguredSpy1 = new Spy('reconfiguredSpy1');
+        const reconfiguredSpy2 = Spy.on(testObj3, 'func3');
+
+        // call all spies with the same object
+        defaultSpy1(testInstance1);
+        testObj1.func1(testInstance1);
+        configuredSpy1(testInstance1);
+        testObj2.func2(testInstance1);
+        reconfiguredSpy1(testInstance1);
+        testObj3.func3(testInstance1);
+
+        const wasCalledChecksForOwnEquals = (spy: Spy) => {
             // default config
             spy.wasCalledWith(testInstance1);
             spy.wasCalledWith(testInstance2);
             spy.wasCalledWith(testInstance3);
             spy.wasNotCalledWith(testInstance4);
+        };
 
-            spy.configure({ useOwnEquals: false });
-
+        const wasCalledChecksForNotOwnEquals = (spy: Spy) => {
             // after configuration
             spy.wasCalledWith(testInstance1);
             spy.wasCalledWith(testInstance2);
             spy.wasNotCalledWith(testInstance3);
             spy.wasNotCalledWith(testInstance4);
-        }
-    );
+        };
 
-    it(
-        'does override the default behaviour for the use of' +
-            'own "equals" implementations. ',
-        () => {
-            const testObj1 = { func1: noop };
-            const testObj2 = { func2: noop };
-            const testObj3 = { func3: noop };
-            // still the initial default config
-            const defaultSpy1 = new Spy('defaultSpy1');
-            // using configure without the "useOwnEquals"-config
-            // does not effect the behaviour
-            Spy.configure({});
-            const defaultSpy2 = Spy.on(testObj1, 'func1');
+        wasCalledChecksForOwnEquals(defaultSpy1);
+        wasCalledChecksForOwnEquals(defaultSpy2);
 
-            // make the new configuration for all spies
-            Spy.configure({ useOwnEquals: false });
-            const configuredSpy1 = new Spy('configuredSpy1');
-            const configuredSpy2 = Spy.on(testObj2, 'func2');
+        wasCalledChecksForNotOwnEquals(configuredSpy1);
+        wasCalledChecksForNotOwnEquals(configuredSpy2);
 
-            // configure it back to the initial config
-            Spy.configure({ useOwnEquals: true });
-            const reconfiguredSpy1 = new Spy('reconfiguredSpy1');
-            const reconfiguredSpy2 = Spy.on(testObj3, 'func3');
-
-            // call all spies with the same object
-            defaultSpy1(testInstance1);
-            testObj1.func1(testInstance1);
-            configuredSpy1(testInstance1);
-            testObj2.func2(testInstance1);
-            reconfiguredSpy1(testInstance1);
-            testObj3.func3(testInstance1);
-
-            const wasCalledChecksForOwnEquals = (spy: Spy) => {
-                // default config
-                spy.wasCalledWith(testInstance1);
-                spy.wasCalledWith(testInstance2);
-                spy.wasCalledWith(testInstance3);
-                spy.wasNotCalledWith(testInstance4);
-            };
-
-            const wasCalledChecksForNotOwnEquals = (spy: Spy) => {
-                // after configuration
-                spy.wasCalledWith(testInstance1);
-                spy.wasCalledWith(testInstance2);
-                spy.wasNotCalledWith(testInstance3);
-                spy.wasNotCalledWith(testInstance4);
-            };
-
-            wasCalledChecksForOwnEquals(defaultSpy1);
-            wasCalledChecksForOwnEquals(defaultSpy2);
-
-            wasCalledChecksForNotOwnEquals(configuredSpy1);
-            wasCalledChecksForNotOwnEquals(configuredSpy2);
-
-            wasCalledChecksForOwnEquals(reconfiguredSpy1);
-            wasCalledChecksForOwnEquals(reconfiguredSpy2);
-        }
-    );
+        wasCalledChecksForOwnEquals(reconfiguredSpy1);
+        wasCalledChecksForOwnEquals(reconfiguredSpy2);
+    });
 
     it('does not allow direct access to the internal properties of each Spy', () => {
         const testObj = { myFunc: () => {} };

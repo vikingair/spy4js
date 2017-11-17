@@ -54,6 +54,25 @@ const objectKeys = (arrOrObj: any): Array<string> => {
 };
 
 /**
+ * This symbol serves as replacement to ignore any
+ * inequality and skip further comparisons.
+ */
+const IGNORE = Symbol('__Spy_IGNORE__');
+
+/**
+ *
+ */
+const JsonStringifyReplacer = (k: any, v: any): any => {
+    if (v === IGNORE) {
+        return 'Spy.IGNORE';
+    }
+    if (v === undefined) {
+        return 'UNDEFINED';
+    }
+    return v;
+};
+
+/**
  * This function is the internal representation of
  * "differenceOf". It does recursively call itself.
  * Read more below.
@@ -80,6 +99,9 @@ const __diff = (
     useOwnEquals: boolean,
     alreadyComparedArray: Array<any> = []
 ): string | void => {
+    if (a === IGNORE || b === IGNORE) {
+        return;
+    }
     if (a === b) {
         return;
     }
@@ -194,4 +216,4 @@ const differenceOf = (
     return __diff(a, b, true, config.useOwnEquals);
 };
 
-export { differenceOf, forEach, objectKeys };
+export { differenceOf, forEach, objectKeys, IGNORE, JsonStringifyReplacer };

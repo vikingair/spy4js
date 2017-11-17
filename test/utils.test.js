@@ -2,7 +2,12 @@
  * @flow
  */
 
-import { differenceOf, forEach } from '../src/utils';
+import {
+    differenceOf,
+    forEach,
+    IGNORE,
+    JsonStringifyReplacer,
+} from '../src/utils';
 import { equals } from '../util/facts';
 
 // I am comparing here with those basic comparators,
@@ -93,6 +98,19 @@ describe('Spy - Equality', () => {
         is(
             differenceOf(someInstance, someDifferentInstance),
             '--> attr3 / different date'
+        );
+    });
+
+    it('assumes always equality for the IGNORE object', () => {
+        is(differenceOf(IGNORE, null), undefined);
+        is(differenceOf(new Date(), IGNORE), undefined);
+        is(differenceOf({ a: 'any attribute' }, { a: IGNORE }), undefined);
+        is(
+            differenceOf(
+                ['first', Symbol('_TEST_'), 'third'],
+                ['first', IGNORE, 'third']
+            ),
+            undefined
         );
     });
 
@@ -208,5 +226,13 @@ describe('Spy - Equality', () => {
         const obj1 = { a: [{ a: 'someString' }, { b: 'someString' }] };
         const obj2 = { a: [{ a: 'someString' }, { b: 'someOtherString' }] };
         is(differenceOf(obj1, obj2), '--> a / 1 / b / different string');
+    });
+
+    it('replaces the given values correctly via JSON.stringify', () => {
+        is(JSON.stringify([IGNORE], JsonStringifyReplacer), '["Spy.IGNORE"]');
+        is(
+            JSON.stringify([undefined, null], JsonStringifyReplacer),
+            '["UNDEFINED",null]'
+        );
     });
 });

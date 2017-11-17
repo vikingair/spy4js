@@ -157,6 +157,27 @@ a very comfortable to this automatically after every test (like in an "afterEach
 Spy.restoreAll();
 ```
 
+**Hint**: 
+To integrate as default that all spies get restored after each test run,
+you can integrate the following snippet to replace the default describe.
+For those of you working with
+[create-react-app](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#srcsetuptestsjs)
+may include the snippet in the `src/setupTests.js`.
+
+```js
+import { Spy } from 'spy4js';
+
+const oldDescribe = describe;
+window.describe = (string, func) => {
+    oldDescribe(string, () => {
+        afterEach(() => {
+            Spy.restoreAll();
+        });
+        return func();
+    });
+};
+```
+
 And also sometimes it is necessary to have access to some of the call arguments with
 which the spy was called.
 
@@ -233,6 +254,20 @@ Spy.restoreAll() => Array<Spy>
 ```
 Does restore all mocked objects to their original state. See [restore](#restore) for
 further information.
+
+### IGNORE (static)
+```
+Spy.IGNORE = $Internal Symbol$
+```
+This object can be passed anywhere where you want the "[wasCalledWith](#wasCalledWith)"
+to ignore that object or value for comparison.
+```js
+spy({prop: 'value', other: 13}, 12);
+
+spy.wasCalledWith(Spy.IGNORE, 12);
+spy.wasCalledWith({prop: Spy.IGNORE, other: 13}, 12);
+```
+
 
 ### configure
 ```
@@ -325,6 +360,9 @@ This fact displays that the spy was called at least once with equal arguments.
 
 The equality check is a deep equality check, which (by default) does consider
 own "equals" implementations.
+
+By supplying `Spy.IGNORE` anywhere inside the expected call arguments, you
+can avoid that the comparison is further executed. See [Spy.IGNORE](#IGNORE) for further information and examples.
 
 The deep equality check does also recursively iterate to the first difference found and is able
 to return a string which contains valuable information about the first found difference. 
@@ -456,6 +494,7 @@ const differentNumber = callArgs[2]['attr2'];
 
 * *After*-methods for `calls`, `returns` and `throws`.
 * Integrate automatic checks on older flow versions to determine the oldest compatible flow version.
+* Implement own object renderer and replace JSON.stringify.
 
 [build-image]: https://img.shields.io/travis/fdc-viktor-luft/spy4js/master.svg?style=flat-square
 [build-url]: https://travis-ci.org/fdc-viktor-luft/spy4js
