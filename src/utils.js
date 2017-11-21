@@ -60,23 +60,6 @@ const objectKeys = (arrOrObj: any): Array<string> => {
 const IGNORE = Symbol('__Spy_IGNORE__');
 
 /**
- * This replacer is used to recognize some special
- * values as something else than the default would display.
- *
- * It is used to modify the render behaviour of
- * JSON.stringify as long as no other renderer will be used.
- */
-const JsonStringifyReplacer = (k: any, v: any): any => {
-    if (v === IGNORE) {
-        return 'Spy.IGNORE';
-    }
-    if (v === undefined) {
-        return 'UNDEFINED';
-    }
-    return v;
-};
-
-/**
  * This function is the internal representation of
  * "differenceOf". It does recursively call itself.
  * Read more below.
@@ -113,8 +96,9 @@ const __diff = (
         return 'null or undefined did not match';
     }
     const aClass = Object.prototype.toString.call(a);
-    if (aClass !== Object.prototype.toString.call(b)) {
-        return 'different object types';
+    const bClass = Object.prototype.toString.call(b);
+    if (aClass !== bClass) {
+        return `different object types: ${aClass} <-> ${bClass}`;
     }
     switch (aClass) {
         case '[object RegExp]':
@@ -145,11 +129,8 @@ const __diff = (
     }
     const aKeys = objectKeys(a);
     const bKeys = objectKeys(b);
-    if (aKeys.length !== bKeys.length) {
-        return 'different key length';
-    }
-    if (useOwnEquals && a['equals'] instanceof Function) {
-        if (a['equals'](b)) {
+    if (useOwnEquals && a.equals instanceof Function) {
+        if (a.equals(b)) {
             return;
         }
         return (
@@ -163,8 +144,9 @@ const __diff = (
         return;
     }
     alreadyComparedArray.push(a);
-    for (let i = 0; i < aKeys.length; i++) {
-        const key = aKeys[i];
+    const keys = aKeys.length > bKeys.length ? aKeys : bKeys;
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
         const diffStr = __diff(
             a[key],
             b[key],
@@ -220,4 +202,4 @@ const differenceOf = (
     return __diff(a, b, true, config.useOwnEquals);
 };
 
-export { differenceOf, forEach, objectKeys, IGNORE, JsonStringifyReplacer };
+export { differenceOf, forEach, objectKeys, IGNORE };

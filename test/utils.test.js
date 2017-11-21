@@ -2,12 +2,7 @@
  * @flow
  */
 
-import {
-    differenceOf,
-    forEach,
-    IGNORE,
-    JsonStringifyReplacer,
-} from '../src/utils';
+import { differenceOf, forEach, IGNORE } from '../src/utils';
 import { equals } from '../util/facts';
 
 // I am comparing here with those basic comparators,
@@ -121,7 +116,10 @@ describe('Spy - Equality', () => {
         is(differenceOf(null, 'test2'), 'null or undefined did not match');
         is(differenceOf(undefined, null), 'null or undefined did not match');
         // different types
-        is(differenceOf('test', 123), 'different object types');
+        is(
+            differenceOf('test', 123),
+            'different object types: [object String] <-> [object Number]'
+        );
         // string
         is(differenceOf('test', 'test'), undefined);
         is(differenceOf('test1', 'test2'), 'different string');
@@ -182,9 +180,15 @@ describe('Spy - Equality', () => {
         );
     });
 
-    it('should flatly detect different keys length correctly', () => {
-        is(differenceOf([1, 2, 'test'], [1, 2, 'test']), undefined);
-        is(differenceOf([1, 2, 'test'], [1, 'test']), 'different key length');
+    it('treats undefined props the same as if the prop has an undefined value', () => {
+        is(differenceOf([1, 2, 'test', undefined], [1, 2, 'test']), undefined);
+        is(
+            differenceOf(
+                { prop1: 'test' },
+                { prop1: 'test', prop2: undefined }
+            ),
+            undefined
+        );
     });
 
     it('should compare with defined equals key, if this exists', () => {
@@ -226,13 +230,5 @@ describe('Spy - Equality', () => {
         const obj1 = { a: [{ a: 'someString' }, { b: 'someString' }] };
         const obj2 = { a: [{ a: 'someString' }, { b: 'someOtherString' }] };
         is(differenceOf(obj1, obj2), '--> a / 1 / b / different string');
-    });
-
-    it('replaces the given values correctly via JSON.stringify', () => {
-        is(JSON.stringify([IGNORE], JsonStringifyReplacer), '["Spy.IGNORE"]');
-        is(
-            JSON.stringify([undefined, null], JsonStringifyReplacer),
-            '["UNDEFINED",null]'
-        );
     });
 });

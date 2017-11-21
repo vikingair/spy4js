@@ -5,10 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Spy = undefined;
 
-var _stringify = require('babel-runtime/core-js/json/stringify');
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
 var _symbol = require('babel-runtime/core-js/symbol');
 
 var _symbol2 = _interopRequireDefault(_symbol);
@@ -16,6 +12,8 @@ var _symbol2 = _interopRequireDefault(_symbol);
 var _utils = require('./utils');
 
 var _registry = require('./registry');
+
+var _serializer = require('./serializer');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -163,7 +161,7 @@ Spy.IGNORE = _utils.IGNORE;
 Spy.on = function on(obj, methodName) {
     var method = obj[methodName];
     if (!(method instanceof Function)) {
-        throw new Error('The object attribute \'' + methodName + '\' ' + ('was: ' + (0, _stringify2.default)(method, _utils.JsonStringifyReplacer) + '\n\n') + 'You should only spy on functions!');
+        throw new Error('The object attribute \'' + methodName + '\' ' + ('was: ' + (0, _serializer.serialize)(method) + '\n\n') + 'You should only spy on functions!');
     }
     if (method[Symbols.isSpy]) {
         throw new Error('The objects attribute \'' + methodName + '\'' + ' was already spied. Please make sure to spy' + ' only once at a time at any attribute.');
@@ -500,7 +498,7 @@ Spy.prototype.wasCalledWith = function () {
         }
         diffInfo.push(diff);
     }
-    throw new Error('\n\n' + this[Symbols.name] + ' was considered' + ' to be called with the following arguments:\n\n' + ('    --> ' + (0, _stringify2.default)(args, _utils.JsonStringifyReplacer) + '\n\n') + 'Actually there were:\n\n' + this.showCallArguments(diffInfo));
+    throw new Error('\n\n' + this[Symbols.name] + ' was considered' + ' to be called with the following arguments:\n\n' + ('    --> ' + (0, _serializer.serialize)(args) + '\n\n') + 'Actually there were:\n\n' + this.showCallArguments(diffInfo));
 };
 
 /**
@@ -534,7 +532,7 @@ Spy.prototype.wasNotCalledWith = function () {
         errorOccurred = true;
     }
     if (!errorOccurred) {
-        throw new Error('\n\n' + this[Symbols.name] + ' was called' + ' unexpectedly with the following arguments:\n\n' + ('    --> ' + (0, _stringify2.default)(args, _utils.JsonStringifyReplacer) + '\n\n'));
+        throw new Error('\n\n' + this[Symbols.name] + ' was called' + ' unexpectedly with the following arguments:\n\n' + ('    --> ' + (0, _serializer.serialize)(args) + '\n\n'));
     }
 };
 
@@ -650,7 +648,7 @@ Spy.prototype.showCallArguments = function () {
     }
     var response = '';
     for (var i = 0; i < madeCalls.length; i++) {
-        var _args = (0, _stringify2.default)(madeCalls[i].arguments, _utils.JsonStringifyReplacer);
+        var _args = (0, _serializer.serialize)(madeCalls[i].arguments);
         response += 'call ' + i + ': ' + _args + '\n';
         if (additionalInformation[i]) {
             response += '        ' + additionalInformation[i] + '\n';

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.JsonStringifyReplacer = exports.IGNORE = exports.objectKeys = exports.forEach = exports.differenceOf = undefined;
+exports.IGNORE = exports.objectKeys = exports.forEach = exports.differenceOf = undefined;
 
 var _symbol = require('babel-runtime/core-js/symbol');
 
@@ -68,23 +68,6 @@ var objectKeys = function objectKeys(arrOrObj) {
 var IGNORE = (0, _symbol2.default)('__Spy_IGNORE__');
 
 /**
- * This replacer is used to recognize some special
- * values as something else than the default would display.
- *
- * It is used to modify the render behaviour of
- * JSON.stringify as long as no other renderer will be used.
- */
-var JsonStringifyReplacer = function JsonStringifyReplacer(k, v) {
-    if (v === IGNORE) {
-        return 'Spy.IGNORE';
-    }
-    if (v === undefined) {
-        return 'UNDEFINED';
-    }
-    return v;
-};
-
-/**
  * This function is the internal representation of
  * "differenceOf". It does recursively call itself.
  * Read more below.
@@ -117,8 +100,9 @@ var __diff = function __diff(a, b, initial, useOwnEquals) {
         return 'null or undefined did not match';
     }
     var aClass = Object.prototype.toString.call(a);
-    if (aClass !== Object.prototype.toString.call(b)) {
-        return 'different object types';
+    var bClass = Object.prototype.toString.call(b);
+    if (aClass !== bClass) {
+        return 'different object types: ' + aClass + ' <-> ' + bClass;
     }
     switch (aClass) {
         case '[object RegExp]':
@@ -149,11 +133,8 @@ var __diff = function __diff(a, b, initial, useOwnEquals) {
     }
     var aKeys = objectKeys(a);
     var bKeys = objectKeys(b);
-    if (aKeys.length !== bKeys.length) {
-        return 'different key length';
-    }
-    if (useOwnEquals && a['equals'] instanceof Function) {
-        if (a['equals'](b)) {
+    if (useOwnEquals && a.equals instanceof Function) {
+        if (a.equals(b)) {
             return;
         }
         return 'own equals method failed <- ' + 'Maybe you want to disable the usage ' + 'of own equals implementation? ' + '[ Use: spy.configure({useOwnEquals: false}) ]';
@@ -162,8 +143,9 @@ var __diff = function __diff(a, b, initial, useOwnEquals) {
         return;
     }
     alreadyComparedArray.push(a);
-    for (var i = 0; i < aKeys.length; i++) {
-        var _key2 = aKeys[i];
+    var keys = aKeys.length > bKeys.length ? aKeys : bKeys;
+    for (var i = 0; i < keys.length; i++) {
+        var _key2 = keys[i];
         var diffStr = __diff(a[_key2], b[_key2], false, useOwnEquals, alreadyComparedArray);
         if (diffStr !== undefined) {
             return (initial ? '--> ' + _key2 : '' + _key2) + ' / ' + diffStr;
@@ -215,4 +197,3 @@ exports.differenceOf = differenceOf;
 exports.forEach = forEach;
 exports.objectKeys = objectKeys;
 exports.IGNORE = IGNORE;
-exports.JsonStringifyReplacer = JsonStringifyReplacer;

@@ -421,23 +421,23 @@ spy.wasCalledWith(42, 'test', {attr1: [1, 2, new Date(2017, 1, 20)], attr2: 1336
 ...would produce the following error output:
 ```
 Error: 
-	
-For my awesome spy did not find call arguments:
 
-    --> [42,"test",{"attr1":[1,2,"2017-02-19T23:00:00.000Z"],"attr2":1336}]
+my awesome spy was considered to be called with the following arguments:
+
+    --> [42, "test", {attr1: [1, 2, >Date:1487545200000<], attr2: 1336}]
 
 Actually there were:
 
-call 0: [42,"test",{"attr1":[1,2,"2017-02-19T23:00:00.000Z"],"attr2":1337}]
+call 0: [42, "test", {attr1: [1, 2, >Date:1487545200000<], attr2: 1337}]
         --> 2 / attr2 / different number
-call 1: [42,"test",{"attr1":[0,2,"2017-02-19T23:00:00.000Z"],"attr2":1336}]
+call 1: [42, "test", {attr1: [0, 2, >Date:1487545200000<], attr2: 1336}]
         --> 2 / attr1 / 0 / different number
-call 2: [42,"test",{"attr1":[1,2,"2017-02-20T23:00:00.000Z"],"attr2":1336}]
+call 2: [42, "test", {attr1: [1, 2, >Date:1487631600000<], attr2: 1336}]
         --> 2 / attr1 / 2 / different date
-call 3: [42,"tes",{"attr1":[1,2,"2017-02-19T23:00:00.000Z"],"attr2":1336}]
+call 3: [42, "tes", {attr1: [1, 2, >Date:1487545200000<], attr2: 1336}]
         --> 1 / different string
-call 4: [42,"test"]
-        different key length
+call 4: [42, "test"]
+        --> 2 / null or undefined did not match
 ```
 There you can see that the arguments of the fact (displayed above all others) does not
 match any of the call arguments on the 5 made calls. 
@@ -456,45 +456,10 @@ different objects you could:
 const callArgs = spy.getCallArguments(0/* for the 0'th call above*/);
 const differentNumber = callArgs[2]['attr2'];
 ```
-
-## Changes
-
-* **1.2.2**
-  * Updated development environment and fixed a comparison issue with functions.
-* **1.2.1**
-  * Updated flow to latest version and fixed production errors.
-* **1.2.0**
-  * Changed license to MIT.
-  * Restructured code base and moved initialization totally into the constructor.
-  * Fixed a flow issue were not-mocking spies were implicitly casted to any.
-* **1.1.4**
-  * Lifted Code-Coverage to 100 %.
-  * Fixed a flow compatibility issue.
-* **1.1.2**
-  * Connected travis.ci and improved code coverage slightly.
-* **1.1.1**
-  * Connected Coverage-Reporter and restructured files.
-* **1.1.0:**
-  * Implemented `getCallArgument` as extension of `getFirstCallArgument`.
-  * Removed `getFirstCallArgument`.
-  * Added global configuration possibility on Spy.
-* **1.0.7:**
-  * Removed expect-dev-dependency.
-  * Added `getCallCount`.
-  * Updated some debug messages. 
-* **1.0.6:**
-  * Updated Babel and transpiled es6-Symbols for older browsers.
-* **1.0.5:**
-  * Switched to es6-Symbols to make the access of private spy properties less accessible.
-  * Added a persistence layer for spies.
-* **1.0.4:**
-  * Added checks to avoid spying on spies.
   
-## Planned
+## Future
 
-* *After*-methods for `calls`, `returns` and `throws`.
 * Integrate automatic checks on older flow versions to determine the oldest compatible flow version.
-* Implement own object renderer and replace JSON.stringify.
 
 [build-image]: https://img.shields.io/travis/fdc-viktor-luft/spy4js/master.svg?style=flat-square
 [build-url]: https://travis-ci.org/fdc-viktor-luft/spy4js

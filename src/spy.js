@@ -2,8 +2,9 @@
  * @flow
  */
 
-import { differenceOf, forEach, IGNORE, JsonStringifyReplacer } from './utils';
+import { differenceOf, forEach, IGNORE } from './utils';
 import { SpyRegistry } from './registry';
+import { serialize } from './serializer';
 
 /**
  *
@@ -146,7 +147,7 @@ Spy.on = function on(obj: Object, methodName: string): Spy {
     if (!(method instanceof Function)) {
         throw new Error(
             `The object attribute '${methodName}' ` +
-                `was: ${JSON.stringify(method, JsonStringifyReplacer)}\n\n` +
+                `was: ${serialize(method)}\n\n` +
                 'You should only spy on functions!'
         );
     }
@@ -491,7 +492,7 @@ Spy.prototype.wasCalledWith = function(...args: Array<any>) {
     throw new Error(
         `\n\n${this[Symbols.name]} was considered` +
             ' to be called with the following arguments:\n\n' +
-            `    --> ${JSON.stringify(args, JsonStringifyReplacer)}\n\n` +
+            `    --> ${serialize(args)}\n\n` +
             'Actually there were:\n\n' +
             this.showCallArguments(diffInfo)
     );
@@ -526,7 +527,7 @@ Spy.prototype.wasNotCalledWith = function(...args: Array<any>) {
         throw new Error(
             `\n\n${this[Symbols.name]} was called` +
                 ' unexpectedly with the following arguments:\n\n' +
-                `    --> ${JSON.stringify(args, JsonStringifyReplacer)}\n\n`
+                `    --> ${serialize(args)}\n\n`
         );
     }
 };
@@ -645,10 +646,7 @@ Spy.prototype.showCallArguments = function(
     }
     let response = '';
     for (let i = 0; i < madeCalls.length; i++) {
-        const args = JSON.stringify(
-            madeCalls[i].arguments,
-            JsonStringifyReplacer
-        );
+        const args = serialize(madeCalls[i].arguments);
         response += `call ${i}: ${args}\n`;
         if (additionalInformation[i]) {
             response += `        ${additionalInformation[i]}\n`;
