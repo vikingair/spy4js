@@ -1,6 +1,6 @@
 {
   "name": "spy4js",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Smart, compact and powerful spy test framework",
   "jest": {
     "collectCoverageFrom": [

@@ -113,8 +113,8 @@ describe('Spy - Equality', () => {
         // null and/or undefined
         is(differenceOf(null, null), undefined);
         is(differenceOf(undefined, undefined), undefined);
-        is(differenceOf(null, 'test2'), 'null or undefined did not match');
-        is(differenceOf(undefined, null), 'null or undefined did not match');
+        is(differenceOf(null, 'test2'), 'one was null');
+        is(differenceOf(undefined, null), 'one was undefined');
         // different types
         is(
             differenceOf('test', 123),
@@ -230,5 +230,15 @@ describe('Spy - Equality', () => {
         const obj1 = { a: [{ a: 'someString' }, { b: 'someString' }] };
         const obj2 = { a: [{ a: 'someString' }, { b: 'someOtherString' }] };
         is(differenceOf(obj1, obj2), '--> a / 1 / b / different string');
+    });
+
+    it('considers all keys when comparing objects', () => {
+        const obj11 = { a: 'same', b1: undefined, c1: 'some' };
+        const obj12 = { a: 'same', b2: undefined, c2: undefined };
+        is(differenceOf(obj11, obj12), '--> c1 / one was undefined');
+
+        const obj21 = { a: 'same', b1: undefined, c1: undefined };
+        const obj22 = { a: 'same', b2: undefined, c2: 'some' };
+        is(differenceOf(obj21, obj22), '--> c2 / one was undefined');
     });
 });

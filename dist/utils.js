@@ -9,6 +9,10 @@ var _symbol = require('babel-runtime/core-js/symbol');
 
 var _symbol2 = _interopRequireDefault(_symbol);
 
+var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -61,6 +65,16 @@ var objectKeys = function objectKeys(arrOrObj) {
     return keys;
 };
 
+var mergeArrays = function mergeArrays(arr1, arr2) {
+    var result = [].concat((0, _toConsumableArray3.default)(arr1));
+    forEach(arr2, function (key, val) {
+        if (arr1.indexOf(val) === -1) {
+            result.push(val);
+        }
+    });
+    return result;
+};
+
 /**
  * This symbol serves as replacement to ignore any
  * inequality and skip further comparisons.
@@ -96,8 +110,11 @@ var __diff = function __diff(a, b, initial, useOwnEquals) {
     if (a === b) {
         return;
     }
-    if (a === undefined || a === null || b === undefined || b === null) {
-        return 'null or undefined did not match';
+    if (a === undefined || b === undefined) {
+        return 'one was undefined';
+    }
+    if (a === null || b === null) {
+        return 'one was null';
     }
     var aClass = Object.prototype.toString.call(a);
     var bClass = Object.prototype.toString.call(b);
@@ -131,8 +148,6 @@ var __diff = function __diff(a, b, initial, useOwnEquals) {
                 return 'different constructor';
             }
     }
-    var aKeys = objectKeys(a);
-    var bKeys = objectKeys(b);
     if (useOwnEquals && a.equals instanceof Function) {
         if (a.equals(b)) {
             return;
@@ -142,11 +157,11 @@ var __diff = function __diff(a, b, initial, useOwnEquals) {
     if (alreadyComparedArray.indexOf(a) !== -1) {
         return;
     }
-    alreadyComparedArray.push(a);
-    var keys = aKeys.length > bKeys.length ? aKeys : bKeys;
+    var compared = [].concat((0, _toConsumableArray3.default)(alreadyComparedArray), [a]);
+    var keys = mergeArrays(objectKeys(a), objectKeys(b));
     for (var i = 0; i < keys.length; i++) {
         var _key2 = keys[i];
-        var diffStr = __diff(a[_key2], b[_key2], false, useOwnEquals, alreadyComparedArray);
+        var diffStr = __diff(a[_key2], b[_key2], false, useOwnEquals, compared);
         if (diffStr !== undefined) {
             return (initial ? '--> ' + _key2 : '' + _key2) + ' / ' + diffStr;
         }

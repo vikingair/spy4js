@@ -32,11 +32,11 @@ const __serialize = (o: any, alreadySerialized: Array<any> = []): string => {
     if (alreadySerialized.indexOf(o) !== -1) {
         return '>CYCLOMATIC<';
     }
-    alreadySerialized.push(o);
+    const serialized = [...alreadySerialized, o];
     if (oClass === '[object Array]') {
         const results = [];
         for (let i = 0; i < o.length; i++) {
-            results.push(__serialize(o[i], alreadySerialized));
+            results.push(__serialize(o[i], serialized));
         }
         return `[${results.join(', ')}]`;
     }
@@ -45,7 +45,7 @@ const __serialize = (o: any, alreadySerialized: Array<any> = []): string => {
     const results = [];
     for (let i = 0; i < oKeys.length; i++) {
         const key = oKeys[i];
-        results.push(`${key}: ${__serialize(o[key], alreadySerialized)}`);
+        results.push(`${key}: ${__serialize(o[key], serialized)}`);
     }
     const objectType = o.constructor.name;
     const displayedType = objectType === 'Object' ? '' : objectType;

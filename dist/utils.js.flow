@@ -53,6 +53,16 @@ const objectKeys = (arrOrObj: any): Array<string> => {
     return keys;
 };
 
+const mergeArrays = (arr1: Array<any>, arr2: Array<any>): Array<any> => {
+    const result = [...arr1];
+    forEach(arr2, (key, val) => {
+        if (arr1.indexOf(val) === -1) {
+            result.push(val);
+        }
+    });
+    return result;
+};
+
 /**
  * This symbol serves as replacement to ignore any
  * inequality and skip further comparisons.
@@ -92,8 +102,11 @@ const __diff = (
     if (a === b) {
         return;
     }
-    if (a === undefined || a === null || b === undefined || b === null) {
-        return 'null or undefined did not match';
+    if (a === undefined || b === undefined) {
+        return 'one was undefined';
+    }
+    if (a === null || b === null) {
+        return 'one was null';
     }
     const aClass = Object.prototype.toString.call(a);
     const bClass = Object.prototype.toString.call(b);
@@ -127,8 +140,6 @@ const __diff = (
                 return 'different constructor';
             }
     }
-    const aKeys = objectKeys(a);
-    const bKeys = objectKeys(b);
     if (useOwnEquals && a.equals instanceof Function) {
         if (a.equals(b)) {
             return;
@@ -143,17 +154,11 @@ const __diff = (
     if (alreadyComparedArray.indexOf(a) !== -1) {
         return;
     }
-    alreadyComparedArray.push(a);
-    const keys = aKeys.length > bKeys.length ? aKeys : bKeys;
+    const compared = [...alreadyComparedArray, a];
+    const keys = mergeArrays(objectKeys(a), objectKeys(b));
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
-        const diffStr = __diff(
-            a[key],
-            b[key],
-            false,
-            useOwnEquals,
-            alreadyComparedArray
-        );
+        const diffStr = __diff(a[key], b[key], false, useOwnEquals, compared);
         if (diffStr !== undefined) {
             return `${initial ? `--> ${key}` : `${key}`} / ${diffStr}`;
         }

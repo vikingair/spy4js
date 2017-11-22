@@ -65,6 +65,16 @@ describe('serialize', () => {
             '{prop1: "test", prop2: {prop21: 12, prop22: >CYCLOMATIC<}, prop3: >CYCLOMATIC<}'
         );
     });
+    it('serializes non cyclomatic structures but repeating elements', () => {
+        const a = { some: 'prop' };
+        const o: any = { prop1: 'test', prop2: { prop21: 12 } };
+        o.prop3 = a;
+        o.prop2.prop22 = a;
+        equals(
+            serialize(o),
+            '{prop1: "test", prop2: {prop21: 12, prop22: {some: "prop"}}, prop3: {some: "prop"}}'
+        );
+    });
     it('serializes all together', () => {
         const o: any = { prop1: 'test', prop2: { prop21: 12 } };
         o.prop3 = o;

@@ -5,7 +5,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.serialize = undefined;
 
+var _toConsumableArray2 = require('babel-runtime/helpers/toConsumableArray');
+
+var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
+
 var _utils = require('./utils');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var __serialize = function __serialize(o) {
     var alreadySerialized = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
@@ -39,11 +45,11 @@ var __serialize = function __serialize(o) {
     if (alreadySerialized.indexOf(o) !== -1) {
         return '>CYCLOMATIC<';
     }
-    alreadySerialized.push(o);
+    var serialized = [].concat((0, _toConsumableArray3.default)(alreadySerialized), [o]);
     if (oClass === '[object Array]') {
         var _results = [];
         for (var i = 0; i < o.length; i++) {
-            _results.push(__serialize(o[i], alreadySerialized));
+            _results.push(__serialize(o[i], serialized));
         }
         return '[' + _results.join(', ') + ']';
     }
@@ -52,7 +58,7 @@ var __serialize = function __serialize(o) {
     var results = [];
     for (var _i = 0; _i < oKeys.length; _i++) {
         var key = oKeys[_i];
-        results.push(key + ': ' + __serialize(o[key], alreadySerialized));
+        results.push(key + ': ' + __serialize(o[key], serialized));
     }
     var objectType = o.constructor.name;
     var displayedType = objectType === 'Object' ? '' : objectType;

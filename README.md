@@ -437,7 +437,7 @@ call 2: [42, "test", {attr1: [1, 2, >Date:1487631600000<], attr2: 1336}]
 call 3: [42, "tes", {attr1: [1, 2, >Date:1487545200000<], attr2: 1336}]
         --> 1 / different string
 call 4: [42, "test"]
-        --> 2 / null or undefined did not match
+        --> 2 / one was undefined
 ```
 There you can see that the arguments of the fact (displayed above all others) does not
 match any of the call arguments on the 5 made calls. 
