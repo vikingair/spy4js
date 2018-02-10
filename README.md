@@ -2,7 +2,7 @@
 [![Travis][build-image]][build-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
 
-# spy4js
+# ![spy4js logo](spy-logo.svg) spy4js
 
 ### Benefits
 

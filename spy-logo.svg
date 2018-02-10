@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="100" height="57.5"
+     viewBox="0 0 650 375">
+    <metadata>
+        <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                 xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <rdf:Description rdf:about="http://svg.tutorial.aptico.de/grafik_svg/kap2_5.svg">
+                <dc:creator>viktor.luft@freiheit.com</dc:creator>
+                <dc:contributor>viktor.luft@freiheit.com</dc:contributor>
+                <dc:subject>spy4js, spy, javascript, test</dc:subject>
+                <dc:description>spy binoculars</dc:description>
+                <dc:relation>https://github.com/fdc-viktor-luft/spy4js</dc:relation>
+                <dc:source>https://github.com/fdc-viktor-luft/spy4js/blob/master/spy-logo.svg</dc:source>
+                <dc:rights>Copyright 2018 Viktor Luft</dc:rights>
+                <dc:format>image/svg+xml</dc:format>
+                <dc:type>Image</dc:type>
+                <dc:title>spy4js Logo</dc:title>
+                <dc:date>2018-11-02</dc:date>
+                <dc:language>en</dc:language>
+            </rdf:Description>
+        </rdf:RDF>
+    </metadata>
+    <title>spy4js</title>
+    <desc>Testing with spy4js</desc>
+    <defs>
+        <!-- monocular -->
+        <g id="nocular" stroke="black" stroke-width="12px" fill="none">
+            <circle cx="130" cy="10" r="150" stroke-width="10px" fill="#003300"/>
+            <line x1="120" y1="190" x2="19" y2="110" stroke-linecap="round"/>
+            <line x1="278" y1="90" x2="279" y2="0" stroke-linecap="round"/>
+            <circle cx="180" cy="110" r="100" fill="#003300"/>
+            <circle cx="180" cy="110" r="80" fill="black"/>
+        </g>
+    </defs>
+    <use xlink:href="#nocular" transform="translate(30 150)"/>
+    <!-- Letter: J -->
+    <text x="180" y="305" stroke="darkred" stroke-width="5px" style="font-family: Times New Roman;
+             font-size: 140px;
+             fill: darkred;">J</text>
+    <use xlink:href="#nocular" transform="translate(620 150) scale(-1, 1)"/>
+    <!-- Letter: S -->
+    <text x="400" y="305" stroke="darkred" stroke-width="5px" style="font-family: Times New Roman;
+             font-size: 140px;
+             fill: darkred;">S</text>
+    <!-- Binocular alignment -->
+    <polygon points="0,10 100,-10 200,10 195,70 100,50 5,70" transform="translate(225 80)" style="fill:#003300;stroke:black;stroke-width:4" />
+</svg>

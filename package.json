@@ -43,7 +43,7 @@
     "flow",
     "es6"
   ],
-  "author": "Viktor Luft",
+  "author": "Viktor Luft <viktor.luft@freiheit.com> (https://github.com/fdc-viktor-luft)",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
@@ -62,7 +62,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-jest": "^21.2.0",
     "eslint-plugin-prettier": "^2.3.1",
-    "flow-bin": "^0.57.3",
+    "flow-bin": "^0.65.0",
     "jest": "^21.2.1",
     "prettier": "1.7.4"
   }
