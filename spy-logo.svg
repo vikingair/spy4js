@@ -26,10 +26,10 @@
     <defs>
         <!-- monocular -->
         <g id="nocular" stroke="black" stroke-width="12px" fill="none">
-            <circle cx="130" cy="10" r="150" stroke-width="10px" fill="#003300"/>
+            <circle cx="130" cy="10" r="150" stroke-width="10px" fill="#004400"/>
             <line x1="120" y1="190" x2="19" y2="110" stroke-linecap="round"/>
             <line x1="278" y1="90" x2="279" y2="0" stroke-linecap="round"/>
-            <circle cx="180" cy="110" r="100" fill="#003300"/>
+            <circle cx="180" cy="110" r="100" fill="#004400"/>
             <circle cx="180" cy="110" r="80" fill="black"/>
         </g>
     </defs>
@@ -44,5 +44,5 @@
              font-size: 140px;
              fill: darkred;">S</text>
     <!-- Binocular alignment -->
-    <polygon points="0,10 100,-10 200,10 195,70 100,50 5,70" transform="translate(225 80)" style="fill:#003300;stroke:black;stroke-width:4" />
+    <polygon points="0,10 100,-10 200,10 195,70 100,50 5,70" transform="translate(225 80)" style="fill:#004400;stroke:black;stroke-width:4" />
 </svg>
