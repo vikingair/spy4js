@@ -23,7 +23,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rm -r dist && babel src --out-dir dist && for i in `ls src/`; do cp src/$i dist/$i.flow; done",
+    "build": "rm -rf dist && babel src --out-dir dist && for i in `ls src/`; do cp src/$i dist/$i.flow; done",
     "eslint": "eslint src/ test/",
     "flow": "flow --quiet",
     "test": "npm run flow && npm run eslint && npm run test-coverage",
