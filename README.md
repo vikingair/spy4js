@@ -472,10 +472,6 @@ const callArgs = spy.getCallArguments(0/* for the 0'th call above*/);
 const differentNumber = callArgs[2]['attr2'];
 ```
   
-## Future
-
-* Integrate automatic checks on older flow versions to determine the oldest compatible flow version.
-
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: https://github.com/fdc-viktor-luft/form4react/blob/master/LICENSE
 [build-image]: https://img.shields.io/travis/fdc-viktor-luft/spy4js/master.svg?style=flat-square
