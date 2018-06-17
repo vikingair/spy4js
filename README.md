@@ -122,6 +122,7 @@ Even as important are the facts, we want to display:
   - `wasNotCalled` (does display that the spy was never called)
   - `wasCalledWith` (does display that the spy was called at least once like with the provided params)
   - `wasNotCalledWith` (does display that the spy was never like with the provided params)
+  - `hasCallHistory` (does display that the spy was called with the following params in the given order)
 
 Those methods on a spy display facts. Facts have to be true, otherwise they
 will throw an Exception, which displays in a formatted debug message why the
@@ -144,9 +145,14 @@ spy('with this text');
 
 spy.wasCalled(2); // called exactly 2 times
 
-spy.wasCalledWith([1, 'test', {attr: [4]}]);    // the spy was called at least once with equal params
+// the spy was called at least once with equal params
+spy.wasCalledWith([1, 'test', {attr: [4]}]);
 
-spy.wasNotCalledWith([1, 'test', {attr: [3]}]); // the spy was not called with those params
+// the spy was not called with those params
+spy.wasNotCalledWith([1, 'test', {attr: [3]}]);
+
+// the spy was called twice with the following params and in same order
+spy.hasCallHistory([ [ [1, 'test', {attr: [4]}] ], [ 'with this text' ] ]);
 ```
 
 There is one static method that does restore all existing spies in all tests.
@@ -378,6 +384,13 @@ neat output. For examples see [showCallArguments](#showcallarguments)
 spy.wasNotCalledWith(...args:Array<any>) => (fact) void
 ```
 This fact displays simply the opposite of [wasCalledWith](#wascalledwith).
+
+### hasCallHistory
+```
+spy.hasCallHistory(callHistory:Array<Array<any>>) => (fact) void
+```
+Works similiar to [wasCalledWith](#wascalledwith) but instead matches each
+call one by one in **correct order** and **correct call count**.
 
 ### getCallArguments
 ```

@@ -474,6 +474,43 @@ describe('Spy - Utils', () => {
         spy.wasCalledWith('test4');
     });
 
+    it('checks the call history', () => {
+        const testObject = { someFunc: errorThrower };
+        const spy: any = Spy.on(testObject, 'someFunc');
+        testObject.someFunc('test1', 42);
+        testObject.someFunc();
+        testObject.someFunc('test3');
+        testObject.someFunc('test4');
+
+        spy.wasCalled(4);
+        throws(
+            () => spy.hasCallHistory([['test1', 42], ['test3'], ['test4']]),
+            {
+                partOfMessage:
+                    "the spy on 'someFunc' was called 4 times, but the expected call history includes exactly 3 calls.",
+            }
+        );
+        throws(
+            () => spy.hasCallHistory([['test1', 42], [], ['test4'], ['test3']]),
+            {
+                partOfMessage: '--> 0 / different string',
+            }
+        );
+        throws(
+            () =>
+                spy.hasCallHistory([
+                    ['test1', 42],
+                    ['foo'],
+                    ['test3'],
+                    ['test4'],
+                ]),
+            {
+                partOfMessage: '--> 0 / one was undefined',
+            }
+        );
+        spy.hasCallHistory([['test1', 42], [], ['test3'], ['test4']]);
+    });
+
     it('should do nothing after for transparent restored spy', () => {
         const testObject = { someFunc: errorThrower };
         const spy: any = Spy.on(testObject, 'someFunc').transparentAfter(3);
@@ -617,6 +654,7 @@ describe('Spy - Utils', () => {
             'wasNotCalled',
             'wasCalledWith',
             'wasNotCalledWith',
+            'hasCallHistory',
             'getCallArguments',
             'getCallArgument',
             'getCallCount',

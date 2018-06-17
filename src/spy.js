@@ -423,16 +423,16 @@ Spy.prototype.transparentAfter = function(callCount: number): Spy {
 /**
  * Checks if the spy was called callCount times often.
  *
- * If callCount = 0 - which is the default - then it only
+ * If callCount is not provided then it only
  * checks if the spy was called at least once.
  *
  * Throws an error if the expectation is wrong.
  *
  * @param {?number} callCount -> Is the number of expected calls made.
  */
-Spy.prototype.wasCalled = function(callCount: number = 0) {
+Spy.prototype.wasCalled = function(callCount?: number) {
     const madeCalls = this[Symbols.calls].length;
-    if (callCount) {
+    if (typeof callCount === 'number') {
         if (madeCalls !== callCount) {
             throw new Error(
                 `\n\n${this[Symbols.name]} was called ${madeCalls} times,` +
@@ -445,10 +445,50 @@ Spy.prototype.wasCalled = function(callCount: number = 0) {
 };
 
 /**
+ * Checks if the spy was call history matches the expectation.
+ *
+ * The call history has to match the call count and order.
+ *
+ * Throws an error if the expectation is wrong.
+ *
+ * @param {Array<Array<any>>} callHistory
+ *          -> Are the expected made call arguments in correct order.
+ */
+Spy.prototype.hasCallHistory = function(callHistory: Array<Array<any>>): void {
+    const madeCalls = this[Symbols.calls];
+    const callCount = callHistory.length;
+    if (madeCalls.length !== callCount) {
+        throw new Error(
+            `\n\n${this[Symbols.name]} was called ${madeCalls.length} times,` +
+                ` but the expected call history includes exactly ${callHistory.length} calls.\n\n`
+        );
+    }
+    let hasErrors = false;
+    const diffInfo = [];
+    for (let i = 0; i < madeCalls.length; i++) {
+        const diff = differenceOf(
+            madeCalls[i].arguments,
+            callHistory[i],
+            this[Symbols.config]
+        );
+        diffInfo.push(diff || '');
+        if (diff) hasErrors = true;
+    }
+    if (hasErrors)
+        throw new Error(
+            `\n\n${this[Symbols.name]} was considered` +
+                ' to be called with the following arguments in the given order:\n\n' +
+                `    --> ${serialize(callHistory)}\n\n` +
+                'Actually there were:\n\n' +
+                this.showCallArguments(diffInfo)
+        );
+};
+
+/**
  * Checks that the spy was never called.
  * Throws an error if the spy was called at least once.
  */
-Spy.prototype.wasNotCalled = function() {
+Spy.prototype.wasNotCalled = function(): void {
     const madeCalls = this[Symbols.calls];
     if (madeCalls.length !== 0) {
         throw new Error(
@@ -476,7 +516,7 @@ Spy.prototype.wasNotCalled = function() {
  * @param {Array<any>} args -> The expected arguments
  *                           for any made call.
  */
-Spy.prototype.wasCalledWith = function(...args: Array<any>) {
+Spy.prototype.wasCalledWith = function(...args: Array<any>): void {
     const madeCalls = this[Symbols.calls];
     if (madeCalls.length === 0) {
         throw new Error(`\n\n${this[Symbols.name]} was never called!\n\n`);
