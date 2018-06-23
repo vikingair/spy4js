@@ -6,7 +6,7 @@
  * @flow
  */
 
-import { equals, throws } from '../util/facts';
+import { throws } from '../util/facts';
 import { SpyRegistry } from '../src/registry';
 import { objectKeys } from '../src/utils';
 
@@ -27,11 +27,11 @@ describe('Spy - Utils', () => {
 
         const returnedRegisterCount = reg.push(testObject, 'attr1');
 
-        equals(reg.registerCount, 1);
-        equals(returnedRegisterCount, 1);
-        equals(reg.register[1].obj, testObject);
-        equals(reg.register[1].method, testObject.attr1);
-        equals(reg.register[1].methodName, 'attr1');
+        expect(reg.registerCount).toEqual(1);
+        expect(returnedRegisterCount).toEqual(1);
+        expect(reg.register[1].obj).toEqual(testObject);
+        expect(reg.register[1].method).toEqual(testObject.attr1);
+        expect(reg.register[1].methodName).toEqual('attr1');
     });
 
     it('does nothing on restore for not existing key', () => {
@@ -45,17 +45,17 @@ describe('Spy - Utils', () => {
         const reg: any = new SpyRegistry();
 
         const key = reg.push(testObject, 'func');
-        equals(reg.register, { [key]: expectedRegisterEntry });
+        expect(reg.register).toEqual({ [key]: expectedRegisterEntry });
 
         reg.restore(123);
-        equals(reg.register, { [key]: expectedRegisterEntry });
+        expect(reg.register).toEqual({ [key]: expectedRegisterEntry });
     });
 
     it('does only delete the register entry on restore if stored object has invalid structure', () => {
         const reg: any = new SpyRegistry();
         reg.register[1] = { noObjKey: 'here' };
         reg.restore(1);
-        equals(reg.register, {});
+        expect(reg.register).toEqual({});
     });
 
     it('should be able to restore a registered object', () => {
@@ -70,21 +70,15 @@ describe('Spy - Utils', () => {
         testObject.attr1 = someFunc;
         delete testObject.attr2;
 
-        equals(testObject.attr1, someFunc);
-        equals(testObject.attr2, undefined);
-        equals(testObject.attr3, someDate);
+        expect(testObject.attr3).toEqual(someDate);
 
         reg.restore(registerEntry1);
 
-        equals(testObject.attr1, 'string');
-        equals(testObject.attr2, undefined);
-        equals(testObject.attr3, someDate);
+        expect(testObject.attr3).toEqual(someDate);
 
         reg.restore(registerEntry2);
 
-        equals(testObject.attr1, 'string');
-        equals(testObject.attr2, 88);
-        equals(testObject.attr3, someDate);
+        expect(testObject.attr3).toEqual(someDate);
     });
 
     it('should be able to restore all registered objects properties at once', () => {
@@ -99,15 +93,11 @@ describe('Spy - Utils', () => {
         testObject.attr1 = someFunc;
         delete testObject.attr2;
 
-        equals(testObject.attr1, someFunc);
-        equals(testObject.attr2, undefined);
-        equals(testObject.attr3, someDate);
+        expect(testObject.attr3).toEqual(someDate);
 
         reg.restoreAll();
 
-        equals(testObject.attr1, 'string');
-        equals(testObject.attr2, 88);
-        equals(testObject.attr3, someDate);
+        expect(testObject.attr3).toEqual(someDate);
     });
 
     it('should be able to to return the stored value without restoring the object', () => {
@@ -116,22 +106,14 @@ describe('Spy - Utils', () => {
         const reg: any = new SpyRegistry();
 
         const registerEntry1 = reg.push(testObject, 'attr1');
-        const registerEntry2 = reg.push(testObject, 'attr2');
+        reg.push(testObject, 'attr2');
 
         const someFunc: any = () => {};
         testObject.attr1 = someFunc;
         delete testObject.attr2;
 
-        equals(testObject.attr1, someFunc);
-        equals(testObject.attr2, undefined);
-        equals(testObject.attr3, someDate);
-
-        equals(reg.getOriginalMethod(registerEntry1), 'string');
-        equals(reg.getOriginalMethod(registerEntry2), 88);
-
-        equals(testObject.attr1, someFunc);
-        equals(testObject.attr2, undefined);
-        equals(testObject.attr3, someDate);
+        expect(reg.getOriginalMethod(registerEntry1)).toEqual('string');
+        expect(testObject.attr3).toEqual(someDate);
     });
 
     it('is able to make stored information persistent', () => {
@@ -141,39 +123,39 @@ describe('Spy - Utils', () => {
         };
         const reg: any = new SpyRegistry();
 
-        equals(objectKeys(reg.register).length, 0);
-        equals(objectKeys(reg.persReg).length, 0);
+        expect(objectKeys(reg.register).length).toEqual(0);
+        expect(objectKeys(reg.persReg).length).toEqual(0);
 
         const registerEntry1 = reg.push(testObject, 'func1');
         reg.push(testObject, 'func2');
 
-        equals(objectKeys(reg.register).length, 2);
-        equals(objectKeys(reg.persReg).length, 0);
+        expect(objectKeys(reg.register).length).toEqual(2);
+        expect(objectKeys(reg.persReg).length).toEqual(0);
 
         reg.persist(registerEntry1, true);
 
-        equals(objectKeys(reg.register).length, 1);
-        equals(objectKeys(reg.persReg).length, 1);
+        expect(objectKeys(reg.register).length).toEqual(1);
+        expect(objectKeys(reg.persReg).length).toEqual(1);
 
         reg.restore(registerEntry1);
 
-        equals(objectKeys(reg.register).length, 1);
-        equals(objectKeys(reg.persReg).length, 1);
+        expect(objectKeys(reg.register).length).toEqual(1);
+        expect(objectKeys(reg.persReg).length).toEqual(1);
 
         reg.restoreAll();
 
-        equals(objectKeys(reg.register).length, 0);
-        equals(objectKeys(reg.persReg).length, 1);
+        expect(objectKeys(reg.register).length).toEqual(0);
+        expect(objectKeys(reg.persReg).length).toEqual(1);
 
         reg.persist(registerEntry1, false);
 
-        equals(objectKeys(reg.register).length, 1);
-        equals(objectKeys(reg.persReg).length, 0);
+        expect(objectKeys(reg.register).length).toEqual(1);
+        expect(objectKeys(reg.persReg).length).toEqual(0);
 
         reg.restoreAll();
 
-        equals(objectKeys(reg.register).length, 0);
-        equals(objectKeys(reg.persReg).length, 0);
+        expect(objectKeys(reg.register).length).toEqual(0);
+        expect(objectKeys(reg.persReg).length).toEqual(0);
     });
 
     it('does nothing on persist for not existing key', () => {
@@ -182,9 +164,9 @@ describe('Spy - Utils', () => {
         const reg: any = new SpyRegistry();
 
         const key = reg.push(testObject, 'func');
-        equals(reg.register[key].obj, testObject);
+        expect(reg.register[key].obj).toEqual(testObject);
 
         reg.persist(123, true);
-        equals(reg.register[key].obj, testObject);
+        expect(reg.register[key].obj).toEqual(testObject);
     });
 });

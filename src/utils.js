@@ -139,6 +139,11 @@ const __diff = (
             return 'different date';
         case '[object Boolean]':
             return 'different bool';
+        case '[object Error]':
+            if (String(a) === String(b)) {
+                return;
+            }
+            return 'different error';
         default:
             if (a.constructor !== b.constructor) {
                 return 'different constructor';

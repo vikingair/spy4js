@@ -7,28 +7,27 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import { equals } from '../util/facts';
 import { serialize } from '../src/serializer';
 import { IGNORE } from '../src/utils';
 
 describe('serialize', () => {
     it('serializes primitives', () => {
-        equals(serialize(undefined), 'undefined');
-        equals(serialize(null), 'null');
-        equals(serialize('test'), '"test"');
-        equals(serialize(12), '12');
-        equals(serialize(true), 'true');
-        equals(serialize(/^abc$/), '//^abc$//');
-        equals(serialize(IGNORE), '>IGNORED<');
-        equals(serialize(Symbol('test')), 'Symbol(test)');
-        equals(serialize(() => {}), 'Function');
+        expect(serialize(undefined)).toBe('undefined');
+        expect(serialize(null)).toBe('null');
+        expect(serialize('test')).toBe('"test"');
+        expect(serialize(12)).toBe('12');
+        expect(serialize(true)).toBe('true');
+        expect(serialize(/^abc$/)).toBe('//^abc$//');
+        expect(serialize(IGNORE)).toBe('>IGNORED<');
+        expect(serialize(Symbol('test'))).toBe('Symbol(test)');
+        expect(serialize(() => {})).toBe('Function');
+        expect(serialize(new Error('foo'))).toBe('Error: foo');
         const date = new Date();
-        equals(serialize(date), `>Date:${Number(date)}<`);
+        expect(serialize(date)).toBe(`>Date:${Number(date)}<`);
     });
     it('serializes arrays', () => {
-        equals(serialize([]), '[]');
-        equals(
-            serialize([1, 'test', IGNORE, /^abc$/]),
+        expect(serialize([])).toBe('[]');
+        expect(serialize([1, 'test', IGNORE, /^abc$/])).toBe(
             '[1, "test", >IGNORED<, //^abc$//]'
         );
     });
@@ -50,16 +49,14 @@ describe('serialize', () => {
         }
         const inst = new Clazz(12);
         const inst2 = new Other(42, 'test');
-        equals(serialize(inst), 'Clazz{_prop: 12}');
-        equals(
-            serialize(inst2),
+        expect(serialize(inst)).toBe('Clazz{_prop: 12}');
+        expect(serialize(inst2)).toBe(
             'Other{_attr: Clazz{_prop: 42}, _other: "test"}'
         );
     });
     it('serializes objects', () => {
-        equals(serialize({}), '{}');
-        equals(
-            serialize({ prop1: 12, prop2: 'test' }),
+        expect(serialize({})).toBe('{}');
+        expect(serialize({ prop1: 12, prop2: 'test' })).toBe(
             '{prop1: 12, prop2: "test"}'
         );
     });
@@ -67,8 +64,7 @@ describe('serialize', () => {
         const o: any = { prop1: 'test', prop2: { prop21: 12 } };
         o.prop3 = o;
         o.prop2.prop22 = o;
-        equals(
-            serialize(o),
+        expect(serialize(o)).toBe(
             '{prop1: "test", prop2: {prop21: 12, prop22: >CYCLOMATIC<}, prop3: >CYCLOMATIC<}'
         );
     });
@@ -77,8 +73,7 @@ describe('serialize', () => {
         const o: any = { prop1: 'test', prop2: { prop21: 12 } };
         o.prop3 = a;
         o.prop2.prop22 = a;
-        equals(
-            serialize(o),
+        expect(serialize(o)).toBe(
             '{prop1: "test", prop2: {prop21: 12, prop22: {some: "prop"}}, prop3: {some: "prop"}}'
         );
     });
@@ -95,8 +90,7 @@ describe('serialize', () => {
         const inst = new Clazz(12);
         o.prop4 = [1, 3, inst, { attr: IGNORE, attr2: Symbol('test') }];
 
-        equals(
-            serialize(o),
+        expect(serialize(o)).toBe(
             '{prop1: "test", ' +
                 'prop2: {prop21: 12, prop22: >CYCLOMATIC<}, ' +
                 'prop3: >CYCLOMATIC<, ' +

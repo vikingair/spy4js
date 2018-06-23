@@ -6,7 +6,7 @@
  * @flow
  */
 
-import { equals, equalsNot, throws } from '../util/facts';
+import { throws } from '../util/facts';
 import { Spy } from '../src/spy';
 
 describe('Spy - Utils', () => {
@@ -26,7 +26,7 @@ describe('Spy - Utils', () => {
         const spy = new Spy();
         const someDate = new Date();
         spy(9, 'test', someDate);
-        equals(spy.getCallArguments(), [9, 'test', someDate]);
+        expect(spy.getCallArguments()).toEqual([9, 'test', someDate]);
         // and more general
         spy.wasCalledWith(9, 'test', someDate);
     });
@@ -46,7 +46,7 @@ describe('Spy - Utils', () => {
         const spy = Spy.on(testObject, 'someFunc');
         const someDate = new Date();
         testObject.someFunc('test', 6, someDate);
-        equals(spy.getCallArguments(), ['test', 6, someDate]);
+        expect(spy.getCallArguments()).toEqual(['test', 6, someDate]);
         // and more general
         spy.wasCalledWith('test', 6, someDate);
     });
@@ -106,13 +106,13 @@ describe('Spy - Utils', () => {
             'func4'
         );
         testObject.func1('test', 6);
-        equals(spy1.getCallArguments(), ['test', 6]);
+        expect(spy1.getCallArguments()).toEqual(['test', 6]);
         spy1.wasCalledWith('test', 6);
         testObject.func2('', 7);
-        equals(spy2.getCallArguments(), ['', 7]);
+        expect(spy2.getCallArguments()).toEqual(['', 7]);
         spy2.wasCalledWith('', 7);
         testObject.func4();
-        equals(spy3.getCallArguments(), []);
+        expect(spy3.getCallArguments()).toEqual([]);
         spy3.wasCalledWith();
         // if this would get spied, the test callback
         // would never be called which would make the test fail
@@ -132,7 +132,7 @@ describe('Spy - Utils', () => {
             func1: noop,
             func2: errorThrower,
             func3: (arg: string) => {
-                equals(arg, 'testCall8');
+                expect(arg).toEqual('testCall8');
                 cb();
             },
             func4: errorThrower,
@@ -174,7 +174,7 @@ describe('Spy - Utils', () => {
             func1: noop,
             func2: errorThrower,
             func3: (arg: string) => {
-                equals(arg, 'testCall8');
+                expect(arg).toEqual('testCall8');
                 cb();
             },
             func4: errorThrower,
@@ -256,40 +256,40 @@ describe('Spy - Utils', () => {
         spy(testArg3, testArg2, testArg1);
         spy(testArg2);
 
-        equals(spy.getCallArguments(), [testArg1]);
-        equals(spy.getCallArguments(0), [testArg1]);
-        equals(spy.getCallArgument(), testArg1);
-        equals(spy.getCallArgument(0), testArg1);
-        equals(spy.getCallArgument(undefined, 1), undefined);
+        expect(spy.getCallArguments()).toEqual([testArg1]);
+        expect(spy.getCallArguments(0)).toEqual([testArg1]);
+        expect(spy.getCallArgument()).toEqual(testArg1);
+        expect(spy.getCallArgument(0)).toEqual(testArg1);
+        expect(spy.getCallArgument(undefined, 1)).toEqual(undefined);
 
-        equals(spy.getCallArguments(1), [testArg1, testArg2]);
-        equals(spy.getCallArgument(1), testArg1);
-        equals(spy.getCallArgument(1, 1), testArg2);
-        equals(spy.getCallArgument(1, 2), undefined);
+        expect(spy.getCallArguments(1)).toEqual([testArg1, testArg2]);
+        expect(spy.getCallArgument(1)).toEqual(testArg1);
+        expect(spy.getCallArgument(1, 1)).toEqual(testArg2);
+        expect(spy.getCallArgument(1, 2)).toEqual(undefined);
 
-        equals(spy.getCallArguments(2), [testArg3, testArg2, testArg1]);
-        equals(spy.getCallArgument(2), testArg3);
-        equals(spy.getCallArgument(2, 1), testArg2);
-        equals(spy.getCallArgument(2, 2), testArg1);
-        equals(spy.getCallArgument(2, 3), undefined);
+        expect(spy.getCallArguments(2)).toEqual([testArg3, testArg2, testArg1]);
+        expect(spy.getCallArgument(2)).toEqual(testArg3);
+        expect(spy.getCallArgument(2, 1)).toEqual(testArg2);
+        expect(spy.getCallArgument(2, 2)).toEqual(testArg1);
+        expect(spy.getCallArgument(2, 3)).toEqual(undefined);
 
-        equals(spy.getCallArguments(3), [testArg2]);
-        equals(spy.getCallArgument(3), testArg2);
+        expect(spy.getCallArguments(3)).toEqual([testArg2]);
+        expect(spy.getCallArgument(3)).toEqual(testArg2);
     });
 
     it('does return the call count of the Spy correctly', () => {
         const spy = new Spy();
-        equals(spy.getCallCount(), 0);
+        expect(spy.getCallCount()).toEqual(0);
         spy();
-        equals(spy.getCallCount(), 1);
+        expect(spy.getCallCount()).toEqual(1);
         spy();
-        equals(spy.getCallCount(), 2);
+        expect(spy.getCallCount()).toEqual(2);
         spy();
-        equals(spy.getCallCount(), 3);
+        expect(spy.getCallCount()).toEqual(3);
         spy.reset();
-        equals(spy.getCallCount(), 0);
+        expect(spy.getCallCount()).toEqual(0);
         spy();
-        equals(spy.getCallCount(), 1);
+        expect(spy.getCallCount()).toEqual(1);
     });
 
     it('should return call arguments in an appropriate display string', () => {
@@ -298,30 +298,30 @@ describe('Spy - Utils', () => {
         spy({ _key: 'myTestArguments' });
         spy({ _key: 'someOtherArguments' }, 42);
         const displayString = spy.showCallArguments();
-        equalsNot(displayString.indexOf('myTestArguments'), -1);
-        equalsNot(displayString.indexOf('someOtherArguments'), -1);
-        equalsNot(displayString.indexOf('42'), -1);
+        expect(displayString.indexOf('myTestArguments')).not.toBe(-1);
+        expect(displayString.indexOf('someOtherArguments')).not.toBe(-1);
+        expect(displayString.indexOf('42')).not.toBe(-1);
     });
 
     it('shows that the spy was not called if this is the fact', () => {
         const spy = new Spy();
-        equals(spy.showCallArguments(), 'the spy was never called!\n');
+        expect(spy.showCallArguments()).toEqual('the spy was never called!\n');
     });
 
     it('should return undefined if no return value is supplied', () => {
         const spy = new Spy().returns();
-        equals(spy('callParams1'), undefined);
+        expect(spy('callParams1')).toEqual(undefined);
         spy.returns(42);
-        equals(spy('callParams2'), 42);
+        expect(spy('callParams2')).toEqual(42);
         spy.returns();
-        equals(spy('callParams3'), undefined);
+        expect(spy('callParams3')).toEqual(undefined);
     });
 
     it('should return given inputs after the spy was called', () => {
         const testObj = { _key: 'testObj' };
         const spy = new Spy().returns(testObj);
-        equals(spy({ _key: 'callParams1' }), testObj);
-        equals(spy({ _key: 'callParams2' }), testObj);
+        expect(spy({ _key: 'callParams1' })).toEqual(testObj);
+        expect(spy({ _key: 'callParams2' })).toEqual(testObj);
     });
 
     it(
@@ -331,10 +331,10 @@ describe('Spy - Utils', () => {
             const testObj2 = { _key: 'testObj2' };
             const testObj3 = { _key: 'testObj3' };
             const spy = new Spy().returns(testObj1, testObj2, testObj3);
-            equals(spy({ _key: 'callParams1' }), testObj1);
-            equals(spy({ _key: 'callParams2' }), testObj2);
-            equals(spy({ _key: 'callParams3' }), testObj3);
-            equals(spy({ _key: 'callParams4' }), testObj3);
+            expect(spy({ _key: 'callParams1' })).toEqual(testObj1);
+            expect(spy({ _key: 'callParams2' })).toEqual(testObj2);
+            expect(spy({ _key: 'callParams3' })).toEqual(testObj3);
+            expect(spy({ _key: 'callParams4' })).toEqual(testObj3);
         }
     );
 
@@ -365,7 +365,7 @@ describe('Spy - Utils', () => {
     it('should reset the call arguments on an object spy and NOT removing it (LIKE RESTORE)', cb => {
         const testObject = {
             func: (allowed: string) => {
-                equals(allowed, 'testCall3');
+                expect(allowed).toEqual('testCall3');
                 cb();
             },
         };
@@ -389,11 +389,11 @@ describe('Spy - Utils', () => {
 
     it('should call NOP if no input-function is supplied', () => {
         const spy = new Spy().calls();
-        equals(spy('callParams1'), undefined);
+        expect(spy('callParams1')).toEqual(undefined);
         spy.calls(() => 42);
-        equals(spy('callParams2'), 42);
+        expect(spy('callParams2')).toEqual(42);
         spy.calls();
-        equals(spy('callParams3'), undefined);
+        expect(spy('callParams3')).toEqual(undefined);
     });
 
     it('should call the given input-function after the spy was called', () => {
@@ -402,8 +402,8 @@ describe('Spy - Utils', () => {
             testObj._key = arg;
             return null;
         });
-        equals(spy('callParams1'), null);
-        equals(testObj._key, 'callParams1');
+        expect(spy('callParams1')).toEqual(null);
+        expect(testObj._key).toEqual('callParams1');
     });
 
     it('ignores specified arguments when using Spy.IGNORE together with wasCalledWith', () => {
@@ -436,12 +436,12 @@ describe('Spy - Utils', () => {
                 return 42;
             }
         );
-        equals(spy('callParams1'), null);
-        equals(testObj._key, 'callParams1');
-        equals(spy('callParams2'), 42);
-        equals(testObj._key, 'some other callParams2');
-        equals(spy('callParams3'), 42);
-        equals(testObj._key, 'some other callParams3');
+        expect(spy('callParams1')).toEqual(null);
+        expect(testObj._key).toEqual('callParams1');
+        expect(spy('callParams2')).toEqual(42);
+        expect(testObj._key).toEqual('some other callParams2');
+        expect(spy('callParams3')).toEqual(42);
+        expect(testObj._key).toEqual('some other callParams3');
     });
 
     it('should make the spy transparent (mainly for spies on object properties)', () => {
@@ -458,8 +458,8 @@ describe('Spy - Utils', () => {
         const spy = Spy.on(testObject, 'someFunc')
             .returns(12, 13)
             .transparentAfter(2);
-        equals(testObject.someFunc('test1', 42), 12);
-        equals(testObject.someFunc('test2'), 13);
+        expect(testObject.someFunc('test1', 42)).toEqual(12);
+        expect(testObject.someFunc('test2')).toEqual(13);
         throws(() => testObject.someFunc('test3', { testProp: 'test' }), {
             message: 'never call this func directly',
         });
@@ -538,7 +538,7 @@ describe('Spy - Utils', () => {
 
         spy.wasCalled(5);
 
-        equals(spy('test7'), undefined);
+        expect(spy('test7')).toEqual(undefined);
     });
 
     /**
@@ -695,10 +695,10 @@ describe('Spy - Utils', () => {
         });
 
         spy.configure({ persistent: false });
-        equals(testObj.myFunc(), undefined);
+        expect(testObj.myFunc()).toEqual(undefined);
 
         spy.restore();
-        equals(testObj.myFunc(), 'originalFunc');
+        expect(testObj.myFunc()).toEqual('originalFunc');
     });
 
     it('does not restore persistent spies when restoreAll gets called', () => {
@@ -708,19 +708,19 @@ describe('Spy - Utils', () => {
             .returns('spy1');
         Spy.on(testObj, 'myFunc2').returns('spy2');
 
-        equals(testObj.myFunc1(), 'spy1');
-        equals(testObj.myFunc2(), 'spy2');
+        expect(testObj.myFunc1()).toEqual('spy1');
+        expect(testObj.myFunc2()).toEqual('spy2');
 
         Spy.restoreAll();
 
-        equals(testObj.myFunc1(), 'spy1');
-        equals(testObj.myFunc2(), 'func2');
+        expect(testObj.myFunc1()).toEqual('spy1');
+        expect(testObj.myFunc2()).toEqual('func2');
 
         spy1.configure({ persistent: false });
 
         Spy.restoreAll();
 
-        equals(testObj.myFunc1(), 'func1');
-        equals(testObj.myFunc2(), 'func2');
+        expect(testObj.myFunc1()).toEqual('func1');
+        expect(testObj.myFunc2()).toEqual('func2');
     });
 });

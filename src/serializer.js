@@ -104,6 +104,7 @@ const __serialize = (o: any, alreadySerialized: Array<any> = []): string => {
         case '[object Number]':
         case '[object Boolean]':
         case '[object Symbol]':
+        case '[object Error]':
             return String(o);
         default:
         // nothing
