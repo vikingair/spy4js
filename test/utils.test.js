@@ -89,7 +89,7 @@ describe('Spy - Equality', () => {
         );
         expect(
             differenceOf(
-                ['first', Symbol('_TEST_'), 'third'],
+                ['first', Symbol.for('_TEST_'), 'third'],
                 ['first', IGNORE, 'third']
             )
         ).toBe(undefined);

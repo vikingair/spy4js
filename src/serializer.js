@@ -96,16 +96,18 @@ const __serialize = (o: any, alreadySerialized: Array<any> = []): string => {
         case '[object RegExp]':
             return `/${String(o)}/`;
         case '[object String]':
-            return `"${o}"`;
+            return `'${o}'`;
         case '[object Function]':
             return o.name || 'Function';
         case '[object Date]':
             return `>Date:${Number(o)}<`;
         case '[object Number]':
         case '[object Boolean]':
-        case '[object Symbol]':
-        case '[object Error]':
             return String(o);
+        case '[object Symbol]':
+            return `Symbol.for('${(Symbol.keyFor(o): any)}')`;
+        case '[object Error]':
+            return `new ${o.name}('${o.message}')`;
         default:
         // nothing
     }
