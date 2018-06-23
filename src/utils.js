@@ -71,7 +71,7 @@ const mergeArrays = (arr1: Array<any>, arr2: Array<any>): Array<any> => {
  * This symbol serves as replacement to ignore any
  * inequality and skip further comparisons.
  */
-const IGNORE = Symbol('__Spy_IGNORE__');
+const IGNORE = Symbol.for('__Spy_IGNORE__');
 
 /**
  * This function is the internal representation of

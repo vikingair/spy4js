@@ -6,6 +6,7 @@
  * @flow
  */
 
+import React, { Component, Fragment } from 'react';
 import { equals } from '../util/facts';
 import { serialize } from '../src/serializer';
 import { IGNORE } from '../src/utils';
@@ -101,5 +102,101 @@ describe('serialize', () => {
                 'prop3: >CYCLOMATIC<, ' +
                 'prop4: [1, 3, Clazz{_prop: 12}, {attr: >IGNORED<, attr2: Symbol(test)}]}'
         );
+    });
+
+    it('serializes simple jsx', () => {
+        const clickHandler = () => {};
+        const o = (
+            <div className="test" key="test-key">
+                <p style={{ background: 'red' }}>Some text for the test</p>
+                <button onClick={clickHandler}>Click here</button>
+            </div>
+        );
+
+        expect(serialize(o)).toBe(
+            '<div className="test" key="test-key">' +
+                '<p style={{background: "red"}}>Some text for the test</p>' +
+                '<button onClick={clickHandler}>Click here</button></div>'
+        );
+    });
+
+    it('serializes react components', () => {
+        class TestComponent extends Component<{
+            str: string,
+            bool: boolean,
+        }> {
+            render() {
+                return (
+                    <div className={this.props.str}>
+                        {String(this.props.bool)}
+                    </div>
+                );
+            }
+        }
+        const o = (
+            <TestComponent str="test" bool key="test-key" ref="test-ref" /> // eslint-disable-line
+        );
+        const o2 = (
+            <TestComponent str="test" bool key="test-key">
+                <div className="foo">Inner text</div>
+            </TestComponent>
+        );
+
+        expect(serialize(o)).toBe(
+            '<TestComponent str="test" bool={true} key="test-key" ref="test-ref" />'
+        );
+
+        expect(serialize(o2)).toBe(
+            '<TestComponent str="test" bool={true} key="test-key"><div className="foo">Inner text</div></TestComponent>'
+        );
+    });
+
+    it('serializes react functional components', () => {
+        const TestComponent = (props: Object) => (
+            <div className={props.str}>{String(props.bool)}</div>
+        );
+        const newRefApiRef = React.createRef();
+        const o = (
+            <TestComponent str="test" bool key="test-key" ref={newRefApiRef} />
+        );
+
+        expect(serialize(o)).toBe(
+            '<TestComponent str="test" bool={true} key="test-key" ref={{current: null}} />'
+        );
+    });
+
+    it('serializes react fragment', () => {
+        const o = (
+            <Fragment key="foo">
+                <div>Test that</div>
+            </Fragment>
+        );
+
+        expect(serialize(o)).toBe(
+            '<Fragment key="foo"><div>Test that</div></Fragment>'
+        );
+    });
+
+    it('serializes fallbacks for failing react serialization', () => {
+        expect(serialize({ $$typeof: Symbol.for('foo') })).toBe(
+            '{$$typeof: Symbol(foo)}' // unknown symbol for the $$typeof attribute
+        );
+        expect(serialize({ $$typeof: Symbol.for('react.special') })).toBe(
+            '{$$typeof: Symbol(react.special)}' // unknown symbol for the $$typeof attribute, which starts with 'react.'
+        );
+        expect(
+            serialize({
+                $$typeof: Symbol.for('react.element'),
+                type: Symbol.for('foo'), // unknown symbol as type
+                props: {},
+            })
+        ).toBe('<UNKNOWN />');
+        expect(
+            serialize({
+                $$typeof: Symbol.for('react.element'),
+                type: 1234, // unknown type for field type
+                props: {},
+            })
+        ).toBe('<UNKNOWN />');
     });
 });

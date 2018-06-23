@@ -25,12 +25,12 @@ let __LOCK__ = true;
  * Those symbols are used to protect the private spy properties from outer manipulation by mistake.
  */
 const Symbols: any = {
-    name: Symbol('__Spy_name__'),
-    isSpy: Symbol('__Spy_isSpy__'),
-    func: Symbol('__Spy_func__'),
-    calls: Symbol('__Spy_calls__'),
-    config: Symbol('__Spy_config__'),
-    index: Symbol('__Spy_config__'),
+    name: Symbol.for('__Spy_name__'),
+    isSpy: Symbol.for('__Spy_isSpy__'),
+    func: Symbol.for('__Spy_func__'),
+    calls: Symbol.for('__Spy_calls__'),
+    config: Symbol.for('__Spy_config__'),
+    index: Symbol.for('__Spy_index__'),
 };
 
 /**
