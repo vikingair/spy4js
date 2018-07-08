@@ -1,6 +1,6 @@
 {
   "name": "spy4js",
-  "version": "1.5.2",
+  "version": "1.6.0",
   "description": "Smart, compact and powerful spy test framework",
   "jest": {
     "collectCoverageFrom": [
@@ -23,7 +23,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && babel src --out-dir dist && for i in `ls src/`; do cp src/$i dist/$i.flow; done",
+    "dist": "rm -rf dist && babel src --out-dir dist && for i in `ls src/`; do cp src/$i dist/$i.flow; done",
     "eslint": "eslint src/ test/",
     "flow": "flow --quiet",
     "test": "npm run flow && npm run eslint && npm run test-coverage",
@@ -45,7 +45,9 @@
   ],
   "author": "Viktor Luft <viktor.luft@freiheit.com> (https://github.com/fdc-viktor-luft)",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "serialize-as-code": "^1.0.1"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
@@ -66,8 +68,7 @@
     "eslint-plugin-react": "^7.9.1",
     "flow-bin": "^0.74.0",
     "jest": "^23.1.0",
-    "prettier": "1.7.4",
-    "react": "^16.4.1"
+    "prettier": "1.7.4"
   },
   "babel": {
     "presets": [

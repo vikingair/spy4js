@@ -8,9 +8,9 @@
 
 ### Benefits
 
-  - Flow
+  - `flow` support out-of-the-box
   - Performance
-  - No dependencies
+  - No foreign dependencies
   - Optimized error messages
   - Customizable
   - Intuitive
