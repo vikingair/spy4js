@@ -140,7 +140,7 @@ const __diff = (
         case '[object Boolean]':
             return 'different bool';
         case '[object Symbol]':
-            return 'different symbol keys';
+            return 'different symbols';
         case '[object Error]':
             if (String(a) === String(b)) {
                 return;

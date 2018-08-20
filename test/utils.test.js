@@ -142,7 +142,11 @@ describe('Spy - Equality', () => {
             undefined
         );
         expect(differenceOf(Symbol.for('foo'), Symbol.for('bar'))).toBe(
-            'different symbol keys'
+            'different symbols'
+        );
+        expect(differenceOf(Symbol('foo'), Symbol('foo'))).toBe(
+            // ATTENTION: Symbols created this way are always unique
+            'different symbols'
         );
     });
 

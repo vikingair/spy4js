@@ -1,6 +1,6 @@
 {
   "name": "spy4js",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Smart, compact and powerful spy test framework",
   "jest": {
     "collectCoverageFrom": [
@@ -46,7 +46,7 @@
   "author": "Viktor Luft <viktor.luft@freiheit.com> (https://github.com/fdc-viktor-luft)",
   "license": "MIT",
   "dependencies": {
-    "serialize-as-code": "^1.0.1"
+    "serialize-as-code": "^1.0.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

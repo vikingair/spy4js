@@ -3941,9 +3941,9 @@ semver@^5.4.1, semver@^5.5.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.0.tgz#dc4bbc7a6ca9d916dee5d43516f0092b58f7b8ab"
 
-serialize-as-code@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/serialize-as-code/-/serialize-as-code-1.0.1.tgz#cbae8ef510792468186fc8ec3d33098e8d845c65"
+serialize-as-code@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/serialize-as-code/-/serialize-as-code-1.0.3.tgz#0c1dd0eac80228f136f1204690c41cfa1d8f900f"
 
 set-blocking@^2.0.0, set-blocking@~2.0.0:
   version "2.0.0"
