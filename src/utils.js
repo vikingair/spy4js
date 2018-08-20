@@ -139,6 +139,8 @@ const __diff = (
             return 'different date';
         case '[object Boolean]':
             return 'different bool';
+        case '[object Symbol]':
+            return 'different symbol keys';
         case '[object Error]':
             if (String(a) === String(b)) {
                 return;

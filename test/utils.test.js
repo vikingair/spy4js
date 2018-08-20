@@ -137,6 +137,13 @@ describe('Spy - Equality', () => {
         expect(differenceOf(new Error('foo'), new Error('bar'))).toBe(
             'different error'
         );
+        // symbols
+        expect(differenceOf(Symbol.for('foo'), Symbol.for('foo'))).toBe(
+            undefined
+        );
+        expect(differenceOf(Symbol.for('foo'), Symbol.for('bar'))).toBe(
+            'different symbol keys'
+        );
     });
 
     it('should detect flat differences for classes correctly', () => {
