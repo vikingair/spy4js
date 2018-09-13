@@ -436,7 +436,9 @@ Spy.prototype.wasCalled = function(callCount?: number) {
         if (madeCalls !== callCount) {
             throw new Error(
                 `\n\n${this[Symbols.name]} was called ${madeCalls} times,` +
-                    ` but there were expected ${callCount} calls.\n\n`
+                    ` but there were expected ${callCount} calls.\n\n` +
+                    'Actually there were:\n\n' +
+                    this.showCallArguments()
             );
         }
     } else if (madeCalls === 0) {
@@ -448,13 +450,18 @@ Spy.prototype.wasCalled = function(callCount?: number) {
  * Checks if the spy was call history matches the expectation.
  *
  * The call history has to match the call count and order.
+ * Single arguments will be automatically wrapped as array, e.g.:
+ *            1, 2, 3 -> [1], [2], [3]
+ * ** Inspired by jest test.each **
  *
  * Throws an error if the expectation is wrong.
  *
- * @param {Array<Array<any>>} callHistory
+ * @param {Array<Array<any> | any>} callHistory
  *          -> Are the expected made call arguments in correct order.
  */
-Spy.prototype.hasCallHistory = function(callHistory: Array<Array<any>>): void {
+Spy.prototype.hasCallHistory = function(
+    ...callHistory: Array<Array<any> | any>
+): void {
     const madeCalls = this[Symbols.calls];
     const callCount = callHistory.length;
     if (madeCalls.length !== callCount) {
@@ -462,25 +469,29 @@ Spy.prototype.hasCallHistory = function(callHistory: Array<Array<any>>): void {
             `\n\n${this[Symbols.name]} was called ${madeCalls.length} times,` +
                 ` but the expected call history includes exactly ${
                     callHistory.length
-                } calls.\n\n`
+                } calls.\n\n` +
+                'Actually there were:\n\n' +
+                this.showCallArguments()
         );
     }
+    const modifiedCallHistory = callHistory.map(
+        arg => (Array.isArray(arg) ? arg : [arg])
+    );
     let hasErrors = false;
-    const diffInfo = [];
-    for (let i = 0; i < madeCalls.length; i++) {
+    const diffInfo = madeCalls.map((call, index) => {
         const diff = differenceOf(
-            madeCalls[i].arguments,
-            callHistory[i],
+            call.arguments,
+            modifiedCallHistory[index],
             this[Symbols.config]
         );
-        diffInfo.push(diff || '');
         if (diff) hasErrors = true;
-    }
+        return diff;
+    });
     if (hasErrors)
         throw new Error(
             `\n\n${this[Symbols.name]} was considered` +
                 ' to be called with the following arguments in the given order:\n\n' +
-                `    --> ${serialize(callHistory)}\n\n` +
+                `    --> ${serialize(modifiedCallHistory)}\n\n` +
                 'Actually there were:\n\n' +
                 this.showCallArguments(diffInfo)
         );

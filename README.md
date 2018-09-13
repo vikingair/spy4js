@@ -152,7 +152,7 @@ spy.wasCalledWith([1, 'test', {attr: [4]}]);
 spy.wasNotCalledWith([1, 'test', {attr: [3]}]);
 
 // the spy was called twice with the following params and in same order
-spy.hasCallHistory([ [ [1, 'test', {attr: [4]}] ], [ 'with this text' ] ]);
+spy.hasCallHistory([ [1, 'test', {attr: [4]}] ], 'with this text');
 ```
 
 There is one static method that does restore all existing spies in all tests.
@@ -387,10 +387,13 @@ This fact displays simply the opposite of [wasCalledWith](#wascalledwith).
 
 ### hasCallHistory
 ```
-spy.hasCallHistory(callHistory:Array<Array<any>>) => (fact) void
+spy.hasCallHistory(...callHistory:Array<Array<any> | any>) => (fact) void
 ```
-Works similiar to [wasCalledWith](#wascalledwith) but instead matches each
+Works similar to [wasCalledWith](#wascalledwith) but instead matches each
 call one by one in **correct order** and **correct call count**.
+ATTENTION: single argument calls can be provided without wrapping into an array. But e.g. if
+the single argument is an array itself, than you have to warp it also yourself. (Inspired by jest
+data providers)
 
 ### getCallArguments
 ```

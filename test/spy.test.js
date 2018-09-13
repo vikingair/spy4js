@@ -481,34 +481,69 @@ describe('Spy - Utils', () => {
         testObject.someFunc();
         testObject.someFunc('test3');
         testObject.someFunc('test4');
+        testObject.someFunc(['test5']);
 
-        spy.wasCalled(4);
+        spy.wasCalled(5);
         throws(
-            () => spy.hasCallHistory([['test1', 42], ['test3'], ['test4']]),
+            () =>
+                spy.hasCallHistory(
+                    ['test1', 42],
+                    'test3',
+                    ['test4'],
+                    [['test5']]
+                ),
             {
                 partOfMessage:
-                    "the spy on 'someFunc' was called 4 times, but the expected call history includes exactly 3 calls.",
+                    "the spy on 'someFunc' was called 5 times, but the expected call history includes exactly 4 calls.",
             }
         );
         throws(
-            () => spy.hasCallHistory([['test1', 42], [], ['test4'], ['test3']]),
+            () =>
+                spy.hasCallHistory(
+                    ['test1', 42],
+                    [],
+                    ['test4'],
+                    ['test3'],
+                    [['test5']]
+                ),
             {
                 partOfMessage: '--> 0 / different string',
             }
         );
         throws(
             () =>
-                spy.hasCallHistory([
+                spy.hasCallHistory(
                     ['test1', 42],
-                    ['foo'],
-                    ['test3'],
+                    'foo',
+                    'test3',
                     ['test4'],
-                ]),
+                    [['test5']]
+                ),
             {
                 partOfMessage: '--> 0 / one was undefined',
             }
         );
-        spy.hasCallHistory([['test1', 42], [], ['test3'], ['test4']]);
+        throws(
+            () =>
+                spy.hasCallHistory(
+                    ['test1', 42],
+                    undefined,
+                    'test3',
+                    ['test4'],
+                    ['test5']
+                ),
+            {
+                partOfMessage:
+                    '--> 0 / different object types: [object Array] <-> [object String]',
+            }
+        );
+        spy.hasCallHistory(
+            ['test1', 42],
+            undefined,
+            'test3',
+            ['test4'],
+            [['test5']]
+        );
     });
 
     it('should do nothing after for transparent restored spy', () => {
