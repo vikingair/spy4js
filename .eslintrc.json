@@ -3,9 +3,7 @@
     "eslint:recommended",
     "prettier",
     "prettier/flowtype",
-    "plugin:flowtype/recommended",
-    "plugin:react/recommended",
-    "prettier/react"
+    "plugin:flowtype/recommended"
   ],
   "plugins": [
     "prettier",
@@ -26,7 +24,6 @@
       "jsxBracketSameLine": true,
       "parser": "flow"}],
     "no-unused-vars": 2,
-    "flowtype/require-valid-file-annotation": [2, "always"],
-    "react/prop-types": 0
+    "flowtype/require-valid-file-annotation": [2, "always"]
   }
 }

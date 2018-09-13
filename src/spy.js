@@ -460,7 +460,9 @@ Spy.prototype.hasCallHistory = function(callHistory: Array<Array<any>>): void {
     if (madeCalls.length !== callCount) {
         throw new Error(
             `\n\n${this[Symbols.name]} was called ${madeCalls.length} times,` +
-                ` but the expected call history includes exactly ${callHistory.length} calls.\n\n`
+                ` but the expected call history includes exactly ${
+                    callHistory.length
+                } calls.\n\n`
         );
     }
     let hasErrors = false;
