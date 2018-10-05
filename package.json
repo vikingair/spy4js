@@ -1,6 +1,6 @@
 {
   "name": "spy4js",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Smart, compact and powerful spy test framework",
   "jest": {
     "collectCoverageFrom": [
@@ -64,7 +64,7 @@
     "eslint-plugin-flowtype": "^2.50.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-prettier": "^2.6.2",
-    "flow-bin": "^0.80.0",
+    "flow-bin": "^0.82.0",
     "jest": "^23.6.0",
     "prettier": "^1.14.2"
   },

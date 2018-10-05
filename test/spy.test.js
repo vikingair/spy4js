@@ -19,7 +19,7 @@ describe('Spy - Utils', () => {
     const noop: any = () => {};
 
     it('should not allow to use the constructor of the Spy without new', () => {
-        throws(Spy, { partOfMessage: 'only with "new" keyword' });
+        throws(Spy, { partOfMessage: 'Cannot call a class as a function' });
     });
 
     it('should call the Spy and record the call arguments', () => {
@@ -646,7 +646,7 @@ describe('Spy - Utils', () => {
         reconfiguredSpy1(testInstance1);
         testObj3.func3(testInstance1);
 
-        const wasCalledChecksForOwnEquals = (spy: Spy) => {
+        const wasCalledChecksForOwnEquals = (spy: any) => {
             // default config
             spy.wasCalledWith(testInstance1);
             spy.wasCalledWith(testInstance2);
@@ -654,7 +654,7 @@ describe('Spy - Utils', () => {
             spy.wasNotCalledWith(testInstance4);
         };
 
-        const wasCalledChecksForNotOwnEquals = (spy: Spy) => {
+        const wasCalledChecksForNotOwnEquals = (spy: any) => {
             // after configuration
             spy.wasCalledWith(testInstance1);
             spy.wasCalledWith(testInstance2);
