@@ -6,7 +6,7 @@
  * @flow
  */
 
-import { differenceOf, forEach, IGNORE } from './utils';
+import { COMPARE, differenceOf, forEach, IGNORE } from './utils';
 import { SpyRegistry } from './registry';
 import { serialize } from './serializer';
 
@@ -349,7 +349,12 @@ const SpyFunctions = {
             throw new Error(
                 `\n\n${this[Symbols.name]} was considered` +
                     ' to be called with the following arguments in the given order:\n\n' +
-                    `    --> ${serialize(modifiedCallHistory)}\n\n` +
+                    `${modifiedCallHistory
+                        .map(
+                            (entry, index) =>
+                                `call ${index}: ${serialize(entry)}`
+                        )
+                        .join('\n')}\n\n` +
                     'Actually there were:\n\n' +
                     this.showCallArguments(diffInfo)
             );
@@ -638,6 +643,13 @@ class Spy {
      * of a specific argument when using "wasCalledWith".
      */
     static IGNORE = IGNORE;
+
+    /**
+     * This static attribute can be called with a custom
+     * comparator that returns a boolean indicating if the
+     * comparison holds. Can be used when calling e.g. "wasCalledWith".
+     */
+    static COMPARE = COMPARE;
 
     /**
      * This static method is an alternative way to

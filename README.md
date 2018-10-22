@@ -268,12 +268,24 @@ further information.
 Spy.IGNORE = $Internal Symbol$
 ```
 This object can be passed anywhere where you want the "[wasCalledWith](#wasCalledWith)"
-to ignore that object or value for comparison.
+or "[hasCallHistory](#hasCallHistory)" to ignore that object or value for comparison.
 ```js
 spy({prop: 'value', other: 13}, 12);
 
 spy.wasCalledWith(Spy.IGNORE, 12);
 spy.wasCalledWith({prop: Spy.IGNORE, other: 13}, 12);
+```
+
+### COMPARE (static)
+```
+Spy.COMPARE(comparator: (arg: any) => boolean) => SpyComparator
+```
+This function can be called with a custom comparator and passed anywhere where you want the "[wasCalledWith](#wasCalledWith)"
+or "[hasCallHistory](#hasCallHistory)" to apply your custom comparison.
+```js
+spy({prop: 'value', other: 13}, 12);
+
+spy.wasCalledWith(Spy.COMPARE(obj => obj.prop === 'value'), 12);
 ```
 
 

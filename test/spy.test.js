@@ -424,6 +424,33 @@ describe('Spy - Utils', () => {
         );
     });
 
+    it('custom comparison via Spy.COMPARE', () => {
+        const testObj = {
+            _key: 'some hard to construct but interesting value',
+            prop: 'whatever',
+        };
+        const spy = new Spy();
+        spy(testObj, 42);
+
+        spy.wasCalledWith(Spy.COMPARE(() => true), 42); // this is the same as using Spy.IGNORE
+        spy.wasCalledWith(
+            {
+                _key: Spy.COMPARE(arg => typeof arg === 'string'),
+                prop: 'whatever',
+            },
+            42
+        );
+        throws(() =>
+            spy.wasCalledWith(
+                {
+                    _key: Spy.COMPARE(arg => typeof arg === 'number'),
+                    prop: 'whatever',
+                },
+                42
+            )
+        );
+    });
+
     it('should call the given input-functions sequentially after the spy was called', () => {
         const testObj = { _key: 'testObj' };
         const spy = new Spy().calls(

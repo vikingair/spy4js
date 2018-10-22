@@ -73,6 +73,27 @@ const mergeArrays = (arr1: Array<any>, arr2: Array<any>): Array<any> => {
  */
 const IGNORE = Symbol.for('__Spy_IGNORE__');
 
+type Comparator = (arg: any) => boolean;
+/**
+ * Uniquely identifiable container for spy relevant comparators.
+ */
+class SpyComparator {
+    _func: Comparator;
+    constructor(comparator: Comparator) {
+        this._func = comparator;
+    }
+    compare(arg: any): string | void {
+        if (!this._func(arg)) return 'custom comparison failed';
+    }
+}
+/**
+ * This function may create individual comparators
+ * to define argument based comparison for arbitrary
+ * nested objects.
+ */
+const COMPARE = (comparator: Comparator): SpyComparator =>
+    new SpyComparator(comparator);
+
 /**
  * This function is the internal representation of
  * "differenceOf". It does recursively call itself.
@@ -100,23 +121,16 @@ const __diff = (
     useOwnEquals: boolean,
     alreadyComparedArray: Array<any> = []
 ): string | void => {
-    if (a === IGNORE || b === IGNORE) {
-        return;
-    }
-    if (a === b) {
-        return;
-    }
-    if (a === undefined || b === undefined) {
-        return 'one was undefined';
-    }
-    if (a === null || b === null) {
-        return 'one was null';
-    }
+    if (a === IGNORE || b === IGNORE) return;
+    if (a instanceof SpyComparator) return a.compare(b);
+    if (b instanceof SpyComparator) return b.compare(a);
+    if (a === b) return;
+    if (a === undefined || b === undefined) return 'one was undefined';
+    if (a === null || b === null) return 'one was null';
     const aClass = Object.prototype.toString.call(a);
     const bClass = Object.prototype.toString.call(b);
-    if (aClass !== bClass) {
+    if (aClass !== bClass)
         return `different object types: ${aClass} <-> ${bClass}`;
-    }
     switch (aClass) {
         case '[object RegExp]':
             if (String(a) === String(b)) {
@@ -218,4 +232,4 @@ const differenceOf = (
     return __diff(a, b, true, config.useOwnEquals);
 };
 
-export { differenceOf, forEach, objectKeys, IGNORE };
+export { differenceOf, forEach, objectKeys, IGNORE, COMPARE };

@@ -6,7 +6,7 @@
  * @flow
  */
 
-import { differenceOf, forEach, IGNORE } from '../src/utils';
+import { COMPARE, differenceOf, forEach, IGNORE } from '../src/utils';
 
 describe('Spy - Equality', () => {
     it('foreach iterates over arrays', () => {
@@ -240,5 +240,31 @@ describe('Spy - Equality', () => {
         const obj21 = { a: 'same', b1: undefined, c1: undefined };
         const obj22 = { a: 'same', b2: undefined, c2: 'some' };
         expect(differenceOf(obj21, obj22)).toBe('--> c2 / one was undefined');
+    });
+
+    it('applies custom comparisons via SpyComparator', () => {
+        expect(
+            differenceOf(COMPARE(arg => arg.length === 2), ['foo', 'bar'])
+        ).toBe(undefined);
+        expect(
+            differenceOf(COMPARE(arg => arg.length !== 2), ['foo', 'bar'])
+        ).toBe('custom comparison failed');
+
+        const obj1 = { a: 'same', b1: undefined, c1: 'some' };
+        const obj11 = {
+            a: 'same',
+            b2: undefined,
+            c1: COMPARE(arg => arg === 'some'),
+        };
+        expect(differenceOf(obj1, obj11)).toBe(undefined);
+
+        const obj12 = {
+            a: 'same',
+            b2: undefined,
+            c1: COMPARE(arg => arg !== 'some'),
+        };
+        expect(differenceOf(obj1, obj12)).toBe(
+            '--> c1 / custom comparison failed'
+        );
     });
 });
