@@ -321,10 +321,11 @@ of the time `arg3`.
 
 ### throws
 ```
-spy.throws(message:?string) => (this) Spy
+spy.throws(message?: string | Error | null) => (this) Spy
 ```
 Perform this on a spy to make it throw an error when called. The error message can be
-provided but a default is also implemented.
+provided but a default is also implemented. If an Error instance gets passed, exactly this one will
+be thrown.
 
 ### reset
 ```

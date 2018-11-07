@@ -354,12 +354,23 @@ describe('Spy - Utils', () => {
         const spy = new Spy().throws('errorMessage');
         throws(() => spy({ _key: 'callParams1' }), { message: 'errorMessage' });
         spy.throws(null);
-        throws(() =>
-            spy(
-                { _key: 'callParams2' },
-                { partOfMessage: 'was requested to throw' }
-            )
-        );
+        throws(() => spy({ _key: 'callParams2' }), {
+            partOfMessage: 'was requested to throw',
+        });
+        spy.throws(new Error('foo'));
+        throws(() => spy({ _key: 'callParams3' }), { message: 'foo' });
+        class CustomError extends Error {
+            constructor(m: string, ...params: Array<any>) {
+                super(`CustomError('${m}')`, ...params);
+                Error.captureStackTrace &&
+                    Error.captureStackTrace(this, CustomError);
+                this.name = 'CustomError';
+            }
+        }
+        spy.throws(new CustomError('bar'));
+        throws(() => spy({ _key: 'callParams4' }), {
+            message: "CustomError('bar')",
+        });
     });
 
     it('should reset the call arguments on an object spy and NOT removing it (LIKE RESTORE)', cb => {

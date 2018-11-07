@@ -44,7 +44,7 @@ const DefaultSettings = {
     useOwnEquals: true,
 };
 
-type SpyInstance = {
+export type SpyInstance = {
     (...any[]): any,
     configure: (config: {
         useOwnEquals?: boolean,
@@ -52,7 +52,7 @@ type SpyInstance = {
     }) => SpyInstance,
     calls: (...funcs: Array<Function>) => SpyInstance,
     returns: (...args: Array<any>) => SpyInstance,
-    throws: (message: ?string) => SpyInstance,
+    throws: (msgOrError?: string | Error | null) => SpyInstance,
     reset: () => SpyInstance,
     restore: () => SpyInstance,
     transparent: () => SpyInstance,
@@ -166,14 +166,15 @@ const SpyFunctions = {
      * Will make the spy throw an Error, if called next time.
      * The error message can be provided as parameter.
      *
-     * @param {?string} message -> Will be the error message.
+     * @param {string | Error | null} msgOrError -> Will be the error message.
      *
      * @return {SpyInstance} <- BuilderPattern
      */
-    throws(message: ?string): SpyInstance {
+    throws(msgOrError?: string | Error | null): SpyInstance {
         this[Symbols.func] = () => {
+            if (msgOrError instanceof Error) throw msgOrError;
             throw new Error(
-                message || `${this[Symbols.name]} was requested to throw`
+                msgOrError || `${this[Symbols.name]} was requested to throw`
             );
         };
         return this;
