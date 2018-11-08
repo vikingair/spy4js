@@ -232,4 +232,10 @@ const differenceOf = (
     return __diff(a, b, true, config.useOwnEquals);
 };
 
-export { differenceOf, forEach, objectKeys, IGNORE, COMPARE };
+export type OptionalMessageOrError = ?string | Error;
+const toError = (msgOrError: OptionalMessageOrError, spyName: string) =>
+    msgOrError instanceof Error
+        ? msgOrError
+        : new Error(msgOrError || `${spyName} was requested to throw`);
+
+export { differenceOf, forEach, objectKeys, IGNORE, COMPARE, toError };

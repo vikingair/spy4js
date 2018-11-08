@@ -6,7 +6,14 @@
  * @flow
  */
 
-import { COMPARE, differenceOf, forEach, IGNORE } from './utils';
+import {
+    COMPARE,
+    differenceOf,
+    forEach,
+    IGNORE,
+    type OptionalMessageOrError,
+    toError,
+} from './utils';
 import { SpyRegistry } from './registry';
 import { serialize } from './serializer';
 
@@ -52,7 +59,9 @@ export type SpyInstance = {
     }) => SpyInstance,
     calls: (...funcs: Array<Function>) => SpyInstance,
     returns: (...args: Array<any>) => SpyInstance,
-    throws: (msgOrError?: string | Error | null) => SpyInstance,
+    resolves: (...args: Array<any>) => SpyInstance,
+    rejects: (...msgOrErrors: Array<OptionalMessageOrError>) => SpyInstance,
+    throws: (msgOrError: OptionalMessageOrError) => SpyInstance,
     reset: () => SpyInstance,
     restore: () => SpyInstance,
     transparent: () => SpyInstance,
@@ -153,29 +162,55 @@ const SpyFunctions = {
      * @return {SpyInstance} <- BuilderPattern.
      */
     returns(...args: Array<any>): SpyInstance {
-        const funcs = [];
+        return this.calls(...args.map(arg => () => arg));
+    },
 
-        for (let i = 0; i < args.length; i++) {
-            funcs.push(() => args[i]);
-        }
+    /**
+     * Accepts multiple values, which will be resolved sequentially.
+     * If called more often, resolves always the last supplied value.
+     *
+     * @param {Array<any>} args -> The iterative provided arguments
+     *                             can be accessed as array.
+     *                             And will be resolved one by one
+     *                             for each made call.
+     *
+     * @return {SpyInstance} <- BuilderPattern.
+     */
+    resolves(...args: Array<any>): SpyInstance {
+        return this.returns(...args.map(arg => Promise.resolve(arg)));
+    },
 
-        return this.calls(...funcs);
+    /**
+     * Accepts multiple values, which will be rejected sequentially.
+     * If called more often, rejects always the last supplied value.
+     *
+     * @param {Array<OptionalMessageOrError>} msgOrErrors
+     *              -> The iterative provided arguments
+     *                 can be accessed as array.
+     *                 And will be rejected one by one
+     *                 for each made call.
+     *
+     * @return {SpyInstance} <- BuilderPattern.
+     */
+    rejects(...msgOrErrors: Array<OptionalMessageOrError>): SpyInstance {
+        return this.calls(
+            ...msgOrErrors.map(msgOrError => () =>
+                Promise.reject(toError(msgOrError, this[Symbols.name]))
+            )
+        );
     },
 
     /**
      * Will make the spy throw an Error, if called next time.
      * The error message can be provided as parameter.
      *
-     * @param {string | Error | null} msgOrError -> Will be the error message.
+     * @param {OptionalMessageOrError} msgOrError -> Will be the error message.
      *
      * @return {SpyInstance} <- BuilderPattern
      */
-    throws(msgOrError?: string | Error | null): SpyInstance {
+    throws(msgOrError: OptionalMessageOrError): SpyInstance {
         this[Symbols.func] = () => {
-            if (msgOrError instanceof Error) throw msgOrError;
-            throw new Error(
-                msgOrError || `${this[Symbols.name]} was requested to throw`
-            );
+            throw toError(msgOrError, this[Symbols.name]);
         };
         return this;
     },

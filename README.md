@@ -226,7 +226,7 @@ debug messages, but can be while you are in a console.log-mania.
 
 ### Constructor
 ```
-Spy(spyName:string = 'the spy') => Spy
+Spy(spyName:string = 'the spy') => SpyInstance
 ```
 The returned Spy instance has his own name-attribute (only) for debugging purpose.
 
@@ -240,7 +240,7 @@ details.
 
 ### on (static)
 ```
-Spy.on(object:Object, methodName:string) => Spy
+Spy.on(object:Object, methodName:string) => SpyInstance
 ```
 Initializing a spy on an object, simply replaces the original function by a spy and 
 stores the necessary information to be able to restore the mocked method. 
@@ -251,14 +251,14 @@ for no purpose a spy should ever be spied.
 
 ### onMany (static)
 ```
-Spy.onMany(object:Object, ...methodNames:Array<string>) => Array<Spy>
+Spy.onMany(object:Object, ...methodNames:Array<string>) => Array<SpyInstance>
 ```
 Initializing as many spies as required for one and the same object. Same as calling
 `Spy.on` for each method name.
 
 ### restoreAll (static)
 ```
-Spy.restoreAll() => Array<Spy>
+Spy.restoreAll() => Array<SpyInstance>
 ```
 Does restore all mocked objects to their original state. See [restore](#restore) for
 further information.
@@ -291,7 +291,7 @@ spy.wasCalledWith(Spy.COMPARE(obj => obj.prop === 'value'), 12);
 
 ### configure
 ```
-spy.configure(config:{useOwnEquals?: boolean, persistent?: boolean}) => (this) Spy
+spy.configure(config:{useOwnEquals?: boolean, persistent?: boolean}) => (this) SpyInstance
 ```
 With `configure` the spy can be configured. One configuration possibility
 is to ignore any `equals` methods while comparing objects. There might be libraries which
@@ -305,7 +305,7 @@ spies. For Spies created with `new Spy()` this configuration will throw an excep
 
 ### calls
 ```
-spy.calls(...functions:Array<Function>) => (this) Spy
+spy.calls(...functions:Array<Function>) => (this) SpyInstance
 ```
 The provided functions will be called sequentially in order when the spy will be called.
 Meaning `spy.calls(func1, func2, func3)` will call first `func1` then `func2` and the rest
@@ -313,15 +313,33 @@ of the time `func3`.
 
 ### returns
 ```
-spy.returns(...args:Array<any>) => (this) Spy
+spy.returns(...args:Array<any>) => (this) SpyInstance
 ```
 The provided arguments will be returned sequentially in order when the spy will be called.
 Meaning `spy.returns(arg1, arg2, arg3)` will return first `arg1` then `arg2` and the rest
 of the time `arg3`.
 
+### resolves
+```
+spy.resolves(...args:Array<any>) => (this) SpyInstance
+```
+The provided arguments will be resolved sequentially in order when the spy will be called.
+Meaning `spy.resolves(arg1, arg2, arg3)` will return first `Promise.resolve(arg1)` then `Promise.resolve(arg2)` and the rest
+of the time `Promise.resolve(arg3)`.
+
+
+### rejects
+```
+spy.rejects(...args:Array<?string | Error>) => (this) SpyInstance
+```
+The provided arguments will be rejected sequentially in order when the spy will be called.
+Meaning `spy.rejects('foo', null, new Error('bar'))` will return first `Promise.reject(new Error('foo'))`
+then `Promise.reject(new Error('<SPY_NAME> was requested to throw'))` and the rest
+of the time `Promise.reject(new Error('bar'))`.
+
 ### throws
 ```
-spy.throws(message?: string | Error | null) => (this) Spy
+spy.throws(message: ?string | Error) => (this) SpyInstance
 ```
 Perform this on a spy to make it throw an error when called. The error message can be
 provided but a default is also implemented. If an Error instance gets passed, exactly this one will
@@ -329,13 +347,13 @@ be thrown.
 
 ### reset
 ```
-spy.reset() => (this) Spy
+spy.reset() => (this) SpyInstance
 ```
 Does reset the registered calls on that spy.
 
 ### restore
 ```
-spy.restore() => (this) Spy
+spy.restore() => (this) SpyInstance
 ```
 Restores the spied object, if existing, to its original state. The spy won't lose any
 other information. So it is still aware of made calls, can be plugged anywhere else
@@ -345,7 +363,7 @@ If the spy was configured to be persistent this method will throw an error.
 
 ### transparent
 ```
-spy.transparent() => (this) Spy
+spy.transparent() => (this) SpyInstance
 ```
 Can be useful with spies on objects. It does make the spy behave like not existing. So
 the original function of the "mocked" object will be called, but the spy does remember
@@ -353,7 +371,7 @@ the call information.
 
 ### transparentAfter
 ```
-spy.transparentAfter(callCount:number) => (this) Spy
+spy.transparentAfter(callCount:number) => (this) SpyInstance
 ```
 Works like [transparent](#transparent) but the spy will get transparent after called as
 often as specified. Meaning `spy.transparentAfter(num)` will not be transparent on the first

@@ -10,6 +10,14 @@ import { throws } from '../util/facts';
 import { Spy } from '../src/spy';
 
 describe('Spy - Utils', () => {
+    class CustomError extends Error {
+        constructor(m: string, ...params: Array<any>) {
+            super(`CustomError('${m}')`, ...params);
+            Error.captureStackTrace &&
+                Error.captureStackTrace(this, CustomError);
+            this.name = 'CustomError';
+        }
+    }
     afterEach(Spy.restoreAll);
 
     const errorThrower: any = () => {
@@ -305,40 +313,87 @@ describe('Spy - Utils', () => {
 
     it('shows that the spy was not called if this is the fact', () => {
         const spy = new Spy();
-        expect(spy.showCallArguments()).toEqual('the spy was never called!\n');
+        expect(spy.showCallArguments()).toBe('the spy was never called!\n');
     });
 
-    it('should return undefined if no return value is supplied', () => {
+    it('returns undefined if no return value was supplied', () => {
         const spy = new Spy().returns();
-        expect(spy('callParams1')).toEqual(undefined);
+        expect(spy('callParams1')).toBe(undefined);
         spy.returns(42);
-        expect(spy('callParams2')).toEqual(42);
+        expect(spy('callParams2')).toBe(42);
         spy.returns();
-        expect(spy('callParams3')).toEqual(undefined);
+        expect(spy('callParams3')).toBe(undefined);
     });
 
-    it('should return given inputs after the spy was called', () => {
+    it('returns given value when the spy gets called', () => {
         const testObj = { _key: 'testObj' };
         const spy = new Spy().returns(testObj);
-        expect(spy({ _key: 'callParams1' })).toEqual(testObj);
-        expect(spy({ _key: 'callParams2' })).toEqual(testObj);
+        expect(spy({ _key: 'callParams1' })).toBe(testObj);
+        expect(spy({ _key: 'callParams2' })).toBe(testObj);
     });
 
-    it(
-        'should return given inputs sequentially' + ' after the spy was called',
-        () => {
-            const testObj1 = { _key: 'testObj1' };
-            const testObj2 = { _key: 'testObj2' };
-            const testObj3 = { _key: 'testObj3' };
-            const spy = new Spy().returns(testObj1, testObj2, testObj3);
-            expect(spy({ _key: 'callParams1' })).toEqual(testObj1);
-            expect(spy({ _key: 'callParams2' })).toEqual(testObj2);
-            expect(spy({ _key: 'callParams3' })).toEqual(testObj3);
-            expect(spy({ _key: 'callParams4' })).toEqual(testObj3);
-        }
-    );
+    it('returns given values sequentially when the spy gets called', () => {
+        const testObj1 = { _key: 'testObj1' };
+        const testObj2 = { _key: 'testObj2' };
+        const testObj3 = { _key: 'testObj3' };
+        const spy = new Spy().returns(testObj1, testObj2, testObj3);
+        expect(spy({ _key: 'callParams1' })).toBe(testObj1);
+        expect(spy({ _key: 'callParams2' })).toBe(testObj2);
+        expect(spy({ _key: 'callParams3' })).toBe(testObj3);
+        expect(spy({ _key: 'callParams4' })).toBe(testObj3);
+    });
 
-    it('should reset the call arguments', () => {
+    it('resolves given values sequentially when the spy gets called', async () => {
+        const testObj1 = { _key: 'testObj1' };
+        const testObj2 = { _key: 'testObj2' };
+        const testObj3 = { _key: 'testObj3' };
+        const spy = new Spy().resolves(testObj1, testObj2, testObj3);
+
+        const p1 = spy({ _key: 'callParams1' });
+        const p2 = spy({ _key: 'callParams2' });
+        const p3 = spy({ _key: 'callParams3' });
+        const p4 = spy({ _key: 'callParams4' });
+
+        expect(p1).toBeInstanceOf(Promise);
+        expect(p2).toBeInstanceOf(Promise);
+        expect(p3).toBeInstanceOf(Promise);
+        expect(p4).toBeInstanceOf(Promise);
+
+        expect(await p1).toBe(testObj1);
+        expect(await p2).toBe(testObj2);
+        expect(await p3).toBe(testObj3);
+        expect(await p4).toBe(testObj3);
+    });
+
+    it('rejects given values sequentially when the spy gets called', async () => {
+        const testArg1 = new Error('foo');
+        const testArg2 = new CustomError('bar');
+        const testArg3 = undefined;
+        const testArg4 = 'custom message';
+        const spy = new Spy().rejects(testArg1, testArg2, testArg3, testArg4);
+
+        const p1 = spy({ _key: 'callParams1' });
+        const p2 = spy({ _key: 'callParams2' });
+        const p3 = spy({ _key: 'callParams3' });
+        const p4 = spy({ _key: 'callParams4' });
+        const p5 = spy({ _key: 'callParams5' });
+
+        expect(p1).toBeInstanceOf(Promise);
+        expect(p2).toBeInstanceOf(Promise);
+        expect(p3).toBeInstanceOf(Promise);
+        expect(p4).toBeInstanceOf(Promise);
+        expect(p5).toBeInstanceOf(Promise);
+
+        await expect(p1).rejects.toBe(testArg1);
+        await expect(p2).rejects.toBe(testArg2);
+        await expect(p3).rejects.toEqual(
+            new Error('the spy was requested to throw')
+        );
+        await expect(p4).rejects.toEqual(new Error('custom message'));
+        await expect(p5).rejects.toEqual(new Error('custom message'));
+    });
+
+    it('resets the call arguments', () => {
         const spy = new Spy();
         spy('callParams1');
         spy('callParams2');
@@ -350,23 +405,19 @@ describe('Spy - Utils', () => {
         spy.wasCalled(1);
     });
 
-    it('should throw if requested and called', () => {
+    it('throws when called', () => {
         const spy = new Spy().throws('errorMessage');
         throws(() => spy({ _key: 'callParams1' }), { message: 'errorMessage' });
+        spy.throws();
+        throws(() => spy({ _key: 'callParams2' }), {
+            partOfMessage: 'was requested to throw',
+        });
         spy.throws(null);
         throws(() => spy({ _key: 'callParams2' }), {
             partOfMessage: 'was requested to throw',
         });
         spy.throws(new Error('foo'));
         throws(() => spy({ _key: 'callParams3' }), { message: 'foo' });
-        class CustomError extends Error {
-            constructor(m: string, ...params: Array<any>) {
-                super(`CustomError('${m}')`, ...params);
-                Error.captureStackTrace &&
-                    Error.captureStackTrace(this, CustomError);
-                this.name = 'CustomError';
-            }
-        }
         spy.throws(new CustomError('bar'));
         throws(() => spy({ _key: 'callParams4' }), {
             message: "CustomError('bar')",
@@ -718,6 +769,8 @@ describe('Spy - Utils', () => {
             'configure',
             'calls',
             'returns',
+            'resolves',
+            'rejects',
             'throws',
             'reset',
             'restore',
