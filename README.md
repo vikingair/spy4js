@@ -4,7 +4,7 @@
 [![Coverage Status][coveralls-image]][coveralls-url]
 [![styled with prettier][prettier-image]][prettier-url]
 
-# ![spy4js logo](spy-logo.svg) spy4js
+# ![spy4js logo](spy-logo.svg?sanitize=true) spy4js
 
 ### Benefits
 
