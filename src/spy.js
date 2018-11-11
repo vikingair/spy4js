@@ -16,6 +16,8 @@ import {
 } from './utils';
 import { SpyRegistry } from './registry';
 import { serialize } from './serializer';
+import { createMock, initMocks } from './mock';
+import { configureTestSuite } from './test-suite';
 
 /**
  *
@@ -368,8 +370,8 @@ const SpyFunctions = {
                     this.showCallArguments()
             );
         }
-        const modifiedCallHistory = callHistory.map(
-            arg => (Array.isArray(arg) ? arg : [arg])
+        const modifiedCallHistory = callHistory.map(arg =>
+            Array.isArray(arg) ? arg : [arg]
         );
         let hasErrors = false;
         const diffInfo = madeCalls.map((call, index) => {
@@ -657,6 +659,9 @@ class Spy {
     /**
      * This static method can be used to configure
      * the default behaviour of created spy instances.
+     * The most suited place where you could configure
+     * spy4js is the "setupTests"-File, which runs
+     * before each test suite.
      *
      * For example,
      *
@@ -666,12 +671,23 @@ class Spy {
      * favor own "equals" implementation while
      * comparing any objects.
      *
+     * You may also override default test suite hooks
+     * by providing afterEach or beforeEach respectively.
+     *
      * @param {Object} config <- Holds the configuration params.
      */
-    static configure(config: { useOwnEquals?: boolean }): void {
+    static configure(config: {
+        useOwnEquals?: boolean,
+        afterEach?: void => void,
+        beforeEach?: void => void,
+    }): void {
         if (config.useOwnEquals !== undefined) {
             DefaultSettings.useOwnEquals = config.useOwnEquals;
         }
+        configureTestSuite({
+            afterEach: config.afterEach,
+            beforeEach: config.beforeEach,
+        });
     }
 
     /**
@@ -735,8 +751,10 @@ class Spy {
     }
 
     /**
-     * This static method is shortcut for applying multiple
-     * spies on one object at (different) attributes.
+     * This static method is not only a shortcut for applying
+     * multiple spies on one object at (different) attributes,
+     * but it enables more control, clarity and comfort for all
+     * kind of unit tests. (see spy.mock.test.js)
      *
      * For example:
      *
@@ -744,27 +762,33 @@ class Spy {
      * const spy2 = Spy.on(obj, 'methodName2');
      * const spy3 = Spy.on(obj, 'methodName3');
      *
-     * Is equivalent to:
+     * Can be accomplished by:
      *
-     * const [spy1, spy2, spy3] =
-     *      Spy.onMany(obj, 'methodName1', 'methodName2', 'methodName3')
+     * const obj$Mock = Spy.mock(obj, 'methodName1', 'methodName2', 'methodName3')
+     *
+     * (spy1 === obj$Mock.methodName1 and so forth)
      *
      * @param {Object} obj -> The manipulated object.
-     * @param {Array<string>} methodNames -> Iterative provided attribute
-     *                                       names that will be mocked.
+     * @param {string[]} methodNames -> Iterative provided attribute
+     *                                  names that will be mocked.
      *
-     * @return {Array<SpyInstance>}
+     * @return {Object} Mock.
      */
-    static onMany(
-        obj: Object,
-        ...methodNames: Array<string>
-    ): Array<SpyInstance> {
-        const spies = [];
-        for (let i = 0; i < methodNames.length; i++) {
-            const spy = Spy.on(obj, methodNames[i]);
-            spies.push(spy);
-        }
-        return spies;
+    static mock(obj: Object, ...methodNames: string[]): Object {
+        return createMock(obj, methodNames);
+    }
+
+    /**
+     * This static method initializes all created
+     * mocks (see Spy.mock). This is necessary, because
+     * it has to apply before each test run, to ensure
+     * that restored spies apply again. This makes
+     * automated cleaned up spies possible.
+     *
+     * Usually it should get called within one "beforeEach"-Hook.
+     */
+    static initMocks(): void {
+        initMocks(Spy.on);
     }
 
     /**
@@ -774,10 +798,14 @@ class Spy {
      *
      * Restoring objects does not disable any
      * other behaviours/features of the spies.
+     *
+     * Usually it should get called within one "afterEach"-Hook.
      */
     static restoreAll(): void {
         registry.restoreAll();
     }
 }
+
+configureTestSuite({ beforeEach: Spy.initMocks, afterEach: Spy.restoreAll });
 
 export { Spy };

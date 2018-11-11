@@ -18,7 +18,6 @@ describe('Spy - Utils', () => {
             this.name = 'CustomError';
         }
     }
-    afterEach(Spy.restoreAll);
 
     const errorThrower: any = () => {
         throw new Error('never call this func directly');
@@ -99,34 +98,6 @@ describe('Spy - Utils', () => {
         Spy.on(testObject, 'attr');
     });
 
-    it('should place many Spies on an object and record different call arguments', cb => {
-        const testObject = {
-            func1: errorThrower,
-            func2: errorThrower,
-            func3: () => cb(),
-            func4: errorThrower,
-        };
-
-        const [spy1, spy2, spy3] = Spy.onMany(
-            testObject,
-            'func1',
-            'func2',
-            'func4'
-        );
-        testObject.func1('test', 6);
-        expect(spy1.getCallArguments()).toEqual(['test', 6]);
-        spy1.wasCalledWith('test', 6);
-        testObject.func2('', 7);
-        expect(spy2.getCallArguments()).toEqual(['', 7]);
-        spy2.wasCalledWith('', 7);
-        testObject.func4();
-        expect(spy3.getCallArguments()).toEqual([]);
-        spy3.wasCalledWith();
-        // if this would get spied, the test callback
-        // would never be called which would make the test fail
-        testObject.func3();
-    });
-
     it('throws an exception if getCallArguments gets called with float', () => {
         const spy = new Spy();
         spy(123);
@@ -145,13 +116,15 @@ describe('Spy - Utils', () => {
             },
             func4: errorThrower,
         };
-        const [spy1, spy2] = Spy.onMany(
+        Spy.restoreAll();
+        const testObject$Mock = Spy.mock(
             testObject,
             'func1',
             'func2',
             'func3',
             'func4'
         );
+        Spy.initMocks();
         testObject.func1('testCall1');
         testObject.func2('testCall2');
         testObject.func3('testCall3');
@@ -163,15 +136,15 @@ describe('Spy - Utils', () => {
 
         testObject.func1('testCall5');
         throws(() => testObject.func2('testCall6'));
-        spy1.wasCalledWith('testCall1');
-        throws(() => spy1.wasCalledWith('testCall5'));
-        throws(() => spy2.wasCalledWith('testCall6'));
-        if (spy1 instanceof Function) {
-            spy1('testCall7');
+        testObject$Mock.func1.wasCalledWith('testCall1');
+        throws(() => testObject$Mock.func1.wasCalledWith('testCall5'));
+        throws(() => testObject$Mock.func2.wasCalledWith('testCall6'));
+        if (testObject$Mock.func1 instanceof Function) {
+            testObject$Mock.func1('testCall7');
         } else {
             throw new Error('spy should always be callable');
         }
-        spy1.wasCalledWith('testCall7');
+        testObject$Mock.func1.wasCalledWith('testCall7');
         // if this would get spied, the test callback would
         // never be called which would make the test fail
         testObject.func3('testCall8');
@@ -187,30 +160,32 @@ describe('Spy - Utils', () => {
             },
             func4: errorThrower,
         };
-        const [spy1, , spy3] = Spy.onMany(
+        Spy.restoreAll();
+        const testObject$Mock = Spy.mock(
             testObject,
             'func1',
             'func2',
             'func3',
             'func4'
         );
+        Spy.initMocks();
         testObject.func1('testCall1');
         testObject.func2('testCall2');
         testObject.func3('testCall3');
         testObject.func4('testCall4');
 
         // this removes first spy from the testObject
-        spy1.restore();
+        testObject$Mock.func1.restore();
 
         testObject.func1('testCall5');
         testObject.func3('testCall6');
 
-        spy1.wasCalledWith('testCall1');
-        throws(() => spy1.wasCalledWith('testCall5'));
+        testObject$Mock.func1.wasCalledWith('testCall1');
+        throws(() => testObject$Mock.func1.wasCalledWith('testCall5'));
 
-        spy3.wasCalledWith('testCall3');
-        spy3.wasCalledWith('testCall6');
-        spy3.restore();
+        testObject$Mock.func3.wasCalledWith('testCall3');
+        testObject$Mock.func3.wasCalledWith('testCall6');
+        testObject$Mock.func3.restore();
         // if this would get spied, the test callback
         // would never be called which would make the test fail
         testObject.func3('testCall8');

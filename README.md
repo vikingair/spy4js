@@ -24,6 +24,11 @@ and other assertion frameworks.
 **spy4js** exports only one object called `Spy`. The spy instances
 are treated as class instances and come with a lot of useful features. See below for more.
 
+**Hint**:
+My favorite test framework is [Jest](https://jestjs.io/). If you are using other
+frameworks you might get issues related to automatically applied test suite hooks.
+To overcome this default behaviour see [here](#configure-static).
+
 ### Installation
 ##### With yarn
 ```
@@ -50,11 +55,11 @@ const spy2 = new Spy('special spy for me');
 // initialize by mocking another objects attribute (usually this attribute is a function)
 const someObject1 = new Date(2017, 1, 15);
 const spy3 = Spy.on(someObject1, 'toJSON');
-// (spy name will be accordingly: 'the spy on \'toJSON\'')
+// (spy name will be accordingly: "the spy on 'toJSON'")
 
 // initialize many by mocking another objects attributes
 const someObject2 = new Date(2017, 1, 15);
-const [spy4, spy5, spy6] = Spy.onMany(someObject2, 'toJSON', 'toString', 'getDate');
+const someObject2$Mock = Spy.mock(someObject2, 'toJSON', 'toString', 'getDate');
 ```
 
 Any spy instance can be configured by overriding the default configuration. For
@@ -157,33 +162,12 @@ spy.hasCallHistory([ [1, 'test', {attr: [4]}] ], 'with this text');
 
 There is one static method that does restore all existing spies in all tests.
 This is extremely useful to clean up all still existing mocks and also
-a very comfortable to this automatically after every test (like in an "afterEach").
+a very comfortable to this automatically after every test (this is done by default).
     
   - `restoreAll` (does restore every existing spy)
 
 ```js
 Spy.restoreAll();
-```
-
-**Hint**: 
-To integrate as default that all spies get restored after each test run,
-you can integrate the following snippet to replace the default describe.
-For those of you working with
-[create-react-app](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#srcsetuptestsjs)
-may include the snippet in the `src/setupTests.js`.
-
-```js
-import { Spy } from 'spy4js';
-
-const oldDescribe = describe;
-window.describe = (string, func) => {
-    oldDescribe(string, () => {
-        afterEach(() => {
-            Spy.restoreAll();
-        });
-        return func();
-    });
-};
 ```
 
 And also sometimes it is necessary to have access to some of the call arguments with
@@ -232,11 +216,17 @@ The returned Spy instance has his own name-attribute (only) for debugging purpos
 
 ### configure (static)
 ```
-Spy.configure(config:{useOwnEquals?:boolean}) => void
+Spy.configure(config: {
+    useOwnEquals?:boolean,
+    beforeEach?: void => void,
+    afterEach?: void => void,
+}) => void
 ```
-Using this function you may edit the default behaviour of every spy instance. The only
-configuration possibility for now is "useOwnEquals". See [configure](#configure) for more
-details.
+Using this function you may edit the default behaviour spy4js itself.
+The configuration possibility are:
+- **useOwnEquals**: Applies for all spy instances. See [configure](#configure) for more details.
+- **beforeEach**: Let's you override the default beforeEach test suite hook.
+- **afterEach**: Let's you override the default afterEach test suite hook.
 
 ### on (static)
 ```
@@ -249,19 +239,29 @@ If the attribute was already spied or is not a function, the Spy will throw an e
 to avoid unexpected behaviour. You never want to spy other attributes than functions and
 for no purpose a spy should ever be spied.
 
-### onMany (static)
+### mock (static)
 ```
-Spy.onMany(object:Object, ...methodNames:Array<string>) => Array<SpyInstance>
+Spy.mock(object:Object, ...methodNames:Array<string>) => Object (Mock)
 ```
-Initializing as many spies as required for one and the same object. Same as calling
-`Spy.on` for each method name.
+Creating an object that references spies for all given methodNames.
+Initialize as many spies as required for one and the same object. Only
+after `Spy.initMocks` gets called, the created mock does affect the given object.
+
+### initMocks (static)
+```
+Spy.initMocks() => void
+```
+Does initialize all mocks by applying spies. Mocks can be created with
+[mock](#mock). This function has not be called manually, if you rely on
+the default test suite hooks.
 
 ### restoreAll (static)
 ```
-Spy.restoreAll() => Array<SpyInstance>
+Spy.restoreAll() => void
 ```
 Does restore all mocked objects to their original state. See [restore](#restore) for
-further information.
+further information. This function has not be called manually, if you rely on
+the default test suite hooks.
 
 ### IGNORE (static)
 ```
