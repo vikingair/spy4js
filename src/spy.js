@@ -179,7 +179,11 @@ const SpyFunctions = {
      * @return {SpyInstance} <- BuilderPattern.
      */
     resolves(...args: Array<any>): SpyInstance {
-        return this.returns(...args.map(arg => Promise.resolve(arg)));
+        return this.returns(
+            ...(args.length ? args : [undefined]).map(arg =>
+                Promise.resolve(arg)
+            )
+        );
     },
 
     /**
@@ -196,8 +200,9 @@ const SpyFunctions = {
      */
     rejects(...msgOrErrors: Array<OptionalMessageOrError>): SpyInstance {
         return this.calls(
-            ...msgOrErrors.map(msgOrError => () =>
-                Promise.reject(toError(msgOrError, this[Symbols.name]))
+            ...(msgOrErrors.length ? msgOrErrors : [undefined]).map(
+                msgOrError => () =>
+                    Promise.reject(toError(msgOrError, this[Symbols.name]))
             )
         );
     },

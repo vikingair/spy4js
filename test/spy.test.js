@@ -318,6 +318,16 @@ describe('Spy - Utils', () => {
         expect(spy({ _key: 'callParams4' })).toBe(testObj3);
     });
 
+    it('resolves undefined if no arguments were provided to resolves', async () => {
+        const spy = new Spy().resolves();
+
+        const p = spy({ _key: 'callParams1' });
+
+        expect(p).toBeInstanceOf(Promise);
+
+        expect(await p).toBe(undefined);
+    });
+
     it('resolves given values sequentially when the spy gets called', async () => {
         const testObj1 = { _key: 'testObj1' };
         const testObj2 = { _key: 'testObj2' };
@@ -338,6 +348,18 @@ describe('Spy - Utils', () => {
         expect(await p2).toBe(testObj2);
         expect(await p3).toBe(testObj3);
         expect(await p4).toBe(testObj3);
+    });
+
+    it('rejects default error if no arguments were provided to rejects', async () => {
+        const spy = new Spy().rejects();
+
+        const p = spy({ _key: 'callParams1' });
+
+        expect(p).toBeInstanceOf(Promise);
+
+        await expect(p).rejects.toEqual(
+            new Error('the spy was requested to throw')
+        );
     });
 
     it('rejects given values sequentially when the spy gets called', async () => {
