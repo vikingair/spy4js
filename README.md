@@ -218,11 +218,13 @@ The returned Spy instance has his own name-attribute (only) for debugging purpos
 ```
 Spy.configure(config: {
     useOwnEquals?:boolean,
-    beforeEach?: void => void,
-    afterEach?: void => void,
+    beforeEach?: (scope: string) => void,
+    afterEach?: (scope: string) => void,
 }) => void
 ```
 Using this function you may edit the default behaviour spy4js itself.
+The scope param will contain the test-suite name, which was provided as first parameter
+of the `describe` function.
 The configuration possibility are:
 - **useOwnEquals**: Applies for all spy instances. See [configure](#configure) for more details.
 - **beforeEach**: Let's you override the default beforeEach test suite hook.
@@ -249,10 +251,10 @@ after `Spy.initMocks` gets called, the created mock does affect the given object
 
 ### initMocks (static)
 ```
-Spy.initMocks() => void
+Spy.initMocks(scope?: string) => void
 ```
-Does initialize all mocks by applying spies. Mocks can be created with
-[mock](#mock). This function has not be called manually, if you rely on
+Does initialize all global and scope-related mocks by applying spies. Mocks can be
+created with [mock](#mock). This function has not to be called manually, if you rely on
 the default test suite hooks.
 
 ### restoreAll (static)

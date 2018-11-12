@@ -6,20 +6,27 @@
  * @flow
  */
 
-type Runner = { afterEach?: void => void, beforeEach?: void => void };
+import { setScope } from './mock';
+
+type Scope = string;
+type Runner = { afterEach?: Scope => void, beforeEach?: Scope => void };
 const runner: Runner = {};
 
 const oldDescribe = describe;
+
 // eslint-disable-next-line
-describe = (string, func) => {
-    oldDescribe(string, () => {
+describe = (name: string, suite: Function) => {
+    oldDescribe(name, () => {
+        setScope(name);
         beforeEach(() => {
-            runner.beforeEach && runner.beforeEach();
+            runner.beforeEach && runner.beforeEach(name);
         });
         afterEach(() => {
-            runner.afterEach && runner.afterEach();
+            runner.afterEach && runner.afterEach(name);
         });
-        return func();
+        const rv = suite();
+        setScope(undefined);
+        return rv;
     });
 };
 

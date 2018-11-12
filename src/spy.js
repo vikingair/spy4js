@@ -34,12 +34,12 @@ let __LOCK__ = true;
  * Those symbols are used to protect the private spy properties from outer manipulation by mistake.
  */
 const Symbols: any = {
-    name: Symbol.for('__Spy_name__'),
-    isSpy: Symbol.for('__Spy_isSpy__'),
-    func: Symbol.for('__Spy_func__'),
-    calls: Symbol.for('__Spy_calls__'),
-    config: Symbol.for('__Spy_config__'),
-    index: Symbol.for('__Spy_index__'),
+    name: Symbol('__Spy_name__'),
+    isSpy: Symbol('__Spy_isSpy__'),
+    func: Symbol('__Spy_func__'),
+    calls: Symbol('__Spy_calls__'),
+    config: Symbol('__Spy_config__'),
+    index: Symbol('__Spy_index__'),
 };
 
 /**
@@ -678,8 +678,8 @@ class Spy {
      */
     static configure(config: {
         useOwnEquals?: boolean,
-        afterEach?: void => void,
-        beforeEach?: void => void,
+        afterEach?: string => void,
+        beforeEach?: string => void,
     }): void {
         if (config.useOwnEquals !== undefined) {
             DefaultSettings.useOwnEquals = config.useOwnEquals;
@@ -786,9 +786,15 @@ class Spy {
      * automated cleaned up spies possible.
      *
      * Usually it should get called within one "beforeEach"-Hook.
+     *
+     * @param {string | void} scope -> A string identifying the scope.
+     *                                 Scopes should not be used only in
+     *                                 combination of custom beforeEach and
+     *                                 afterEach-Hooks.
+     *
      */
-    static initMocks(): void {
-        initMocks(Spy.on);
+    static initMocks(scope?: string): void {
+        initMocks(Spy.on, scope);
     }
 
     /**

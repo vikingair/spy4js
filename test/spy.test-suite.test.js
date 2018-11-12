@@ -43,8 +43,8 @@ describe('Spy - Test-Suite', () => {
     });
 
     it('initializes mock not manually', () => {
-        expect(Matrix$Mock.startup).toThrow(
-            "Method 'startup' was not initialized on Mock."
+        expect(Matrix$Mock.startup).toThrowErrorMatchingInlineSnapshot(
+            `"Method 'startup' was not initialized on Mock."`
         );
         expect(Matrix$Mock.teardown).toBe(undefined);
 
@@ -57,20 +57,9 @@ describe('Spy - Test-Suite', () => {
         Matrix$Mock.startup.returns('go go go');
         expect(Matrix.startup()).toBe('go go go');
 
-        expect(Spy.initMocks).toThrow(
-            "The objects attribute 'startup' was already spied. " +
-                'Please make sure to spy only once at a time at any attribute.'
-        ); // double init not allowed
-    });
-
-    it('restores no spies from other tests', () => {
-        expect(Spy.initMocks).toThrow(
-            "The objects attribute 'startup' was already spied. " +
-                'Please make sure to spy only once at a time at any attribute.'
-        ); // was not cleared from previous test
-
-        Spy.restoreAll();
-
-        Spy.initMocks();
+        expect(Spy.initMocks).toThrowErrorMatchingInlineSnapshot(`
+"Could not initialize mock for global scope, because:
+The objects attribute 'startup' was already spied. Please make sure to spy only once at a time at any attribute."
+`); // double init not allowed
     });
 });

@@ -6,7 +6,13 @@
  * @flow
  */
 
-import { createMock, initMocks, _mocks } from '../src/mock';
+import {
+    createMock,
+    initMocks,
+    _mocks,
+    setScope,
+    defaultScope,
+} from '../src/mock';
 
 const IRL = {
     saveTheWorld: () => 'feed some koalas',
@@ -19,28 +25,32 @@ const Matrix = { tearDown: () => 1337, startup: () => 1 };
 const testSpyOn = (obj: Object, method: string) => obj[method];
 
 describe('Mocks', () => {
-    beforeEach(() => (_mocks.length = 0));
+    beforeEach(() => {
+        _mocks[defaultScope].length = 0;
+        setScope(undefined);
+    });
 
     it('creates uninitialized mocks', () => {
         const IRL$Mock = createMock(IRL, ['doWithTree', 'giveBanana']);
 
-        expect(_mocks.length).toBe(1);
-        expect(_mocks[0].mock).toBe(IRL$Mock);
-        expect(_mocks[0].mocked).toBe(IRL);
+        expect(_mocks[defaultScope].length).toBe(1);
+        expect(_mocks[defaultScope][0].mock).toBe(IRL$Mock);
+        expect(_mocks[defaultScope][0].mocked).toBe(IRL);
 
         expect(IRL$Mock.saveTheWorld).toBe(undefined);
-        expect(IRL$Mock.doWithTree).toThrow(
-            "Method 'doWithTree' was not initialized on Mock."
+        expect(IRL$Mock.doWithTree).toThrowErrorMatchingInlineSnapshot(
+            `"Method 'doWithTree' was not initialized on Mock."`
         );
-        expect(IRL$Mock.giveBanana).toThrow(
-            "Method 'giveBanana' was not initialized on Mock."
+        expect(IRL$Mock.giveBanana).toThrowErrorMatchingInlineSnapshot(
+            `"Method 'giveBanana' was not initialized on Mock."`
         );
     });
 
     it('mocks specified methods', () => {
+        setScope('Test Scope');
         const IRL$Mock = createMock(IRL, ['doWithTree', 'giveBanana']);
-        expect(_mocks.length).toBe(1);
-        initMocks(testSpyOn);
+        expect(_mocks['Test Scope'].length).toBe(1);
+        initMocks(testSpyOn, 'Test Scope');
 
         expect(IRL$Mock.saveTheWorld).toBe(undefined);
         expect(IRL$Mock.doWithTree('kiss')).toBe('kiss the tree');
@@ -50,7 +60,7 @@ describe('Mocks', () => {
     it('creates multiple mocks', () => {
         const IRL$Mock = createMock(IRL, ['saveTheWorld']);
         const Matrix$Mock = createMock(Matrix, ['tearDown']);
-        expect(_mocks.length).toBe(2);
+        expect(_mocks[defaultScope].length).toBe(2);
         initMocks(testSpyOn);
 
         expect(IRL$Mock.saveTheWorld()).toBe('feed some koalas');

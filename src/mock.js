@@ -14,10 +14,21 @@ const uninitialized = (method: string) => () => {
     throw new Error(`Method '${method}' was not initialized on Mock.`);
 };
 
-type MockInfo = { mock: Object, mocked: Object };
-export const _mocks: MockInfo[] = [];
+type MockInfo = { mock: Object, mocked: Object, scope: string };
+type MockScope = MockInfo[];
+export const defaultScope: string = (Symbol('__Spy_global__'): any);
+export const _mocks: { [string]: MockScope } = { [defaultScope]: [] };
+
+let scope = defaultScope;
+export const setScope = (scoping?: string): void => {
+    if (scoping) {
+        _mocks[scoping] = [];
+        scope = scoping;
+    } else scope = defaultScope;
+};
+
 const registerMock = (mocked: Object, mock: Object = {}): Object => {
-    _mocks.push({ mocked, mock });
+    _mocks[scope].push({ mocked, mock, scope });
     return mock;
 };
 
@@ -29,12 +40,28 @@ export const createMock = (obj: Object, methods: string[]): Object => {
     return mock;
 };
 
-const initMock = ({ mocked, mock }: MockInfo, spyOn: SpyOn): void => {
+const couldNotInitError = (scope: string, additional: string) =>
+    new Error(
+        `Could not initialize mock for ${
+            scope === defaultScope ? 'global scope' : `scope "${scope}"`
+        }, because:\n${additional}`
+    );
+
+const initMock = ({ mocked, mock, scope }: MockInfo, spyOn: SpyOn): void => {
     forEach(mock, (method: string) => {
-        mock[method] = spyOn(mocked, method);
+        try {
+            mock[method] = spyOn(mocked, method);
+        } catch (e) {
+            throw new couldNotInitError(scope, e.message);
+        }
     });
 };
 
-export const initMocks = (spyOn: SpyOn): void => {
-    forEach(_mocks, (_, mock: MockInfo) => initMock(mock, spyOn));
+const initMockScope = (scoping: string, spyOn: SpyOn): void => {
+    forEach(_mocks[scoping], (_, mock: MockInfo) => initMock(mock, spyOn));
+};
+
+export const initMocks = (spyOn: SpyOn, scoping?: string): void => {
+    initMockScope(defaultScope, spyOn);
+    scoping && initMockScope(scoping, spyOn);
 };
