@@ -26,7 +26,7 @@ describe('Spy - Utils', () => {
     const noop: any = () => {};
 
     it('should not allow to use the constructor of the Spy without new', () => {
-        throws(Spy, { partOfMessage: 'Cannot call a class as a function' });
+        expect(Spy).toThrow();
     });
 
     it('should call the Spy and record the call arguments', () => {

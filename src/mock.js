@@ -52,7 +52,7 @@ const initMock = ({ mocked, mock, scope }: MockInfo, spyOn: SpyOn): void => {
         try {
             mock[method] = spyOn(mocked, method);
         } catch (e) {
-            throw new couldNotInitError(scope, e.message);
+            throw couldNotInitError(scope, e.message);
         }
     });
 };
