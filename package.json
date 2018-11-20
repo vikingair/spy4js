@@ -1,6 +1,6 @@
 {
   "name": "spy4js",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Smart, compact and powerful spy test framework",
   "jest": {
     "collectCoverageFrom": [
@@ -52,11 +52,8 @@
     "@babel/cli": "^7.1.5",
     "@babel/core": "^7.1.5",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.1.5",
     "@babel/preset-flow": "^7.0.0",
-    "@babel/runtime": "^7.1.5",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
@@ -73,24 +70,18 @@
   "babel": {
     "comments": false,
     "presets": [
-      "@babel/preset-env",
-      "@babel/preset-flow"
-    ],
-    "plugins": [
-      "@babel/plugin-proposal-class-properties",
+      "@babel/preset-flow",
       [
-        "@babel/plugin-transform-runtime",
+        "@babel/preset-env",
         {
-          "helpers": false,
-          "regenerator": true
-        }
-      ],
-      [
-        "@babel/plugin-proposal-object-rest-spread",
-        {
-          "useBuiltIns": true
+          "targets": {
+            "node": "8"
+          }
         }
       ]
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-class-properties"
     ]
   }
 }

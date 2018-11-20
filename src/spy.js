@@ -773,13 +773,18 @@ class Spy {
      *
      * (spy1 === obj$Mock.methodName1 and so forth)
      *
-     * @param {Object} obj -> The manipulated object.
+     * @param {Object} obj -> The manipulated object. Actual type:
+     *                        Before initialization: { [$Keys<typeof methodNames>]: Throwing function }
+     *                        After initialization: { [$Keys<typeof methodNames>]: SpyInstance }
      * @param {string[]} methodNames -> Iterative provided attribute
      *                                  names that will be mocked.
      *
      * @return {Object} Mock.
      */
-    static mock(obj: Object, ...methodNames: string[]): Object {
+    static mock(
+        obj: Object,
+        ...methodNames: string[]
+    ): { [string]: SpyInstance } {
         return createMock(obj, methodNames);
     }
 
