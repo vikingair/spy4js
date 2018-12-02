@@ -614,6 +614,8 @@ const SpyFunctions = {
     },
 };
 
+const AllCreatedSpies: Array<SpyInstance> = [];
+
 class Spy {
     /**
      * This constructor does instantiate a new spy
@@ -658,6 +660,7 @@ class Spy {
         forEach(SpyFunctions, (key, value) => {
             spy[key] = value;
         });
+        AllCreatedSpies.push(spy);
         return (spy: SpyInstance);
     }
 
@@ -820,8 +823,30 @@ class Spy {
     static restoreAll(): void {
         registry.restoreAll();
     }
+
+    /**
+     * This static method does reset all
+     * created spy instances.
+     *
+     * This deletes all information related to made calls.
+     * This is very useful, if you want to avoid testing any
+     * conditions that were outside the control of your test.
+     *
+     * Usually it should get called within one "afterEach"-Hook.
+     */
+    static resetAll(): void {
+        AllCreatedSpies.forEach(spy => spy.reset());
+    }
 }
 
-configureTestSuite({ beforeEach: Spy.initMocks, afterEach: Spy.restoreAll });
+const defaultHooks = {
+    beforeEach: Spy.initMocks,
+    afterEach: () => {
+        Spy.restoreAll();
+        Spy.resetAll();
+    },
+};
+
+configureTestSuite(defaultHooks);
 
 export { Spy };

@@ -265,6 +265,15 @@ Does restore all mocked objects to their original state. See [restore](#restore)
 further information. This function has not be called manually, if you rely on
 the default test suite hooks.
 
+### resetAll (static)
+```
+Spy.resetAll() => void
+```
+Does reset all existing spies. This effects even persistent spies.
+See [reset](#reset) for further information. This function has not be
+called manually in between different tests, if you rely on the default
+test suite hooks.
+
 ### IGNORE (static)
 ```
 Spy.IGNORE = $Internal Symbol$

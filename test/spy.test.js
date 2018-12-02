@@ -846,4 +846,25 @@ describe('Spy - Utils', () => {
         expect(testObj.myFunc1()).toEqual('func1');
         expect(testObj.myFunc2()).toEqual('func2');
     });
+
+    it('resets all spies', () => {
+        const [spy1, spy2, spy3] = [new Spy(), new Spy(), new Spy()];
+
+        spy1('foo');
+        spy1('bar');
+
+        spy2();
+
+        spy3('foo', ['bar']);
+
+        spy1.wasCalled(2);
+        spy2.wasCalled(1);
+        spy3.wasCalled(1);
+
+        Spy.resetAll();
+
+        spy1.wasNotCalled();
+        spy2.wasNotCalled();
+        spy3.wasNotCalled();
+    });
 });

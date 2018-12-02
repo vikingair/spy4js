@@ -18,7 +18,9 @@ const throws = (
             check.message !== expectedError.message
         ) {
             throw new Error(
-                `Expected the error message "${check.message}", but received ${expectedError.message}.`
+                `Expected the error message "${check.message}", but received ${
+                    expectedError.message
+                }.`
             );
         } else if (
             check.partOfMessage !== undefined &&
