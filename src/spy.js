@@ -43,6 +43,16 @@ const Symbols: any = {
 };
 
 /**
+ * Very jest specific snapshot serialization behaviour.
+ */
+expect &&
+    expect.addSnapshotSerializer &&
+    expect.addSnapshotSerializer({
+        test: v => v && v[Symbols.isSpy],
+        print: spy => `Spy(${spy[Symbols.name]})`,
+    });
+
+/**
  * Initial default settings for every
  * spy instance. Can be modified only
  * implicitly by "Spy.configure".

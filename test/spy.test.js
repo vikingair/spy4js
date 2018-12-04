@@ -867,4 +867,8 @@ describe('Spy - Utils', () => {
         spy2.wasNotCalled();
         spy3.wasNotCalled();
     });
+
+    it('overrides the snapshot rendering of spies', () => {
+        expect(new Spy('foo')).toMatchInlineSnapshot(`Spy(foo)`);
+    });
 });
