@@ -869,6 +869,10 @@ describe('Spy - Utils', () => {
     });
 
     it('overrides the snapshot rendering of spies', () => {
-        expect(new Spy('foo')).toMatchInlineSnapshot(`Spy(foo)`);
+        expect(new Spy()).toMatchInlineSnapshot('Spy()');
+        expect(new Spy('foo')).toMatchInlineSnapshot('Spy(foo)');
+        const testObj = { func: () => {} };
+        const spyOn = Spy.on(testObj, 'func');
+        expect(spyOn).toMatchInlineSnapshot('Spy.on(func)');
     });
 });

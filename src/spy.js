@@ -35,6 +35,7 @@ let __LOCK__ = true;
  */
 const Symbols: any = {
     name: Symbol('__Spy_name__'),
+    snap: Symbol('__Spy_snap__'),
     isSpy: Symbol('__Spy_isSpy__'),
     func: Symbol('__Spy_func__'),
     calls: Symbol('__Spy_calls__'),
@@ -44,12 +45,16 @@ const Symbols: any = {
 
 /**
  * Very jest specific snapshot serialization behaviour.
+ *
+ * Hint: We are casting here anything to any, because not all users might
+ * have typed those functions correctly and should not see flow errors
+ * related to those types.
  */
-expect &&
-    expect.addSnapshotSerializer &&
-    expect.addSnapshotSerializer({
+(expect: any) &&
+    (expect.addSnapshotSerializer: any) &&
+    (expect.addSnapshotSerializer: any)({
         test: v => v && v[Symbols.isSpy],
-        print: spy => `Spy(${spy[Symbols.name]})`,
+        print: spy => spy[Symbols.snap],
     });
 
 /**
@@ -652,17 +657,20 @@ class Spy {
      *
      * @constructor
      */
-    constructor(name: string = 'the spy', __mock: any): SpyInstance {
+    constructor(name: string = '', __mock: any): SpyInstance {
         const spy: any = function(...args: Array<any>) {
             spy[Symbols.calls].push({ args });
             return spy[Symbols.func](...args);
         };
         if (__mock && !__LOCK__) {
             spy[Symbols.index] = registry.push(__mock.obj, __mock.methodName);
+            spy[Symbols.name] = `the spy on '${name}'`;
+            spy[Symbols.snap] = `Spy.on(${name})`;
         } else {
             spy[Symbols.index] = null;
+            spy[Symbols.name] = name || 'the spy';
+            spy[Symbols.snap] = `Spy(${name})`;
         }
-        spy[Symbols.name] = name;
         spy[Symbols.isSpy] = true;
         spy[Symbols.func] = () => {};
         spy[Symbols.calls] = [];
@@ -762,7 +770,7 @@ class Spy {
             );
         }
         __LOCK__ = false;
-        const spy = new Spy(`the spy on '${methodName}'`, { obj, methodName });
+        const spy = new Spy(methodName, { obj, methodName });
         __LOCK__ = true;
         obj[methodName] = spy;
         return spy;
