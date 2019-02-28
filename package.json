@@ -2,6 +2,53 @@
   "name": "spy4js",
   "version": "2.3.1",
   "description": "Smart, compact and powerful spy test framework",
+  "main": "dist/spy.js",
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fdc-viktor-luft/spy4js"
+  },
+  "keywords": [
+    "spy4js",
+    "spy",
+    "debug",
+    "js",
+    "flow",
+    "es6"
+  ],
+  "author": "Viktor Luft <viktor.luft@freiheit.com> (https://github.com/fdc-viktor-luft)",
+  "license": "MIT",
+  "scripts": {
+    "dist": "rm -rf dist && babel src --out-dir dist && for i in `ls src/`; do cp src/$i dist/$i.flow; done",
+    "eslint": "eslint src/ test/",
+    "flow": "flow --quiet",
+    "test": "npm run flow && npm run eslint && npm run test-coverage",
+    "test-coverage": "jest --all --coverage",
+    "prettier": "prettier --config .prettierrc --write src/**/*.js test/**/*.js",
+    "coveralls": "cat ./coverage/lcov.info | coveralls"
+  },
+  "dependencies": {
+    "serialize-as-code": "^1.0.6"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.3.4",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-flow": "^7.0.0",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "^24.1.0",
+    "coveralls": "^3.0.3",
+    "eslint": "^5.14.1",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-flowtype": "^3.4.2",
+    "eslint-plugin-prettier": "^3.0.1",
+    "flow-bin": "^0.93.0",
+    "jest": "^24.1.0",
+    "prettier": "^1.16.4"
+  },
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.{js}"
@@ -17,55 +64,6 @@
         "lines": 100
       }
     }
-  },
-  "main": "dist/spy.js",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "dist": "rm -rf dist && babel src --out-dir dist && for i in `ls src/`; do cp src/$i dist/$i.flow; done",
-    "eslint": "eslint src/ test/",
-    "flow": "flow --quiet",
-    "test": "npm run flow && npm run eslint && npm run test-coverage",
-    "test-coverage": "jest --all --coverage",
-    "prettier": "prettier --config .prettierrc --write src/**/*.js test/**/*.js",
-    "coveralls": "cat ./coverage/lcov.info | coveralls"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fdc-viktor-luft/spy4js"
-  },
-  "keywords": [
-    "spy4js",
-    "spy",
-    "debug",
-    "js",
-    "flow",
-    "es6"
-  ],
-  "author": "Viktor Luft <viktor.luft@freiheit.com> (https://github.com/fdc-viktor-luft)",
-  "license": "MIT",
-  "dependencies": {
-    "serialize-as-code": "^1.0.3"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.1.5",
-    "@babel/core": "^7.1.5",
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/preset-env": "^7.1.5",
-    "@babel/preset-flow": "^7.0.0",
-    "babel-core": "7.0.0-bridge.0",
-    "babel-eslint": "^10.0.1",
-    "babel-jest": "^23.6.0",
-    "coveralls": "^3.0.2",
-    "eslint": "^5.9.0",
-    "eslint-config-prettier": "^3.2.0",
-    "eslint-plugin-flowtype": "^3.2.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-prettier": "^3.0.0",
-    "flow-bin": "^0.88.0",
-    "jest": "^23.6.0",
-    "prettier": "^1.15.2"
   },
   "babel": {
     "comments": false,
