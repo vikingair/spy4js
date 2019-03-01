@@ -8,8 +8,8 @@ export default {
     plugins: [
         babel({
             exclude: 'node_modules/**',
-            presets: [['@babel/preset-env', { modules: false, targets: { node: "8" } }]] }
-        ),
+            presets: [['@babel/preset-env', { modules: false, targets: { node: "8" } }]]
+        }),
         resolve(),
         commonjs(),
         flowEntry(),

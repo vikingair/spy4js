@@ -54,38 +54,5 @@
     "rollup-plugin-commonjs": "^9.2.1",
     "rollup-plugin-flow-entry": "^0.3.0",
     "rollup-plugin-node-resolve": "^4.0.1"
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.{js}"
-    ],
-    "coverageReporters": [
-      "lcov"
-    ],
-    "coverageThreshold": {
-      "global": {
-        "statements": 100,
-        "branches": 100,
-        "functions": 100,
-        "lines": 100
-      }
-    }
-  },
-  "babel": {
-    "comments": false,
-    "presets": [
-      "@babel/preset-flow",
-      [
-        "@babel/preset-env",
-        {
-          "targets": {
-            "node": "8"
-          }
-        }
-      ]
-    ],
-    "plugins": [
-      "@babel/plugin-proposal-class-properties"
-    ]
   }
 }
