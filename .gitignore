@@ -1,7 +1,7 @@
-.idea/
-dist/
-node_modules/
-coverage/
+/.idea
+/dist
+/build
+/node_modules
 
 npm-debug.log*
 yarn-debug.log*

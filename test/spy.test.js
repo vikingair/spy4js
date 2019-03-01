@@ -6,7 +6,6 @@
  * @flow
  */
 
-import { throws } from '../util/facts';
 import { Spy } from '../src/spy';
 
 describe('Spy - Utils', () => {
@@ -40,12 +39,8 @@ describe('Spy - Utils', () => {
 
     it('throws an exception that the spy was never called if not called when wasCalledWith or wasCalled gets called', () => {
         const spy = new Spy();
-        throws(() => spy.wasCalled(), {
-            partOfMessage: 'was never called!',
-        });
-        throws(() => spy.wasCalledWith(), {
-            partOfMessage: 'was never called!',
-        });
+        expect(() => spy.wasCalled()).toThrow(/.*was never called!.*/);
+        expect(() => spy.wasCalledWith()).toThrow(/.*was never called!.*/);
     });
 
     it('should place the Spy on an object and record the call arguments', () => {
@@ -66,33 +61,33 @@ describe('Spy - Utils', () => {
             attrDate: new Date(),
             attrObject: {},
         };
-        throws(() => Spy.on(testObject, 'attrString'), {
-            partOfMessage: 'only spy on functions!',
-        });
-        throws(() => Spy.on(testObject, 'attrNumber'), {
-            partOfMessage: 'only spy on functions!',
-        });
-        throws(() => Spy.on(testObject, 'attrNull'), {
-            partOfMessage: 'only spy on functions!',
-        });
-        throws(() => Spy.on(testObject, 'attrDate'), {
-            partOfMessage: 'only spy on functions!',
-        });
-        throws(() => Spy.on(testObject, 'attrObject'), {
-            partOfMessage: 'only spy on functions!',
-        });
-        throws(() => Spy.on(testObject, 'attrUnknown'), {
-            partOfMessage: 'only spy on functions!',
-        });
+        expect(() => Spy.on(testObject, 'attrString')).toThrow(
+            /.*only spy on functions!.*/
+        );
+        expect(() => Spy.on(testObject, 'attrNumber')).toThrow(
+            /.*only spy on functions!.*/
+        );
+        expect(() => Spy.on(testObject, 'attrNull')).toThrow(
+            /.*only spy on functions!.*/
+        );
+        expect(() => Spy.on(testObject, 'attrDate')).toThrow(
+            /.*only spy on functions!.*/
+        );
+        expect(() => Spy.on(testObject, 'attrObject')).toThrow(
+            /.*only spy on functions!.*/
+        );
+        expect(() => Spy.on(testObject, 'attrUnknown')).toThrow(
+            /.*only spy on functions!.*/
+        );
     });
 
     it('should throw if trying to spy on already spied attributes.', () => {
         const testObject = { attr: () => {} };
         const firstSpy = Spy.on(testObject, 'attr');
         // spying again does throw now
-        throws(() => Spy.on(testObject, 'attr'), {
-            partOfMessage: 'was already spied',
-        });
+        expect(() => Spy.on(testObject, 'attr')).toThrow(
+            /.*was already spied.*/
+        );
         // after restoring the spy, we can spy there again
         firstSpy.restore();
         Spy.on(testObject, 'attr');
@@ -101,9 +96,9 @@ describe('Spy - Utils', () => {
     it('throws an exception if getCallArguments gets called with float', () => {
         const spy = new Spy();
         spy(123);
-        throws(() => spy.getCallArguments(0.5), {
-            partOfMessage: 'callNr "0.5" was not valid',
-        });
+        expect(() => spy.getCallArguments(0.5)).toThrow(
+            /.*callNr "0.5" was not valid.*/
+        );
     });
 
     it('should restore all Spies', cb => {
@@ -135,10 +130,14 @@ describe('Spy - Utils', () => {
         Spy.restoreAll();
 
         testObject.func1('testCall5');
-        throws(() => testObject.func2('testCall6'));
+        expect(() => testObject.func2('testCall6')).toThrow();
         testObject$Mock.func1.wasCalledWith('testCall1');
-        throws(() => testObject$Mock.func1.wasCalledWith('testCall5'));
-        throws(() => testObject$Mock.func2.wasCalledWith('testCall6'));
+        expect(() =>
+            testObject$Mock.func1.wasCalledWith('testCall5')
+        ).toThrow();
+        expect(() =>
+            testObject$Mock.func2.wasCalledWith('testCall6')
+        ).toThrow();
         if (testObject$Mock.func1 instanceof Function) {
             testObject$Mock.func1('testCall7');
         } else {
@@ -181,7 +180,9 @@ describe('Spy - Utils', () => {
         testObject.func3('testCall6');
 
         testObject$Mock.func1.wasCalledWith('testCall1');
-        throws(() => testObject$Mock.func1.wasCalledWith('testCall5'));
+        expect(() =>
+            testObject$Mock.func1.wasCalledWith('testCall5')
+        ).toThrow();
 
         testObject$Mock.func3.wasCalledWith('testCall3');
         testObject$Mock.func3.wasCalledWith('testCall6');
@@ -196,9 +197,9 @@ describe('Spy - Utils', () => {
         spy.wasNotCalled();
         spy({ _key: 'test' });
         spy.wasCalledWith({ _key: 'test' });
-        throws(() => spy.wasNotCalled(), {
-            partOfMessage: 'was not considered to be called',
-        });
+        expect(() => spy.wasNotCalled()).toThrow(
+            /.*was not considered to be called.*/
+        );
     });
 
     it('should inspect calls for given arguments of the Spy correctly', () => {
@@ -211,21 +212,23 @@ describe('Spy - Utils', () => {
         spy(testArg3, testArg2, testArg1);
         spy(testArg2);
         spy.wasCalled();
-        throws(() => spy.wasCalled(2));
+        expect(() => spy.wasCalled(2)).toThrow();
         spy.wasCalled(4);
         spy.wasCalledWith(testArg1);
-        throws(() => spy.wasNotCalledWith(testArg1));
+        expect(() => spy.wasNotCalledWith(testArg1)).toThrow();
         spy.wasCalledWith(testArg2);
-        throws(() => spy.wasNotCalledWith(testArg2));
+        expect(() => spy.wasNotCalledWith(testArg2)).toThrow();
         spy.wasCalledWith(testArg1, testArg2);
-        throws(() => spy.wasNotCalledWith(testArg1, testArg2));
+        expect(() => spy.wasNotCalledWith(testArg1, testArg2)).toThrow();
         spy.wasCalledWith(testArg3, testArg2, testArg1);
-        throws(() => spy.wasNotCalledWith(testArg3, testArg2, testArg1));
-        throws(() => spy.wasCalledWith(testArg3));
+        expect(() =>
+            spy.wasNotCalledWith(testArg3, testArg2, testArg1)
+        ).toThrow();
+        expect(() => spy.wasCalledWith(testArg3)).toThrow();
         spy.wasNotCalledWith(testArg3);
-        throws(() => spy.wasCalledWith(testArg3, testArg2));
+        expect(() => spy.wasCalledWith(testArg3, testArg2)).toThrow();
         spy.wasNotCalledWith(testArg3, testArg2);
-        throws(() => spy.wasCalledWith(testArg3, testArg1, testArg2));
+        expect(() => spy.wasCalledWith(testArg3, testArg1, testArg2)).toThrow();
         spy.wasNotCalledWith(testArg3, testArg1, testArg2);
     });
 
@@ -404,21 +407,21 @@ describe('Spy - Utils', () => {
 
     it('throws when called', () => {
         const spy = new Spy().throws('errorMessage');
-        throws(() => spy({ _key: 'callParams1' }), { message: 'errorMessage' });
+        expect(() => spy({ _key: 'callParams1' })).toThrow(/^errorMessage$/);
         spy.throws();
-        throws(() => spy({ _key: 'callParams2' }), {
-            partOfMessage: 'was requested to throw',
-        });
+        expect(() => spy({ _key: 'callParams2' })).toThrow(
+            /.*was requested to throw.*/
+        );
         spy.throws(null);
-        throws(() => spy({ _key: 'callParams2' }), {
-            partOfMessage: 'was requested to throw',
-        });
+        expect(() => spy({ _key: 'callParams2' })).toThrow(
+            /.*was requested to throw.*/
+        );
         spy.throws(new Error('foo'));
-        throws(() => spy({ _key: 'callParams3' }), { message: 'foo' });
+        expect(() => spy({ _key: 'callParams3' })).toThrow(/^foo$/);
         spy.throws(new CustomError('bar'));
-        throws(() => spy({ _key: 'callParams4' }), {
-            message: "CustomError('bar')",
-        });
+        expect(() => spy({ _key: 'callParams4' })).toThrow(
+            /^CustomError\('bar'\)$/
+        );
     });
 
     it('should reset the call arguments on an object spy and NOT removing it (LIKE RESTORE)', cb => {
@@ -438,7 +441,7 @@ describe('Spy - Utils', () => {
         testObject.func('testCall2');
 
         spy.wasCalledWith('testCall2');
-        throws(() => spy.wasCalledWith('testCall1'));
+        expect(() => spy.wasCalledWith('testCall1')).toThrow();
 
         spy.restore();
         // if this would get spied, the test callback
@@ -478,9 +481,9 @@ describe('Spy - Utils', () => {
         spy.wasCalledWith({ _key: Spy.IGNORE, prop: 'whatever' }, 42);
         spy.wasCalledWith({ _key: Spy.IGNORE, prop: 'whatever' }, Spy.IGNORE);
         spy.wasCalledWith({ _key: Spy.IGNORE, prop: Spy.IGNORE }, Spy.IGNORE);
-        throws(() =>
+        expect(() =>
             spy.wasCalledWith({ _key: Spy.IGNORE, prop: 'FAILURE' }, Spy.IGNORE)
-        );
+        ).toThrow();
     });
 
     it('custom comparison via Spy.COMPARE', () => {
@@ -499,7 +502,7 @@ describe('Spy - Utils', () => {
             },
             42
         );
-        throws(() =>
+        expect(() =>
             spy.wasCalledWith(
                 {
                     _key: Spy.COMPARE(arg => typeof arg === 'number'),
@@ -507,7 +510,7 @@ describe('Spy - Utils', () => {
                 },
                 42
             )
-        );
+        ).toThrow();
     });
 
     it('should call the given input-functions sequentially after the spy was called', () => {
@@ -533,9 +536,9 @@ describe('Spy - Utils', () => {
     it('should make the spy transparent (mainly for spies on object properties)', () => {
         const testObject = { someFunc: errorThrower };
         const spy = Spy.on(testObject, 'someFunc').transparent();
-        throws(() => testObject.someFunc('test', 6), {
-            message: 'never call this func directly',
-        });
+        expect(() => testObject.someFunc('test', 6)).toThrow(
+            /^never call this func directly$/
+        );
         spy.wasCalledWith('test', 6);
     });
 
@@ -546,12 +549,12 @@ describe('Spy - Utils', () => {
             .transparentAfter(2);
         expect(testObject.someFunc('test1', 42)).toEqual(12);
         expect(testObject.someFunc('test2')).toEqual(13);
-        throws(() => testObject.someFunc('test3', { testProp: 'test' }), {
-            message: 'never call this func directly',
-        });
-        throws(() => testObject.someFunc('test4'), {
-            message: 'never call this func directly',
-        });
+        expect(() =>
+            testObject.someFunc('test3', { testProp: 'test' })
+        ).toThrow(/^never call this func directly$/);
+        expect(() => testObject.someFunc('test4')).toThrow(
+            /^never call this func directly$/
+        );
 
         spy.wasCalled(4);
         spy.wasCalledWith('test1', 42);
@@ -570,58 +573,39 @@ describe('Spy - Utils', () => {
         testObject.someFunc(['test5']);
 
         spy.wasCalled(5);
-        throws(
-            () =>
-                spy.hasCallHistory(
-                    ['test1', 42],
-                    'test3',
-                    ['test4'],
-                    [['test5']]
-                ),
-            {
-                partOfMessage:
-                    "the spy on 'someFunc' was called 5 times, but the expected call history includes exactly 4 calls.",
-            }
+        expect(() =>
+            spy.hasCallHistory(['test1', 42], 'test3', ['test4'], [['test5']])
+        ).toThrow(
+            /.*the spy on 'someFunc' was called 5 times, but the expected call history includes exactly 4 calls\..*/
         );
-        throws(
-            () =>
-                spy.hasCallHistory(
-                    ['test1', 42],
-                    [],
-                    ['test4'],
-                    ['test3'],
-                    [['test5']]
-                ),
-            {
-                partOfMessage: '--> 0 / different string',
-            }
-        );
-        throws(
-            () =>
-                spy.hasCallHistory(
-                    ['test1', 42],
-                    'foo',
-                    'test3',
-                    ['test4'],
-                    [['test5']]
-                ),
-            {
-                partOfMessage: '--> 0 / one was undefined',
-            }
-        );
-        throws(
-            () =>
-                spy.hasCallHistory(
-                    ['test1', 42],
-                    undefined,
-                    'test3',
-                    ['test4'],
-                    ['test5']
-                ),
-            {
-                partOfMessage:
-                    '--> 0 / different object types: [object Array] <-> [object String]',
-            }
+        expect(() =>
+            spy.hasCallHistory(
+                ['test1', 42],
+                [],
+                ['test4'],
+                ['test3'],
+                [['test5']]
+            )
+        ).toThrow(/.*--> 0 \/ different string.*/);
+        expect(() =>
+            spy.hasCallHistory(
+                ['test1', 42],
+                'foo',
+                'test3',
+                ['test4'],
+                [['test5']]
+            )
+        ).toThrow(/.*--> 0 \/ one was undefined.*/);
+        expect(() =>
+            spy.hasCallHistory(
+                ['test1', 42],
+                undefined,
+                'test3',
+                ['test4'],
+                ['test5']
+            )
+        ).toThrow(
+            /.*--> 0 \/ different object types: \[object Array] <-> \[object String].*/
         );
         spy.hasCallHistory(
             ['test1', 42],
@@ -638,12 +622,12 @@ describe('Spy - Utils', () => {
         testObject.someFunc('test1', 42);
         testObject.someFunc();
         testObject.someFunc();
-        throws(() => testObject.someFunc('test4'), {
-            message: 'never call this func directly',
-        });
-        throws(() => testObject.someFunc('test5'), {
-            message: 'never call this func directly',
-        });
+        expect(() => testObject.someFunc('test4')).toThrow(
+            /^never call this func directly$/
+        );
+        expect(() => testObject.someFunc('test5')).toThrow(
+            /^never call this func directly$/
+        );
 
         spy.wasCalled(5);
         spy.wasCalledWith('test1', 42);
@@ -653,9 +637,9 @@ describe('Spy - Utils', () => {
 
         spy.restore();
 
-        throws(() => testObject.someFunc('test6'), {
-            message: 'never call this func directly',
-        });
+        expect(() => testObject.someFunc('test6')).toThrow(
+            /^never call this func directly$/
+        );
 
         spy.wasCalled(5);
 
@@ -801,21 +785,21 @@ describe('Spy - Utils', () => {
     it('does not allow to configure not mocking spies to be persistent', () => {
         const spy = new Spy('spy that does not mock any object');
 
-        throws(() => spy.configure({ persistent: true }), {
-            partOfMessage: 'does not mock any object',
-        });
-        throws(() => spy.configure({ persistent: false }), {
-            partOfMessage: 'does not mock any object',
-        });
+        expect(() => spy.configure({ persistent: true })).toThrow(
+            /.*does not mock any object.*/
+        );
+        expect(() => spy.configure({ persistent: false })).toThrow(
+            /.*does not mock any object.*/
+        );
     });
 
     it('does not allow to restore persistent spies', () => {
         const testObj = { myFunc: () => 'originalFunc' };
         const spy = Spy.on(testObj, 'myFunc').configure({ persistent: true });
 
-        throws(() => spy.restore(), {
-            partOfMessage: 'was configured to be persistent',
-        });
+        expect(() => spy.restore()).toThrow(
+            /.*was configured to be persistent.*/
+        );
 
         spy.configure({ persistent: false });
         expect(testObj.myFunc()).toEqual(undefined);

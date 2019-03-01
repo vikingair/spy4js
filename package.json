@@ -24,7 +24,7 @@
   "license": "MIT",
   "scripts": {
     "dist": "rm -rf dist && rollup -c",
-    "eslint": "eslint src/ test/",
+    "eslint": "eslint --cache --cache-location 'build/.eslintcache' src/ test/",
     "flow": "flow --quiet",
     "test": "npm run flow && npm run eslint && npm run test-coverage",
     "test-coverage": "jest --all --coverage",

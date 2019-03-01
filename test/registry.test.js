@@ -6,7 +6,6 @@
  * @flow
  */
 
-import { throws } from '../util/facts';
 import { SpyRegistry } from '../src/registry';
 import { objectKeys } from '../src/utils';
 
@@ -18,7 +17,8 @@ import { objectKeys } from '../src/utils';
  */
 describe('Spy - Utils', () => {
     it('should not allow to use the constructor of the Spy without new', () => {
-        throws(SpyRegistry, { partOfMessage: 'only with "new" keyword' });
+        // throws(SpyRegistry, { partOfMessage: 'only with "new" keyword' });
+        expect(SpyRegistry).toThrow(/.*only with "new" keyword.*/);
     });
 
     it('should register an arbitrary object attribute correctly', () => {
