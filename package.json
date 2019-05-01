@@ -1,10 +1,10 @@
 {
   "name": "spy4js",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "description": "Smart, compact and powerful spy test framework",
   "main": "dist/cjs/spy.js",
   "module": "dist/esm/spy.js",
-  "types": "src/spy.js",
+  "types": "src/spy.d.ts",
   "files": [
     "dist/cjs",
     "dist/esm",
