@@ -1,21 +1,21 @@
 
-const Comparator = (arg: unknown) => boolean;
-interface SpyComparator {
-    compare(arg: unknown): string | undefined;
-}
+const Comparator = (arg: any) => boolean;
+type SpyComparator = {
+    compare(arg: any): string | undefined;
+};
 
 const COMPARE = (comparator: Comparator) => SpyComparator;
 const OptionalMessageOrError = string | Error | null | undefined;
 
-interface SpyInstance {
-    (...args: unknown[]): unknown,
+type SpyInstance = {
+    (...args: any[]): any,
     configure: (config: {
         useOwnEquals?: boolean,
         persistent?: boolean,
     }) => SpyInstance,
     calls: (...funcs: Function[]) => SpyInstance,
-    returns: (...args: unknown[]) => SpyInstance,
-    resolves: (...args: unknown[]) => SpyInstance,
+    returns: (...args: any[]) => SpyInstance,
+    resolves: (...args: any[]) => SpyInstance,
     rejects: (...msgOrErrors: OptionalMessageOrError[]) => SpyInstance,
     throws: (msgOrError: OptionalMessageOrError) => SpyInstance,
     reset: () => SpyInstance,
@@ -23,17 +23,17 @@ interface SpyInstance {
     transparent: () => SpyInstance,
     transparentAfter: (callCount: number) => SpyInstance,
     wasCalled: (callCount?: number) => undefined,
-    hasCallHistory: (...callHistory: Array<unknown[] | unknown>) => undefined,
+    hasCallHistory: (...callHistory: Array<any[] | any>) => undefined,
     wasNotCalled: () => undefined,
-    wasCalledWith: (...args: unknown[]) => undefined,
-    wasNotCalledWith: (...args: unknown[]) => undefined,
-    getCallArguments: (callNr?: number) => unknown[],
-    getCallArgument: (callNr?: number, argNr?: number) => unknown,
+    wasCalledWith: (...args: any[]) => undefined,
+    wasNotCalledWith: (...args: any[]) => undefined,
+    getCallArguments: (callNr?: number) => any[],
+    getCallArgument: (callNr?: number, argNr?: number) => any,
     getCallCount: () => number,
     showCallArguments: (additionalInformation?: string[]) => string,
 };
 
-interface ISpy {
+type ISpy = {
     new(name: string = ''): SpyInstance;
     configure(config: {
         useOwnEquals?: boolean,
@@ -42,14 +42,11 @@ interface ISpy {
     }): undefined;
     IGNORE: Symbol;
     COMPARE: typeof COMPARE;
-    on(obj: Object, methodName: string): SpyInstance;
-    mock<T, K extends keyof T>(
-        obj: T,
-        ...methodNames: K[]
-    ): { [K]: SpyInstance };
+    on<T, K extends keyof T>(obj: T, methodName: K): SpyInstance;
+    mock<T, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance };
     initMocks(scope?: string): undefined;
     restoreAll(): undefined;
     resetAll(): undefined;
-}
+};
 
-export const Spy: ISpy; // want to import ISpy
+export const Spy: ISpy;

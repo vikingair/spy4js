@@ -753,7 +753,7 @@ class Spy {
      *
      * @return {SpyInstance}
      */
-    static on(obj: Object, methodName: string): SpyInstance {
+    static on<T: Object>(obj: T, methodName: $Keys<T>): SpyInstance {
         const method = obj[methodName];
         if (!(method instanceof Function)) {
             throw new Error(
@@ -802,10 +802,10 @@ class Spy {
      *
      * @return {Object} Mock.
      */
-    static mock(
-        obj: Object,
-        ...methodNames: string[]
-    ): { [string]: SpyInstance } {
+    static mock<T: Object>(
+        obj: T,
+        ...methodNames: $Keys<T>[]
+    ): { [$Keys<T>]: SpyInstance } {
         return createMock(obj, methodNames);
     }
 

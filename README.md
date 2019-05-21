@@ -8,7 +8,8 @@
 
 ### Benefits
 
-  - `flow` support out-of-the-box
+  - `TypeScript` support included
+  - `flow` support included
   - Performance
   - No foreign dependencies
   - Optimized error messages

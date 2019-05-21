@@ -1,6 +1,6 @@
 {
   "name": "spy4js",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Smart, compact and powerful spy test framework",
   "main": "dist/cjs/spy.js",
   "module": "dist/esm/spy.js",
@@ -19,7 +19,8 @@
     "test",
     "tool",
     "jest",
-    "flow"
+    "flow",
+    "TypeScript"
   ],
   "author": "Viktor Luft <viktor.luft@freiheit.com> (https://github.com/fdc-viktor-luft)",
   "license": "MIT",

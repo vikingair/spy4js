@@ -46,7 +46,7 @@ describe('Spy - Test-Suite', () => {
         expect(Matrix$Mock.startup).toThrowErrorMatchingInlineSnapshot(
             `"Method 'startup' was not initialized on Mock."`
         );
-        expect(Matrix$Mock.teardown).toBe(undefined);
+        expect(Matrix$Mock.tearDown).toBe(undefined);
 
         expect(Matrix.startup()).toBe(1);
         expect(Matrix.tearDown()).toBe(42);

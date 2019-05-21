@@ -32,7 +32,7 @@ const registerMock = (mocked: Object, mock: Object = {}): Object => {
     return mock;
 };
 
-export const createMock = (obj: Object, methods: string[]): Object => {
+export const createMock = <T, K: $Keys<T>>(obj: T, methods: K[]): Object => {
     const mock = registerMock(obj);
     forEach(methods, (_, method: string) => {
         mock[method] = uninitialized(method);

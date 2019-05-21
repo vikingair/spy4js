@@ -76,7 +76,7 @@ describe('Spy - Utils', () => {
         expect(() => Spy.on(testObject, 'attrObject')).toThrow(
             /.*only spy on functions!.*/
         );
-        expect(() => Spy.on(testObject, 'attrUnknown')).toThrow(
+        expect(() => Spy.on(testObject, ('attrUnknown': any))).toThrow(
             /.*only spy on functions!.*/
         );
     });
