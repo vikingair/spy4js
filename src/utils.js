@@ -28,6 +28,7 @@ const forEach = (
     handler: (key: string, value: any) => any
 ): void => {
     for (let key in arrOrObj) {
+        // eslint-disable-next-line no-prototype-builtins
         if (arrOrObj.hasOwnProperty(key)) {
             handler(key, arrOrObj[key]);
         }
@@ -141,11 +142,15 @@ const __diff = (
             return 'different string';
         case '[object Function]':
             return 'different function';
+        case '[object AsyncFunction]':
+            return 'different async function';
         case '[object Number]':
             if (isNaN(a) && isNaN(b)) {
                 return;
             }
             return 'different number';
+        case '[object BigInt]':
+            return 'different BigInt';
         case '[object Date]':
             if (Number(a) === Number(b)) {
                 return;

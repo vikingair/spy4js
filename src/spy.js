@@ -51,8 +51,8 @@ const Symbols: any = {
  * related to those types.
  */
 (expect: any) &&
-    (expect.addSnapshotSerializer: any) &&
-    (expect.addSnapshotSerializer: any)({
+    (expect: any).addSnapshotSerializer &&
+    (expect: any).addSnapshotSerializer({
         test: v => v && v[Symbols.isSpy],
         print: spy => spy[Symbols.snap],
     });
@@ -383,9 +383,7 @@ const SpyFunctions = {
                 `\n\n${this[Symbols.name]} was called ${
                     madeCalls.length
                 } times,` +
-                    ` but the expected call history includes exactly ${
-                        callHistory.length
-                    } calls.\n\n` +
+                    ` but the expected call history includes exactly ${callHistory.length} calls.\n\n` +
                     'Actually there were:\n\n' +
                     this.showCallArguments()
             );

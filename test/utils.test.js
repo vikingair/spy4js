@@ -112,6 +112,12 @@ describe('Spy - Equality', () => {
         const func = () => {};
         expect(differenceOf(func, func)).toBe(undefined);
         expect(differenceOf(func, () => {})).toBe('different function');
+        // async functions
+        const asyncFunc = async () => {};
+        expect(differenceOf(asyncFunc, asyncFunc)).toBe(undefined);
+        expect(differenceOf(asyncFunc, async () => {})).toBe(
+            'different async function'
+        );
         // regexp
         expect(differenceOf(/./g, /./g)).toBe(undefined);
         expect(differenceOf(/abc/, /ab/)).toBe('different regexp');
@@ -120,6 +126,13 @@ describe('Spy - Equality', () => {
         expect(differenceOf(NaN, NaN)).toBe(undefined);
         expect(differenceOf(NaN, 123)).toBe('different number');
         expect(differenceOf(12, -13)).toBe('different number');
+        // BigInt
+        expect(differenceOf(window.BigInt(123), window.BigInt(123))).toBe(
+            undefined
+        );
+        expect(differenceOf(window.BigInt(123), window.BigInt(124))).toBe(
+            'different BigInt'
+        );
         // date
         expect(
             differenceOf(new Date(2016, 12, 24), new Date(2016, 12, 24))
