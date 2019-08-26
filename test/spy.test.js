@@ -859,4 +859,37 @@ describe('Spy - Utils', () => {
         const spyOn = Spy.on(testObj, 'func');
         expect(spyOn).toMatchInlineSnapshot('Spy.on(func)');
     });
+
+    it('can spy on bound functions (bound to object)', () => {
+        const foo = { info: 'waiting', bar: () => {} };
+        foo.bar = function() {
+            throw new Error(this.info);
+        }.bind(foo);
+
+        expect(foo.bar).toThrowError('waiting');
+
+        Spy.on(foo, 'bar').returns('spied!');
+        expect(foo.bar()).toBe('spied!');
+    });
+
+    it('can spy on bound functions (bound to instance)', () => {
+        class Foo {
+            info = 'waiting';
+            bar() {
+                throw new Error(this.info);
+            }
+        }
+
+        const foo = new Foo();
+        expect(() => foo.bar()).toThrowError('waiting');
+
+        Spy.on(foo, 'bar').returns('spied!');
+        expect(foo.bar()).toBe('spied!');
+    });
+
+    it('can spy on bound functions (bound to internal objects)', () => {
+        const spy = Spy.on(window.console, 'error').returns('spied!');
+        expect(window.console.error('foo')).toBe('spied!');
+        spy.hasCallHistory('foo');
+    });
 });

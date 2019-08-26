@@ -753,7 +753,7 @@ class Spy {
      */
     static on<T: Object>(obj: T, methodName: $Keys<T>): SpyInstance {
         const method = obj[methodName];
-        if (!(method instanceof Function)) {
+        if (!(typeof method === 'function')) {
             throw new Error(
                 `The object attribute '${methodName}' ` +
                     `was: ${serialize(method)}\n\n` +
