@@ -6,7 +6,7 @@
  * @flow
  */
 
-import { configureTestSuite } from '../src/test-suite';
+import { TestSuite } from '../../src/test-suite';
 
 const counters = { beforeEach: 0, afterEach: 0 };
 
@@ -18,7 +18,7 @@ const increaseAfterEach = () => {
     ++counters.afterEach;
 };
 
-configureTestSuite({
+TestSuite.configure({
     beforeEach: increaseBeforeEach,
     afterEach: increaseAfterEach,
 });

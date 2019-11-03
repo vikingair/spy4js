@@ -16,7 +16,7 @@ import {
 import { SpyRegistry } from './registry';
 import { serialize, IGNORE } from './serializer';
 import { createMock, initMocks } from './mock';
-import { configureTestSuite } from './test-suite';
+import { TestSuite } from './test-suite';
 
 /**
  *
@@ -49,12 +49,10 @@ const Symbols: any = {
  * have typed those functions correctly and should not see flow errors
  * related to those types.
  */
-(expect: any) &&
-    (expect: any).addSnapshotSerializer &&
-    (expect: any).addSnapshotSerializer({
-        test: v => v && v[Symbols.isSpy],
-        print: spy => spy[Symbols.snap],
-    });
+TestSuite.addSnapshotSerializer({
+    test: v => v && v[Symbols.isSpy],
+    print: spy => spy[Symbols.snap],
+});
 
 /**
  * Initial default settings for every
@@ -707,7 +705,7 @@ class Spy {
         if (config.useOwnEquals !== undefined) {
             DefaultSettings.useOwnEquals = config.useOwnEquals;
         }
-        configureTestSuite({
+        TestSuite.configure({
             afterEach: config.afterEach,
             beforeEach: config.beforeEach,
         });
@@ -807,6 +805,36 @@ class Spy {
     }
 
     /**
+     * This static method enables you to create mocks on module scope.
+     * As long as jest will support this behaviour, the Spy will too. If
+     * you are calling this function on other test runners you will
+     * encounter an exception. You should favor to use "Spy.mock" but there
+     * might be reasons that this will not work. E.g. if you want to mock
+     * directly exported functions.
+     *
+     * For example:
+     *
+     * const Mock$MyModule = Spy.mockModule('./my-module', 'useMe');
+     *
+     * Now you could do:
+     * Mock$MyModule.useMe.returns(['foo', 'bar']);
+     *
+     * @param {string} moduleName -> Everything that's expected by "jest.mock"
+     *                               as first parameter. Relative and absolute
+     *                               module paths.
+     * @param {string[]} methodNames -> Iterative provided attribute
+     *                                  names that will be mocked.
+     *
+     * @return {Object} Mock.
+     */
+    static mockModule<K: string>(
+        moduleName: string,
+        ...methodNames: K[]
+    ): { [name: K]: SpyInstance } {
+        return TestSuite.createMock(Spy, moduleName, (methodNames: any[]));
+    }
+
+    /**
      * This static method initializes all created
      * mocks (see Spy.mock). This is necessary, because
      * it has to apply before each test run, to ensure
@@ -862,6 +890,6 @@ const defaultHooks = {
     },
 };
 
-configureTestSuite(defaultHooks);
+TestSuite.configure(defaultHooks);
 
 export { Spy };

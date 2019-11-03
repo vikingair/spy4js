@@ -8,6 +8,11 @@
 
 import { setScope } from './mock';
 
+// we have to cheat here flow since it might be the case that "jest" was not
+// configured correctly or the jest test runner might not even be present
+// $FlowFixMe
+export const _testSuite = { isJest: !!(jest: any), isCJS: !!(require: any) };
+
 type Scope = string;
 type Runner = { afterEach?: Scope => void, beforeEach?: Scope => void };
 const runner: Runner = {};
@@ -30,7 +35,54 @@ describe = (name: string, suite: Function) => {
     });
 };
 
-export const configureTestSuite = (other: Runner): void => {
+const configure = (other: Runner): void => {
     if (other.afterEach) runner.afterEach = other.afterEach;
     if (other.beforeEach) runner.beforeEach = other.beforeEach;
 };
+
+const addSnapshotSerializer = (serializer: any) => {
+    _testSuite.isJest &&
+        (expect: any) &&
+        (expect: any).addSnapshotSerializer &&
+        (expect: any).addSnapshotSerializer(serializer);
+};
+
+const __caller = (stackNum: number) => {
+    const traceFn = Error.prepareStackTrace;
+    Error.prepareStackTrace = (err, stack) => stack;
+    const stack = new Error().stack;
+    Error.prepareStackTrace = traceFn;
+    // it highly depends from were the functionality will be called
+    return (stack[stackNum]: any).getFileName();
+};
+
+const __callerBasedir = (stackNum: number) =>
+    require('path').dirname(__caller(stackNum));
+
+// 1. Spy.createMock in some test
+// 2. _createMock from test-suite.js
+// 3. __callerBasedir from test-suite.js
+// 4. __caller from test-suite.js
+const STACK_NUM_CREATE_MOCK = 4;
+const createMock = (
+    SPY: Function,
+    moduleName: string,
+    names: string[]
+): Object => {
+    if (!_testSuite.isCJS)
+        throw new Error(
+            'Spy.moduleMock works only if your test runner executes with CommonJS'
+        );
+
+    // now we are free to use "require('path')" to calculate the correct
+    // module path for the mocking.
+    return SPY.mock(
+        require(require('path').join(
+            __callerBasedir(STACK_NUM_CREATE_MOCK),
+            moduleName
+        )),
+        ...names
+    );
+};
+
+export const TestSuite = { addSnapshotSerializer, createMock, configure };

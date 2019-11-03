@@ -10,7 +10,7 @@ export default {
             exclude: 'node_modules/**',
             presets: [['@babel/preset-env', { modules: false, targets: { node: "8" } }]]
         }),
-        resolve(),
+        resolve({ preferBuiltins: true }),
         commonjs(),
         flowEntry(),
     ],

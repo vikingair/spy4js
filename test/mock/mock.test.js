@@ -12,7 +12,7 @@ import {
     _mocks,
     setScope,
     defaultScope,
-} from '../src/mock';
+} from '../../src/mock';
 
 const IRL = {
     saveTheWorld: () => 'feed some koalas',

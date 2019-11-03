@@ -6,7 +6,7 @@
  * @flow
  */
 
-import { Spy } from '../src/spy';
+import { Spy } from '../../src/spy';
 
 const Matrix = { tearDown: () => 1337, startup: () => 1 };
 const Matrix$Mock = Spy.mock(Matrix, 'startup');

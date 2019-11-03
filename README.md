@@ -45,7 +45,7 @@ npm install --save-dev spy4js
 A spy instance can be initialized differently.
 
 ```js
-import {Spy} from 'spy4js';
+import { Spy } from 'spy4js';
 
 // initialize directly
 const spy1 = new Spy();
@@ -61,6 +61,9 @@ const spy3 = Spy.on(someObject1, 'toJSON');
 // initialize many by mocking another objects attributes
 const someObject2 = new Date(2017, 1, 15);
 const someObject2$Mock = Spy.mock(someObject2, 'toJSON', 'toString', 'getDate');
+
+// mock exported functions from other modules
+const myModuleMocks = Spy.mockModule('./my-module', 'useMe');
 ```
 
 Any spy instance can be configured by overriding the default configuration. For
@@ -244,19 +247,25 @@ for no purpose a spy should ever be spied.
 
 ### mock (static)
 ```
-Spy.mock(object:Object, ...methodNames:Array<string>) => Object (Mock)
+Spy.mock(object:Object, ...methodNames: string[]) => Object (Mock)
 ```
 Creating an object that references spies for all given methodNames.
 Initialize as many spies as required for one and the same object. Only
 after `Spy.initMocks` gets called, the created mock does affect the given object.
+
+### mockModule (static)
+```
+Spy.mockModule(moduleName: string, ...methodNames: string[]) => Object (Mock)
+```
+Same as [mock](#mock) but only necessary if you want to mock exported functions.
 
 ### initMocks (static)
 ```
 Spy.initMocks(scope?: string) => void
 ```
 Does initialize all global and scope-related mocks by applying spies. Mocks can be
-created with [mock](#mock). This function has not to be called manually, if you rely on
-the default test suite hooks.
+created with [mock](#mock) or [mockModule](#mockModule). This function has not to 
+be called manually, if you rely on the default test suite hooks.
 
 ### restoreAll (static)
 ```

@@ -1,9 +1,9 @@
 // @flow
 
-import { Spy } from '../src/spy';
-import { configureTestSuite } from '../src/test-suite';
+import { Spy } from '../../src/spy';
+import { TestSuite } from '../../src/test-suite';
 
-configureTestSuite({
+TestSuite.configure({
     beforeEach: () => {},
     afterEach: () => {},
 });

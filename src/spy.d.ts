@@ -44,6 +44,7 @@ type ISpy = {
     COMPARE: typeof COMPARE;
     on<T, K extends keyof T>(obj: T, methodName: K): SpyInstance;
     mock<T, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance };
+    mockModule<K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance };
     initMocks(scope?: string): undefined;
     restoreAll(): undefined;
     resetAll(): undefined;

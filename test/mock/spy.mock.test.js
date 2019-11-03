@@ -6,7 +6,7 @@
  * @flow
  */
 
-import { Spy } from '../src/spy';
+import { Spy } from '../../src/spy';
 
 const IRL = {
     saveTheWorld: () => 'feed some koalas',
