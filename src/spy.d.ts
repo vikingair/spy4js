@@ -5,6 +5,7 @@ type SpyComparator = {
 };
 
 const COMPARE = (comparator: Comparator) => SpyComparator;
+const MAPPER = (from: any | any[], to: any) => SpyComparator;
 const OptionalMessageOrError = string | Error | null | undefined;
 
 type SpyInstance = {
@@ -42,6 +43,7 @@ type ISpy = {
     }): undefined;
     IGNORE: Symbol;
     COMPARE: typeof COMPARE;
+    MAPPER: typeof MAPPER;
     on<T, K extends keyof T>(obj: T, methodName: K): SpyInstance;
     mock<T, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance };
     mockModule<K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance };

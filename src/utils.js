@@ -71,17 +71,22 @@ const mergeArrays = (arr1: Array<any>, arr2: Array<any>): Array<any> => {
 };
 
 type Comparator = (arg: any) => boolean | void;
+type ComparatorOrMapper = (arg: any) => boolean | void | string;
 const SPY_COMPARE_FAILED = 'Spy.COMPARE failed';
+const SPY_MAPPER_FAILED = 'Spy.MAPPER failed';
 /**
  * Uniquely identifiable container for spy relevant comparators.
  */
 class SpyComparator {
-    _func: Comparator;
-    constructor(comparator: Comparator) {
+    _func: ComparatorOrMapper;
+    constructor(comparator: ComparatorOrMapper) {
         this._func = comparator;
     }
     compare(arg: any): string[] | void {
-        if (this._func(arg) === false) return [SPY_COMPARE_FAILED];
+        const result = this._func(arg);
+        if (typeof result === 'string')
+            return [`${SPY_MAPPER_FAILED} [${result}]`];
+        if (result === false) return [SPY_COMPARE_FAILED];
     }
 }
 /**
@@ -91,6 +96,15 @@ class SpyComparator {
  */
 const COMPARE = (comparator: Comparator): SpyComparator =>
     new SpyComparator(comparator);
+
+const MAPPER = (from: any | any[], to: any) =>
+    new SpyComparator((mapper: Function) => {
+        const result = mapper(...(Array.isArray(from) ? from : [from]));
+        const diff = differenceOf(result, to);
+        return diff
+            ? `${serialize(result)} did not match ${serialize(to)}: ${diff}`
+            : undefined;
+    });
 
 const __different = (type: string) => ['different ' + type];
 
@@ -252,8 +266,10 @@ const differenceOf = (
     const diffStr = __diffToStr(diff);
     if (diff.length < 2) return diffStr;
     const diffProp1 = __serializeDifferentProp(a, diff);
+    const lastPart = diff[diff.length - 1];
+    if (lastPart.indexOf(SPY_MAPPER_FAILED) === 0) return diffStr;
     const info =
-        diff[diff.length - 1] === SPY_COMPARE_FAILED
+        lastPart === SPY_COMPARE_FAILED
             ? `called with: ${diffProp1}`
             : `${diffProp1} != ${__serializeDifferentProp(b, diff)}`;
     return `${diffStr} [${info}]`;
@@ -265,4 +281,4 @@ const toError = (msgOrError: OptionalMessageOrError, spyName: string) =>
         ? msgOrError
         : new Error(msgOrError || `${spyName} was requested to throw`);
 
-export { differenceOf, forEach, objectKeys, COMPARE, toError };
+export { differenceOf, forEach, objectKeys, COMPARE, toError, MAPPER };

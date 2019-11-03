@@ -6,7 +6,7 @@
  * @flow
  */
 
-import { COMPARE, differenceOf, forEach } from '../src/utils';
+import { COMPARE, differenceOf, forEach, MAPPER } from '../src/utils';
 import { IGNORE } from '../src/serializer';
 
 describe('Spy - Equality', () => {
@@ -289,6 +289,13 @@ describe('Spy - Equality', () => {
         };
         expect(differenceOf(obj1, obj12)).toBe(
             "--> c1 / Spy.COMPARE failed [called with: 'some']"
+        );
+    });
+
+    it('applies mapper evaluation via SpyComparator MAPPER', () => {
+        expect(differenceOf(MAPPER(undefined, 42), () => 42)).toBe(undefined);
+        expect(differenceOf(MAPPER(2, 42), (num: number) => 42 + num)).toBe(
+            'Spy.MAPPER failed [44 did not match 42: different number]'
         );
     });
 });

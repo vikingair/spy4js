@@ -313,6 +313,23 @@ spy.wasCalledWith(Spy.COMPARE(fn => {
 }), 12);
 ```
 
+### MAPPER (static)
+```
+Spy.MAPPER(from: any | any[], to: any) => SpyComparator
+```
+This function can be called in the same places like `Spy.COMPARE`. It is not that much
+customizable but provides a nice way to evaluate mapper functions. Meaning pure 
+functions that return some output for given inputs. The function will be called exactly
+once for each comparison, so you can even rely on site effects you might want to test,
+if you want to use this for non-pure functions.
+```js
+spy((value: number) => ({ prop: 'here', other: value }), 12);
+spy((value: number, num: number) => ({ prop: 'here', value, num }), 12);
+
+spy.wasCalledWith(Spy.MAPPER('foo', { prop: 'here', other: 'foo' }), 12);
+spy.wasCalledWith(Spy.MAPPER(['foo', 44], { prop: 'here', value: 'foo', num: 44 }), 12);
+```
+
 
 ### configure
 ```

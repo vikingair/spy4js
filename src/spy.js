@@ -8,6 +8,7 @@
 
 import {
     COMPARE,
+    MAPPER,
     differenceOf,
     forEach,
     type OptionalMessageOrError,
@@ -723,6 +724,14 @@ class Spy {
      * comparison holds. Can be used when calling e.g. "wasCalledWith".
      */
     static COMPARE = COMPARE;
+
+    /**
+     * This static attribute can be used to test mapper
+     * functions inside call argument checks. It is similar to
+     * Spy.COMPARE, but wraps some mechanics to evaluate the result
+     * based on the given input.
+     */
+    static MAPPER = MAPPER;
 
     /**
      * This static method is an alternative way to

@@ -537,6 +537,40 @@ describe('Spy - Utils', () => {
         ).toThrow();
     });
 
+    it('mapper testing via Spy.MAPPER', () => {
+        const testMapper = (state: Object, moreState: Object) => ({
+            prop: 'foo',
+            ...state,
+            more: { ...moreState },
+        });
+        const spy = new Spy();
+        spy(testMapper, 42);
+
+        spy.wasCalledWith(Spy.MAPPER(undefined, { prop: 'foo', more: {} }), 42);
+        spy.wasCalledWith(
+            Spy.MAPPER(
+                { some: 'stuff' },
+                { prop: 'foo', some: 'stuff', more: {} }
+            ),
+            42
+        );
+        spy.wasCalledWith(
+            Spy.MAPPER([{ some: 'stuff' }, { more: 'things' }], {
+                prop: 'foo',
+                some: 'stuff',
+                more: { more: 'things' },
+            }),
+            42
+        );
+        // throw because of incorrect assumption
+        expect(() =>
+            spy.wasCalledWith(
+                Spy.MAPPER({ prop: 'stuff' }, { prop: 'foo' }),
+                42
+            )
+        ).toThrow();
+    });
+
     it('should call the given input-functions sequentially after the spy was called', () => {
         const testObj = { _key: 'testObj' };
         const spy = new Spy().calls(
