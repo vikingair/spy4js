@@ -290,20 +290,24 @@ spy.wasCalledWith({prop: Spy.IGNORE, other: 13}, 12);
 
 ### COMPARE (static)
 ```
-Spy.COMPARE(comparator: (arg: any) => boolean) => SpyComparator
+Spy.COMPARE(comparator: (arg: any) => boolean | void) => SpyComparator
 ```
 This function can be called with a custom comparator and passed anywhere where you want the "[wasCalledWith](#wasCalledWith)"
-or "[hasCallHistory](#hasCallHistory)" to apply your custom comparison.
+or "[hasCallHistory](#hasCallHistory)" to apply your custom comparison. Very useful if
+the spy gets called with functions that you want to test additionally.
 ```js
-spy({prop: 'value', other: 13}, 12);
+spy(() => ({ prop: 'value', other: 13 }), 12);
 
-spy.wasCalledWith(Spy.COMPARE(obj => obj.prop === 'value'), 12);
+spy.wasCalledWith(Spy.COMPARE(fn => fn().prop === 'value'), 12);
+spy.wasCalledWith(Spy.COMPARE(fn => {
+    expect(fn()).toEqual({ prop: 'value', other: 13 });
+}), 12);
 ```
 
 
 ### configure
 ```
-spy.configure(config:{useOwnEquals?: boolean, persistent?: boolean}) => (this) SpyInstance
+spy.configure(config: { useOwnEquals?: boolean, persistent?: boolean }) => (this) SpyInstance
 ```
 With `configure` the spy can be configured. One configuration possibility
 is to ignore any `equals` methods while comparing objects. There might be libraries which
@@ -325,7 +329,7 @@ of the time `func3`.
 
 ### returns
 ```
-spy.returns(...args:Array<any>) => (this) SpyInstance
+spy.returns(...args: Array<any>) => (this) SpyInstance
 ```
 The provided arguments will be returned sequentially in order when the spy will be called.
 Meaning `spy.returns(arg1, arg2, arg3)` will return first `arg1` then `arg2` and the rest
@@ -333,7 +337,7 @@ of the time `arg3`.
 
 ### resolves
 ```
-spy.resolves(...args:Array<any>) => (this) SpyInstance
+spy.resolves(...args: Array<any>) => (this) SpyInstance
 ```
 The provided arguments will be resolved sequentially in order when the spy will be called.
 Meaning `spy.resolves(arg1, arg2, arg3)` will return first `Promise.resolve(arg1)` then `Promise.resolve(arg2)` and the rest
@@ -342,7 +346,7 @@ of the time `Promise.resolve(arg3)`.
 
 ### rejects
 ```
-spy.rejects(...args:Array<?string | Error>) => (this) SpyInstance
+spy.rejects(...args: Array<?string | Error>) => (this) SpyInstance
 ```
 The provided arguments will be rejected sequentially in order when the spy will be called.
 Meaning `spy.rejects('foo', null, new Error('bar'))` will return first `Promise.reject(new Error('foo'))`
@@ -391,7 +395,7 @@ often as specified. Meaning `spy.transparentAfter(num)` will not be transparent 
 
 ### wasCalled
 ```
-spy.wasCalled(callCount:number = 0) => (fact) void
+spy.wasCalled(callCount: number = 0) => (fact) void
 ```
 This call does display a fact. So if the spy is violating the fact, it is told to throw
 an error. The provided argument does represent the registered calls on that spy.
@@ -405,7 +409,7 @@ this fact will be given.
 
 ### wasCalledWith
 ```
-spy.wasCalledWith(...args:Array<any>) => (fact) void
+spy.wasCalledWith(...args: Array<any>) => (fact) void
 ```
 This fact displays that the spy was called at least once with equal arguments. 
 
@@ -424,13 +428,13 @@ neat output. For examples see [showCallArguments](#showcallarguments)
 
 ### wasNotCalledWith
 ```
-spy.wasNotCalledWith(...args:Array<any>) => (fact) void
+spy.wasNotCalledWith(...args: Array<any>) => (fact) void
 ```
 This fact displays simply the opposite of [wasCalledWith](#wascalledwith).
 
 ### hasCallHistory
 ```
-spy.hasCallHistory(...callHistory:Array<Array<any> | any>) => (fact) void
+spy.hasCallHistory(...callHistory: Array<Array<any> | any>) => (fact) void
 ```
 Works similar to [wasCalledWith](#wascalledwith) but instead matches each
 call one by one in **correct order** and **correct call count**.
@@ -440,7 +444,7 @@ data providers)
 
 ### getCallArguments
 ```
-spy.getCallArguments(callNr:number = 0) => Array<any>
+spy.getCallArguments(callNr: number = 0) => Array<any>
 ```
 Returns the call arguments that were registered on the given call. Meaning
 `spy.getCallArguments(num)` does return the (num + 1)'th call arguments.
@@ -449,7 +453,7 @@ Throws an exception if the provided (`callNr` - 1) is bigger than the made calls
 
 ### getCallArgument
 ```
-spy.getCallArgument(callNr:number = 0, argNr:number = 0) => any
+spy.getCallArgument(callNr: number = 0, argNr: number = 0) => any
 ```
 Same as [getCallArguments](#getcallarguments) but returns only a single entry out
 of the array of arguments. Most useful in situations where exactly one call param is expected.
@@ -463,16 +467,16 @@ This method simply returns the number of made calls on the spy.
 
 ### showCallArguments
 ```
-spy.showCallArguments(additionalInformation:Array<string> = []) => string
+spy.showCallArguments(additionalInformation: Array<string> = []) => string
 ```
 This primarily internally used method is responsible for returning formatted informative debug
 messages when facts are broken. Let's do an example:
 ```js
 const spy = new Spy('my awesome spy');
-spy(42, 'test', {attr1: [1, 2, new Date(2017, 1, 20)], attr2: 1337});
-spy(42, 'test', {attr1: [0, 2, new Date(2017, 1, 20)], attr2: 1336});
-spy(42, 'test', {attr1: [1, 2, new Date(2017, 1, 21)], attr2: 1336});
-spy(42, 'tes', {attr1: [1, 2, new Date(2017, 1, 20)], attr2: 1336});
+spy(42, 'test', { attr1: [1, 2, new Date(2017, 1, 20)], attr2: 1337 });
+spy(42, 'test', { attr1: [0, 2, new Date(2017, 1, 20)], attr2: 1336 });
+spy(42, 'test', { attr1: [1, 2, new Date(2017, 1, 21)], attr2: 1336 });
+spy(42, 'tes', { attr1: [1, 2, new Date(2017, 1, 20)], attr2: 1336 });
 spy(42, 'test');
 ```
 The following broken fact...
@@ -485,20 +489,20 @@ Error:
 
 my awesome spy was considered to be called with the following arguments:
 
-    --> [42, "test", {attr1: [1, 2, >Date:1487545200000<], attr2: 1336}]
+    --> [42, 'test', {attr1: [1, 2, new Date(1487545200000)], attr2: 1336}]
 
 Actually there were:
 
-call 0: [42, "test", {attr1: [1, 2, >Date:1487545200000<], attr2: 1337}]
-        --> 2 / attr2 / different number
-call 1: [42, "test", {attr1: [0, 2, >Date:1487545200000<], attr2: 1336}]
-        --> 2 / attr1 / 0 / different number
-call 2: [42, "test", {attr1: [1, 2, >Date:1487631600000<], attr2: 1336}]
-        --> 2 / attr1 / 2 / different date
-call 3: [42, "tes", {attr1: [1, 2, >Date:1487545200000<], attr2: 1336}]
-        --> 1 / different string
-call 4: [42, "test"]
-        --> 2 / one was undefined
+call 0: [42, 'test', {attr1: [1, 2, new Date(1487545200000)], attr2: 1337}]
+        --> 2 / attr2 / different number [1337 != 1336]
+call 1: [42, 'test', {attr1: [0, 2, new Date(1487545200000)], attr2: 1336}]
+        --> 2 / attr1 / 0 / different number [0 != 1]
+call 2: [42, 'test', {attr1: [1, 2, new Date(1487631600000)], attr2: 1336}]
+        --> 2 / attr1 / 2 / different date [new Date(1487631600000) != new Date(1487545200000)]
+call 3: [42, 'tes', {attr1: [1, 2, new Date(1487545200000)], attr2: 1336}]
+        --> 1 / different string ['tes' != 'test']
+call 4: [42, 'test']
+        --> 2 / one was undefined [undefined != {attr1: [1, 2, new Date(1487545200000)], attr2: 1336}]
 ```
 There you can see that the arguments of the fact (displayed above all others) does not
 match any of the call arguments on the 5 made calls. 

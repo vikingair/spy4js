@@ -1,5 +1,5 @@
 
-const Comparator = (arg: any) => boolean;
+const Comparator = (arg: any) => boolean | void;
 type SpyComparator = {
     compare(arg: any): string | undefined;
 };
@@ -34,7 +34,7 @@ type SpyInstance = {
 };
 
 type ISpy = {
-    new(name: string = ''): SpyInstance;
+    new(name: string): SpyInstance;
     configure(config: {
         useOwnEquals?: boolean,
         afterEach?: (scope: string) => undefined,

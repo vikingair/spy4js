@@ -10,12 +10,11 @@ import {
     COMPARE,
     differenceOf,
     forEach,
-    IGNORE,
     type OptionalMessageOrError,
     toError,
 } from './utils';
 import { SpyRegistry } from './registry';
-import { serialize } from './serializer';
+import { serialize, IGNORE } from './serializer';
 import { createMock, initMocks } from './mock';
 import { configureTestSuite } from './test-suite';
 

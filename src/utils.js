@@ -6,6 +6,8 @@
  * @flow
  */
 
+import { IGNORE, serialize } from './serializer';
+
 /**
  * This function takes a handler as second argument to process
  * all key-value-pairs of the given object through this handler.
@@ -68,13 +70,8 @@ const mergeArrays = (arr1: Array<any>, arr2: Array<any>): Array<any> => {
     return result;
 };
 
-/**
- * This symbol serves as replacement to ignore any
- * inequality and skip further comparisons.
- */
-const IGNORE = Symbol.for('__Spy_IGNORE__');
-
-type Comparator = (arg: any) => boolean;
+type Comparator = (arg: any) => boolean | void;
+const SPY_COMPARE_FAILED = 'Spy.COMPARE failed';
 /**
  * Uniquely identifiable container for spy relevant comparators.
  */
@@ -83,8 +80,8 @@ class SpyComparator {
     constructor(comparator: Comparator) {
         this._func = comparator;
     }
-    compare(arg: any): string | void {
-        if (!this._func(arg)) return 'custom comparison failed';
+    compare(arg: any): string[] | void {
+        if (this._func(arg) === false) return [SPY_COMPARE_FAILED];
     }
 }
 /**
@@ -94,6 +91,8 @@ class SpyComparator {
  */
 const COMPARE = (comparator: Comparator): SpyComparator =>
     new SpyComparator(comparator);
+
+const __different = (type: string) => ['different ' + type];
 
 /**
  * This function is the internal representation of
@@ -121,65 +120,65 @@ const __diff = (
     initial: boolean,
     useOwnEquals: boolean,
     alreadyComparedArray: Array<any> = []
-): string | void => {
+): string[] | void => {
     if (a === IGNORE || b === IGNORE) return;
     if (a instanceof SpyComparator) return a.compare(b);
     if (b instanceof SpyComparator) return b.compare(a);
     if (a === b) return;
-    if (a === undefined || b === undefined) return 'one was undefined';
-    if (a === null || b === null) return 'one was null';
+    if (a === undefined || b === undefined) return ['one was undefined'];
+    if (a === null || b === null) return ['one was null'];
     const aClass = Object.prototype.toString.call(a);
     const bClass = Object.prototype.toString.call(b);
     if (aClass !== bClass)
-        return `different object types: ${aClass} <-> ${bClass}`;
+        return __different(`object types: ${aClass} <-> ${bClass}`);
     switch (aClass) {
         case '[object RegExp]':
             if (String(a) === String(b)) {
                 return;
             }
-            return 'different regexp';
+            return __different('regexp');
         case '[object String]':
-            return 'different string';
+            return __different('string');
         case '[object Function]':
-            return 'different function';
+            return __different('function');
         case '[object AsyncFunction]':
-            return 'different async function';
+            return __different('async function');
         case '[object Number]':
             if (isNaN(a) && isNaN(b)) {
                 return;
             }
-            return 'different number';
+            return __different('number');
         case '[object BigInt]':
-            return 'different BigInt';
+            return __different('BigInt');
         case '[object Date]':
             if (Number(a) === Number(b)) {
                 return;
             }
-            return 'different date';
+            return __different('date');
         case '[object Boolean]':
-            return 'different bool';
+            return __different('bool');
         case '[object Symbol]':
-            return 'different symbols';
+            return __different('symbols');
         case '[object Error]':
             if (String(a) === String(b)) {
                 return;
             }
-            return 'different error';
+            return __different('error');
         default:
             if (a.constructor !== b.constructor) {
-                return 'different constructor';
+                return __different('constructor');
             }
     }
     if (useOwnEquals && a.equals instanceof Function) {
         if (a.equals(b)) {
             return;
         }
-        return (
+        return [
             'own equals method failed <- ' +
-            'Maybe you want to disable the usage ' +
-            'of own equals implementation? ' +
-            '[ Use: spy.configure({useOwnEquals: false}) ]'
-        );
+                'Maybe you want to disable the usage ' +
+                'of own equals implementation? ' +
+                '[ Use: spy.configure({useOwnEquals: false}) ]',
+        ];
     }
     if (alreadyComparedArray.indexOf(a) !== -1) {
         return;
@@ -188,11 +187,25 @@ const __diff = (
     const keys = mergeArrays(objectKeys(a), objectKeys(b));
     for (let i = 0; i < keys.length; i++) {
         const key = keys[i];
-        const diffStr = __diff(a[key], b[key], false, useOwnEquals, compared);
-        if (diffStr !== undefined) {
-            return `${initial ? `--> ${key}` : `${key}`} / ${diffStr}`;
+        const diff = __diff(a[key], b[key], false, useOwnEquals, compared);
+        if (diff !== undefined) {
+            return [key, ...diff];
         }
     }
+};
+
+const __serializeDifferentProp = (obj: any, diff: string[]): string => {
+    // asserting diff.length > 1
+    let toSerialize = obj;
+    diff.slice(0, -1).forEach((key: string) => {
+        toSerialize = toSerialize[key];
+    });
+    return serialize(toSerialize);
+};
+
+const __diffToStr = (diff: string[], info: string = ''): string => {
+    if (diff.length === 1) return diff[0];
+    return `--> ${diff[0]} / ` + diff.slice(1).join(' / ') + info;
 };
 
 /**
@@ -234,7 +247,16 @@ const differenceOf = (
     b: any,
     config: { useOwnEquals: boolean } = { useOwnEquals: true }
 ): string | void => {
-    return __diff(a, b, true, config.useOwnEquals);
+    const diff = __diff(a, b, true, config.useOwnEquals);
+    if (!diff) return;
+    const diffStr = __diffToStr(diff);
+    if (diff.length < 2) return diffStr;
+    const diffProp1 = __serializeDifferentProp(a, diff);
+    const info =
+        diff[diff.length - 1] === SPY_COMPARE_FAILED
+            ? `called with: ${diffProp1}`
+            : `${diffProp1} != ${__serializeDifferentProp(b, diff)}`;
+    return `${diffStr} [${info}]`;
 };
 
 export type OptionalMessageOrError = ?string | Error;
@@ -243,4 +265,4 @@ const toError = (msgOrError: OptionalMessageOrError, spyName: string) =>
         ? msgOrError
         : new Error(msgOrError || `${spyName} was requested to throw`);
 
-export { differenceOf, forEach, objectKeys, IGNORE, COMPARE, toError };
+export { differenceOf, forEach, objectKeys, COMPARE, toError };

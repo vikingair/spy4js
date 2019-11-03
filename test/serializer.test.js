@@ -6,8 +6,7 @@
  * @flow
  */
 
-import { serialize } from '../src/serializer';
-import { IGNORE } from '../src/utils';
+import { serialize, IGNORE } from '../src/serializer';
 
 describe('serialize', () => {
     it('serializes arrays with IGNORED entry', () => {

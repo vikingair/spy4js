@@ -502,10 +502,34 @@ describe('Spy - Utils', () => {
             },
             42
         );
+        spy.wasCalledWith(
+            {
+                _key: Spy.COMPARE((arg: any) => {
+                    expect(arg).toBeTruthy();
+                }),
+                prop: 'whatever',
+            },
+            Spy.COMPARE((arg: number) => {
+                expect(arg).toBe(42);
+            })
+        );
+        // throw because of incorrect assumption
         expect(() =>
             spy.wasCalledWith(
                 {
                     _key: Spy.COMPARE(arg => typeof arg === 'number'),
+                    prop: 'whatever',
+                },
+                42
+            )
+        ).toThrow();
+        // throw because the comparator did throw
+        expect(() =>
+            spy.wasCalledWith(
+                {
+                    _key: Spy.COMPARE((arg: any) => {
+                        expect(arg).toBe(undefined);
+                    }),
                     prop: 'whatever',
                 },
                 42

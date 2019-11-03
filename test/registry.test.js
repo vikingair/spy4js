@@ -60,7 +60,7 @@ describe('Spy - Utils', () => {
 
     it('should be able to restore a registered object', () => {
         const someDate = new Date();
-        const testObject = { attr1: 'string', attr2: 88, attr3: someDate };
+        const testObject: any = { attr1: 'string', attr2: 88, attr3: someDate };
         const reg: any = new SpyRegistry();
 
         const registerEntry1 = reg.push(testObject, 'attr1');
@@ -83,7 +83,7 @@ describe('Spy - Utils', () => {
 
     it('should be able to restore all registered objects properties at once', () => {
         const someDate = new Date();
-        const testObject = { attr1: 'string', attr2: 88, attr3: someDate };
+        const testObject: any = { attr1: 'string', attr2: 88, attr3: someDate };
         const reg: any = new SpyRegistry();
 
         reg.push(testObject, 'attr1');
@@ -102,7 +102,7 @@ describe('Spy - Utils', () => {
 
     it('should be able to to return the stored value without restoring the object', () => {
         const someDate = new Date();
-        const testObject = { attr1: 'string', attr2: 88, attr3: someDate };
+        const testObject: any = { attr1: 'string', attr2: 88, attr3: someDate };
         const reg: any = new SpyRegistry();
 
         const registerEntry1 = reg.push(testObject, 'attr1');

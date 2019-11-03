@@ -6,7 +6,8 @@
  * @flow
  */
 
-import { COMPARE, differenceOf, forEach, IGNORE } from '../src/utils';
+import { COMPARE, differenceOf, forEach } from '../src/utils';
+import { IGNORE } from '../src/serializer';
 
 describe('Spy - Equality', () => {
     it('foreach iterates over arrays', () => {
@@ -77,7 +78,7 @@ describe('Spy - Equality', () => {
         expect(someInstance).not.toBe(someOtherInstance);
         expect(differenceOf(someInstance, someOtherInstance)).toBe(undefined);
         expect(differenceOf(someInstance, someDifferentInstance)).toBe(
-            '--> attr3 / different date'
+            '--> attr3 / different date [new Date(1485212400000) != new Date(1485126000000)]'
         );
     });
 
@@ -224,7 +225,7 @@ describe('Spy - Equality', () => {
             differenceOf(new TestClass(2), new TestClass(4), {
                 useOwnEquals: false,
             })
-        ).toBe('--> attr / different number');
+        ).toBe('--> attr / different number [2 != 4]');
     });
 
     it('should default circular structures as compared without failure', () => {
@@ -234,25 +235,31 @@ describe('Spy - Equality', () => {
         b.c = b;
         expect(differenceOf(a, b)).toBe(undefined);
         b.d = 'test2';
-        expect(differenceOf(a, b)).toBe('--> d / different string');
+        expect(differenceOf(a, b)).toBe(
+            "--> d / different string ['test' != 'test2']"
+        );
     });
 
     it('should make deep equality checks correctly', () => {
         const obj1 = { a: [{ a: 'someString' }, { b: 'someString' }] };
         const obj2 = { a: [{ a: 'someString' }, { b: 'someOtherString' }] };
         expect(differenceOf(obj1, obj2)).toBe(
-            '--> a / 1 / b / different string'
+            "--> a / 1 / b / different string ['someString' != 'someOtherString']"
         );
     });
 
     it('considers all keys when comparing objects', () => {
         const obj11 = { a: 'same', b1: undefined, c1: 'some' };
         const obj12 = { a: 'same', b2: undefined, c2: undefined };
-        expect(differenceOf(obj11, obj12)).toBe('--> c1 / one was undefined');
+        expect(differenceOf(obj11, obj12)).toBe(
+            "--> c1 / one was undefined ['some' != undefined]"
+        );
 
         const obj21 = { a: 'same', b1: undefined, c1: undefined };
         const obj22 = { a: 'same', b2: undefined, c2: 'some' };
-        expect(differenceOf(obj21, obj22)).toBe('--> c2 / one was undefined');
+        expect(differenceOf(obj21, obj22)).toBe(
+            "--> c2 / one was undefined [undefined != 'some']"
+        );
     });
 
     it('applies custom comparisons via SpyComparator', () => {
@@ -261,7 +268,7 @@ describe('Spy - Equality', () => {
         ).toBe(undefined);
         expect(
             differenceOf(COMPARE(arg => arg.length !== 2), ['foo', 'bar'])
-        ).toBe('custom comparison failed');
+        ).toBe('Spy.COMPARE failed');
 
         const obj1 = { a: 'same', b1: undefined, c1: 'some' };
         const obj11 = {
@@ -277,7 +284,7 @@ describe('Spy - Equality', () => {
             c1: COMPARE(arg => arg !== 'some'),
         };
         expect(differenceOf(obj1, obj12)).toBe(
-            '--> c1 / custom comparison failed'
+            "--> c1 / Spy.COMPARE failed [called with: 'some']"
         );
     });
 });
