@@ -63,22 +63,26 @@ describe('Spy - Equality', () => {
             }
         };
 
-        const someInstance = new TestClass('test', 42, new Date(2016, 12, 24));
+        const someInstance = new TestClass(
+            'test',
+            42,
+            new Date(Date.UTC(2016, 12, 24))
+        );
         const someOtherInstance = new TestClass(
             'test',
             42,
-            new Date(2016, 12, 24)
+            new Date(Date.UTC(2016, 12, 24))
         );
         const someDifferentInstance = new TestClass(
             'test',
             42,
-            new Date(2016, 12, 23)
+            new Date(Date.UTC(2016, 12, 23))
         );
 
         expect(someInstance).not.toBe(someOtherInstance);
         expect(differenceOf(someInstance, someOtherInstance)).toBe(undefined);
         expect(differenceOf(someInstance, someDifferentInstance)).toBe(
-            '--> attr3 / different date [new Date(1485212400000) != new Date(1485126000000)]'
+            '--> attr3 / different date [new Date(1485216000000) != new Date(1485129600000)]'
         );
     });
 
