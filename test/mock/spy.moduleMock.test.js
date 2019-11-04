@@ -3,6 +3,7 @@
 import { differenceOf } from '../../src/utils';
 import { Spy } from '../../src/spy';
 import { serialize } from '../../src/serializer';
+import { watch } from 'rollup';
 
 describe('Spy.moduleMock', () => {
     const Mock$Utils = Spy.mockModule(
@@ -25,5 +26,14 @@ describe('Spy.moduleMock.2', () => {
         Mock$Serializer.serialize.returns(42);
         expect(differenceOf('foo', 'bar')).toBe('different string');
         expect(serialize({ foo: 'bar' })).toBe(42);
+    });
+});
+
+describe('Spy.moduleMock.3', () => {
+    const Mock$Rollup = Spy.mockModule('rollup', 'watch');
+
+    it('does something', () => {
+        Mock$Rollup.watch.returns(42);
+        expect(watch('foo', 'bar')).toBe(42);
     });
 });

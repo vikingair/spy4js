@@ -59,11 +59,15 @@ const __caller = (stackNum: number) => {
 const __callerBasedir = (stackNum: number) =>
     require('path').dirname(__caller(stackNum));
 
+const __getAbsolutePath = (stackNum: number, moduleName: string) =>
+    require('path').join(__callerBasedir(stackNum), moduleName);
+
 // 1. Spy.createMock in some test
 // 2. _createMock from test-suite.js
 // 3. __callerBasedir from test-suite.js
 // 4. __caller from test-suite.js
-const STACK_NUM_CREATE_MOCK = 4;
+// 5. __getAbsolutePath from test-suite.js
+const STACK_NUM_CREATE_MOCK = 5;
 const createMock = (
     SPY: Function,
     moduleName: string,
@@ -74,13 +78,15 @@ const createMock = (
             'Spy.moduleMock works only if your test runner executes with CommonJS'
         );
 
+    const isNodeModule =
+        moduleName.indexOf('.') !== 0 && moduleName.indexOf('/') !== 0;
+
     // now we are free to use "require('path')" to calculate the correct
     // module path for the mocking.
     return SPY.mock(
-        require(require('path').join(
-            __callerBasedir(STACK_NUM_CREATE_MOCK),
-            moduleName
-        )),
+        require(isNodeModule
+            ? moduleName
+            : __getAbsolutePath(STACK_NUM_CREATE_MOCK, moduleName)),
         ...names
     );
 };
