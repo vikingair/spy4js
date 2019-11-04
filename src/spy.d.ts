@@ -35,7 +35,7 @@ type SpyInstance = {
 };
 
 type ISpy = {
-    new(name: string): SpyInstance;
+    new(name?: string): SpyInstance;
     configure(config: {
         useOwnEquals?: boolean,
         afterEach?: (scope: string) => undefined,
