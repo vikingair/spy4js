@@ -64,9 +64,9 @@ const __getAbsolutePath = (stackNum: number, moduleName: string) =>
 
 // 1. Spy.createMock in some test
 // 2. _createMock from test-suite.js
-// 3. __callerBasedir from test-suite.js
-// 4. __caller from test-suite.js
-// 5. __getAbsolutePath from test-suite.js
+// 3. __getAbsolutePath from test-suite.js
+// 4. __callerBasedir from test-suite.js
+// 5. __caller from test-suite.js
 const STACK_NUM_CREATE_MOCK = 5;
 const createMock = (
     SPY: Function,

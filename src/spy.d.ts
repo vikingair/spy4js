@@ -1,5 +1,5 @@
 
-const Comparator = (arg: any) => boolean | void;
+const Comparator = (arg: any) => boolean | undefined;
 type SpyComparator = {
     compare(arg: any): string | undefined;
 };
