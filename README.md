@@ -177,6 +177,7 @@ Spy.restoreAll();
 And also sometimes it is necessary to have access to some of the call arguments with
 which the spy was called.
 
+  - `getAllCallArguments` (returns all call arguments for all calls in an array containing arrays)
   - `getCallArguments` (returns all call arguments for a specified call in an array)
   - `getCallArgument` (same as getCallArguments, but returns only a single element of the array)
   - `getCallCount` (returns the number of made calls)
@@ -190,6 +191,8 @@ spy([1, 2, 3]);
 spy();
 spy(null);
 
+spy.getAllCallArguments();     // returns [['string', 1], [[1, 2, 3]], [], [null]]
+spy.getCallCount();     // returns 4
 spy.getCallArguments(/* default = 0 */);     // returns ['string', 1]
 spy.getCallArgument(/* defaults = (0, 0) */); // returns 'string'
 spy.getCallArgument(0, 1); // returns 1
@@ -467,6 +470,13 @@ call one by one in **correct order** and **correct call count**.
 ATTENTION: single argument calls can be provided without wrapping into an array. But e.g. if
 the single argument is an array itself, than you have to warp it also yourself. (Inspired by jest
 data providers)
+
+### getAllCallArguments
+```
+spy.getAllCallArguments() => Array<any[]>
+```
+Returns the call arguments of all made calls to the spy.
+Especially returning an empty array if the spy was never called.
 
 ### getCallArguments
 ```

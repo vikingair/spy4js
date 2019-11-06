@@ -86,6 +86,7 @@ export type SpyInstance = {
     wasNotCalled: () => void,
     wasCalledWith: (...args: Array<any>) => void,
     wasNotCalledWith: (...args: Array<any>) => void,
+    getAllCallArguments: () => Array<any[]>,
     getCallArguments: (callNr?: number) => Array<any>,
     getCallArgument: (callNr?: number, argNr?: number) => any,
     getCallCount: () => number,
@@ -507,6 +508,23 @@ const SpyFunctions = {
     },
 
     /**
+     * This method returns all call arguments of all calls. Will be an empty
+     * array if the spy was never called.
+     *
+     * For example:
+     * const spy = new Spy();
+     * spy(arg1, arg2, arg3);
+     * spy(arg4, arg5, arg6);
+     * spy.getAllCallArguments();
+     * // returns [[arg1, arg2, arg3], [arg4, arg5, arg6]]
+     *
+     * @return {Array<any[]>} -> the call arguments of all calls.
+     */
+    getAllCallArguments(): Array<any[]> {
+        return this[Symbols.calls];
+    },
+
+    /**
      * This method returns the call arguments of the
      * n'th made call as array. If less than n calls were made,
      * it will throw an error.
@@ -524,7 +542,7 @@ const SpyFunctions = {
      * @return {Array<any>} -> the call arguments of the (callNr + 1)'th call.
      */
     getCallArguments(callNr: number = 0): Array<any> {
-        const madeCalls = this[Symbols.calls];
+        const madeCalls = this.getAllCallArguments();
         if (callNr % 1 !== 0 || callNr >= madeCalls.length) {
             throw new Error(
                 `\n\nThe provided callNr "${callNr}" was not valid.\n\n` +
@@ -573,7 +591,7 @@ const SpyFunctions = {
      * @return {number} -> the number of made calls.
      */
     getCallCount(): number {
-        return this[Symbols.calls].length;
+        return this.getAllCallArguments().length;
     },
 
     /**

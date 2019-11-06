@@ -28,6 +28,7 @@ type SpyInstance = {
     wasNotCalled: () => undefined,
     wasCalledWith: (...args: any[]) => undefined,
     wasNotCalledWith: (...args: any[]) => undefined,
+    getAllCallArguments: () => Array<any[]>,
     getCallArguments: (callNr?: number) => any[],
     getCallArgument: (callNr?: number, argNr?: number) => any,
     getCallCount: () => number,

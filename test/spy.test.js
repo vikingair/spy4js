@@ -820,6 +820,7 @@ describe('Spy - Utils', () => {
             'wasCalledWith',
             'wasNotCalledWith',
             'hasCallHistory',
+            'getAllCallArguments',
             'getCallArguments',
             'getCallArgument',
             'getCallCount',
