@@ -14,7 +14,7 @@ const uninitialized = (method: string) => () => {
     throw new Error(`Method '${method}' was not initialized on Mock.`);
 };
 
-type MockInfo = { mock: Object, mocked: Object, scope: string };
+type MockInfo = { mock: Object, mocked: Object, scope: string, returns?: any };
 type MockScope = MockInfo[];
 export const defaultScope: string = (Symbol('__Spy_global__'): any);
 export const _mocks: { [string]: MockScope } = { [defaultScope]: [] };
@@ -27,13 +27,18 @@ export const setScope = (scoping?: string): void => {
     } else scope = defaultScope;
 };
 
-const registerMock = (mocked: Object, mock: Object = {}): Object => {
-    _mocks[scope].push({ mocked, mock, scope });
+const registerMock = (mocked: Object, returns?: any): Object => {
+    const mock = {};
+    _mocks[scope].push({ mocked, mock, scope, returns });
     return mock;
 };
 
-export const createMock = <T, K: $Keys<T>>(obj: T, methods: K[]): Object => {
-    const mock = registerMock(obj);
+export const createMock = <T, K: $Keys<T>>(
+    obj: T,
+    methods: K[],
+    returns?: any
+): Object => {
+    const mock = registerMock(obj, returns);
     forEach(methods, (_, method: string) => {
         mock[method] = uninitialized(method);
     });
@@ -47,10 +52,13 @@ const couldNotInitError = (scope: string, additional: string) =>
         }, because:\n${additional}`
     );
 
-const initMock = ({ mocked, mock, scope }: MockInfo, spyOn: SpyOn): void => {
+const initMock = (
+    { mocked, mock, scope, returns }: MockInfo,
+    spyOn: SpyOn
+): void => {
     forEach(mock, (method: string) => {
         try {
-            mock[method] = spyOn(mocked, method);
+            mock[method] = spyOn(mocked, method).returns(returns);
         } catch (e) {
             throw couldNotInitError(scope, e.message);
         }

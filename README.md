@@ -64,6 +64,9 @@ const someObject2$Mock = Spy.mock(someObject2, 'toJSON', 'toString', 'getDate');
 
 // mock exported functions from other modules
 const myModuleMocks = Spy.mockModule('./my-module', 'useMe');
+
+// mock React components from other modules
+const { Calculator } = Spy.mockModule('./my/fancy/Calculator', 'Calculator');
 ```
 
 Any spy instance can be configured by overriding the default configuration. For
@@ -261,6 +264,17 @@ after `Spy.initMocks` gets called, the created mock does affect the given object
 Spy.mockModule(moduleName: string, ...methodNames: string[]) => Object (Mock)
 ```
 Same as [mock](#mock) but only necessary if you want to mock exported functions.
+
+### mockReactComponents (static)
+```
+Spy.mockReactComponents(moduleName: string, ...methodNames: string[]) => Object (Mock)
+```
+Same as [mockModule](#mockModule) but designed for ReactJS components. The registered
+spies return `null` instead of `undefined`. This makes minimal usable React components.
+Even if in most cases the pure mocking is nice enough, you can even test the number
+of rerender cycles and the provided props of the mocked component. Works perfectly
+with [enzyme](https://www.npmjs.com/package/enzyme) and
+[@testing-library/react](https://testing-library.com/docs/react-testing-library/intro).
 
 ### initMocks (static)
 ```

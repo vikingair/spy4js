@@ -33,7 +33,17 @@ describe('Spy.moduleMock.3', () => {
     const Mock$Rollup = Spy.mockModule('rollup', 'watch');
 
     it('does something', () => {
+        expect(watch()).toBe(undefined);
         Mock$Rollup.watch.returns(42);
         expect(watch('foo', 'bar')).toBe(42);
+    });
+});
+
+describe('Spy.mockReactComponents', () => {
+    const Mock$Rollup = Spy.mockReactComponents('rollup', 'watch');
+
+    it('does something', () => {
+        expect(watch('foo', 'bar')).toBe(null);
+        Mock$Rollup.watch.wasCalledWith('foo', 'bar');
     });
 });

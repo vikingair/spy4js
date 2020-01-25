@@ -858,7 +858,36 @@ class Spy {
         moduleName: string,
         ...methodNames: K[]
     ): { [name: K]: SpyInstance } {
-        return TestSuite.createMock(Spy, moduleName, (methodNames: any[]));
+        return TestSuite.createModuleMock(moduleName, (methodNames: any[]));
+    }
+
+    /**
+     * This static method is very similar to "Spy.mockModule" but perfectly
+     * suited for testing with React components. When using testing tools
+     * that render the whole subtree it is sometimes better to mock parts
+     * of your nested components.
+     *
+     * The only difference is that the returned mocks will return "null"
+     * instead of "undefined" as default. This is a minimal valid React
+     * component.
+     *
+     * @param {string} moduleName -> Everything that's expected by "jest.mock"
+     *                               as first parameter. Relative and absolute
+     *                               module paths.
+     * @param {string[]} methodNames -> Iterative provided attribute
+     *                                  names that will be mocked.
+     *
+     * @return {Object} Mock.
+     */
+    static mockReactComponents<K: string>(
+        moduleName: string,
+        ...methodNames: K[]
+    ): { [name: K]: SpyInstance } {
+        return TestSuite.createModuleMock(
+            moduleName,
+            (methodNames: any[]),
+            null
+        );
     }
 
     /**

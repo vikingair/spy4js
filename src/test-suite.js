@@ -6,7 +6,7 @@
  * @flow
  */
 
-import { setScope } from './mock';
+import { setScope, createMock } from './mock';
 
 // we have to cheat here flow since it might be the case that "jest" was not
 // configured correctly or the jest test runner might not even be present
@@ -68,10 +68,10 @@ const __getAbsolutePath = (stackNum: number, moduleName: string) =>
 // 4. __callerBasedir from test-suite.js
 // 5. __caller from test-suite.js
 const STACK_NUM_CREATE_MOCK = 5;
-const createMock = (
-    SPY: Function,
+const createModuleMock = (
     moduleName: string,
-    names: string[]
+    names: string[],
+    returns?: any
 ): Object => {
     if (!_testSuite.isCJS)
         throw new Error(
@@ -83,12 +83,13 @@ const createMock = (
 
     // now we are free to use "require('path')" to calculate the correct
     // module path for the mocking.
-    return SPY.mock(
+    return createMock(
         require(isNodeModule
             ? moduleName
             : __getAbsolutePath(STACK_NUM_CREATE_MOCK, moduleName)),
-        ...names
+        names,
+        returns
     );
 };
 
-export const TestSuite = { addSnapshotSerializer, createMock, configure };
+export const TestSuite = { addSnapshotSerializer, createModuleMock, configure };

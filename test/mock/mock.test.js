@@ -22,7 +22,9 @@ const IRL = {
 
 const Matrix = { tearDown: () => 1337, startup: () => 1 };
 
-const testSpyOn = (obj: Object, method: string) => obj[method];
+const testSpyOn = (obj: Object, method: string) => ({
+    returns: () => obj[method],
+});
 
 describe('Mocks', () => {
     beforeEach(() => {

@@ -53,6 +53,26 @@ describe('Spy - Utils', () => {
         spy.wasCalledWith('test', 6, someDate);
     });
 
+    it('is able to mock classes', () => {
+        const someModule = {
+            TestClass: class {
+                dummy: string;
+                constructor(dummy: string) {
+                    this.dummy = dummy;
+                }
+            },
+        };
+
+        const spy = Spy.on(someModule, 'TestClass').returns({
+            dummy: 'bar',
+        });
+
+        const someInstance = new someModule.TestClass('foo');
+
+        spy.hasCallHistory('foo');
+        expect(someInstance.dummy).toBe('bar');
+    });
+
     it('should throw if trying to spy other attributes than functions', () => {
         const testObject = {
             attrString: 'string',
