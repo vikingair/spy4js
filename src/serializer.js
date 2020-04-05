@@ -15,5 +15,5 @@ import { Serializer } from 'serialize-as-code';
 export const IGNORE = Symbol.for('__Spy_IGNORE__');
 
 export const serialize = Serializer.create(
-    o => (o === IGNORE && '>IGNORED<') || undefined
+    (o) => (o === IGNORE && '>IGNORED<') || undefined
 );

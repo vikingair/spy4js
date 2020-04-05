@@ -74,7 +74,7 @@ describe('Spy - Scoped - Mocks - 2', () => {
 
     it('Guy$Mock: mocks swim to return 12', () => {
         Guy$Mock.swim.returns(12);
-        Guy$Mock.goTo.calls(s => s);
+        Guy$Mock.goTo.calls((s) => s);
 
         expect(Guy.swim()).toBe(12);
         expect(Guy.goTo('park')).toBe('park');

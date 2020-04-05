@@ -121,7 +121,7 @@ describe('Spy - Utils', () => {
         );
     });
 
-    it('should restore all Spies', cb => {
+    it('should restore all Spies', (cb) => {
         const testObject = {
             func1: noop,
             func2: errorThrower,
@@ -169,7 +169,7 @@ describe('Spy - Utils', () => {
         testObject.func3('testCall8');
     });
 
-    it('should restore single Spies', cb => {
+    it('should restore single Spies', (cb) => {
         const testObject = {
             func1: noop,
             func2: errorThrower,
@@ -444,7 +444,7 @@ describe('Spy - Utils', () => {
         );
     });
 
-    it('should reset the call arguments on an object spy and NOT removing it (LIKE RESTORE)', cb => {
+    it('should reset the call arguments on an object spy and NOT removing it (LIKE RESTORE)', (cb) => {
         const testObject = {
             func: (allowed: string) => {
                 expect(allowed).toEqual('testCall3');
@@ -480,7 +480,7 @@ describe('Spy - Utils', () => {
 
     it('should call the given input-function after the spy was called', () => {
         const testObj = { _key: 'testObj' };
-        const spy = new Spy().calls(arg => {
+        const spy = new Spy().calls((arg) => {
             testObj._key = arg;
             return null;
         });
@@ -514,10 +514,13 @@ describe('Spy - Utils', () => {
         const spy = new Spy();
         spy(testObj, 42);
 
-        spy.wasCalledWith(Spy.COMPARE(() => true), 42); // this is the same as using Spy.IGNORE
+        spy.wasCalledWith(
+            Spy.COMPARE(() => true),
+            42
+        ); // this is the same as using Spy.IGNORE
         spy.wasCalledWith(
             {
-                _key: Spy.COMPARE(arg => typeof arg === 'string'),
+                _key: Spy.COMPARE((arg) => typeof arg === 'string'),
                 prop: 'whatever',
             },
             42
@@ -537,7 +540,7 @@ describe('Spy - Utils', () => {
         expect(() =>
             spy.wasCalledWith(
                 {
-                    _key: Spy.COMPARE(arg => typeof arg === 'number'),
+                    _key: Spy.COMPARE((arg) => typeof arg === 'number'),
                     prop: 'whatever',
                 },
                 42
@@ -594,11 +597,11 @@ describe('Spy - Utils', () => {
     it('should call the given input-functions sequentially after the spy was called', () => {
         const testObj = { _key: 'testObj' };
         const spy = new Spy().calls(
-            arg => {
+            (arg) => {
                 testObj._key = arg;
                 return null;
             },
-            arg => {
+            (arg) => {
                 testObj._key = 'some other ' + arg;
                 return 42;
             }
@@ -941,7 +944,7 @@ describe('Spy - Utils', () => {
 
     it('can spy on bound functions (bound to object)', () => {
         const foo = { info: 'waiting', bar: () => {} };
-        foo.bar = function() {
+        foo.bar = function () {
             throw new Error(this.info);
         }.bind(foo);
 

@@ -44,7 +44,7 @@ function SpyRegistry() {
  * Meaning that all stored object information will be restored
  * to their individual previous state.
  */
-SpyRegistry.prototype.restoreAll = function(): void {
+SpyRegistry.prototype.restoreAll = function (): void {
     forEach(this.register, (ignored, entry) => {
         restoreAttributeForEntry(entry);
     });
@@ -61,7 +61,7 @@ SpyRegistry.prototype.restoreAll = function(): void {
  *
  * @param {number} index -> the unique identifier of stored information.
  */
-SpyRegistry.prototype.restore = function(index: number): void {
+SpyRegistry.prototype.restore = function (index: number): void {
     const entry = this.register[index];
     if (entry) {
         restoreAttributeForEntry(entry);
@@ -77,7 +77,10 @@ SpyRegistry.prototype.restore = function(index: number): void {
  * @param {string} methodName -> The name of the mocked method.
  * @return {number} -> The unique store index.
  */
-SpyRegistry.prototype.push = function(obj: Object, methodName: string): number {
+SpyRegistry.prototype.push = function (
+    obj: Object,
+    methodName: string
+): number {
     this.registerCount += 1;
     this.register[this.registerCount] = {
         obj,
@@ -97,7 +100,7 @@ SpyRegistry.prototype.push = function(obj: Object, methodName: string): number {
  *                   BUT: Usually this method returns a function or
  *                        undefined.
  */
-SpyRegistry.prototype.getOriginalMethod = function(index: number): any {
+SpyRegistry.prototype.getOriginalMethod = function (index: number): any {
     const entry = this.register[index];
     if (entry) {
         return entry.method;
@@ -113,7 +116,7 @@ SpyRegistry.prototype.getOriginalMethod = function(index: number): any {
  * @param {boolean} intoPersReg -> boolean to determine the moving
  *                                 direction.
  */
-SpyRegistry.prototype.persist = function(
+SpyRegistry.prototype.persist = function (
     index: number,
     intoPersReg: boolean
 ): void {

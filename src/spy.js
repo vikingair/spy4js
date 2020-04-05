@@ -51,8 +51,8 @@ const Symbols: any = {
  * related to those types.
  */
 TestSuite.addSnapshotSerializer({
-    test: v => v && v[Symbols.isSpy],
-    print: spy => spy[Symbols.snap],
+    test: (v) => v && v[Symbols.isSpy],
+    print: (spy) => spy[Symbols.snap],
 });
 
 /**
@@ -178,7 +178,7 @@ const SpyFunctions = {
      * @return {SpyInstance} <- BuilderPattern.
      */
     returns(...args: Array<any>): SpyInstance {
-        return this.calls(...args.map(arg => () => arg));
+        return this.calls(...args.map((arg) => () => arg));
     },
 
     /**
@@ -194,7 +194,7 @@ const SpyFunctions = {
      */
     resolves(...args: Array<any>): SpyInstance {
         return this.returns(
-            ...(args.length ? args : [undefined]).map(arg =>
+            ...(args.length ? args : [undefined]).map((arg) =>
                 Promise.resolve(arg)
             )
         );
@@ -214,9 +214,11 @@ const SpyFunctions = {
      */
     rejects(...msgOrErrors: Array<OptionalMessageOrError>): SpyInstance {
         return this.calls(
-            ...(msgOrErrors.length ? msgOrErrors : [undefined]).map(
-                msgOrError => () =>
-                    Promise.reject(toError(msgOrError, this[Symbols.name]))
+            ...(msgOrErrors.length
+                ? msgOrErrors
+                : [undefined]
+            ).map((msgOrError) => () =>
+                Promise.reject(toError(msgOrError, this[Symbols.name]))
             )
         );
     },
@@ -387,7 +389,7 @@ const SpyFunctions = {
                     this.showCallArguments()
             );
         }
-        const modifiedCallHistory = callHistory.map(arg =>
+        const modifiedCallHistory = callHistory.map((arg) =>
             Array.isArray(arg) ? arg : [arg]
         );
         let hasErrors = false;
@@ -672,7 +674,7 @@ class Spy {
      * @constructor
      */
     constructor(name: string = '', __mock: any): SpyInstance {
-        const spy: any = function(...args: Array<any>) {
+        const spy: any = function (...args: Array<any>) {
             spy[Symbols.calls].push({ args });
             return spy[Symbols.func](...args);
         };
@@ -718,8 +720,8 @@ class Spy {
      */
     static configure(config: {
         useOwnEquals?: boolean,
-        afterEach?: string => void,
-        beforeEach?: string => void,
+        afterEach?: (string) => void,
+        beforeEach?: (string) => void,
     }): void {
         if (config.useOwnEquals !== undefined) {
             DefaultSettings.useOwnEquals = config.useOwnEquals;
@@ -934,7 +936,7 @@ class Spy {
      * Usually it should get called within one "afterEach"-Hook.
      */
     static resetAll(): void {
-        AllCreatedSpies.forEach(spy => spy.reset());
+        AllCreatedSpies.forEach((spy) => spy.reset());
     }
 }
 

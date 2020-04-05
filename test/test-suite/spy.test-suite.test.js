@@ -22,11 +22,9 @@ describe('Spy - Test-Suite', () => {
         beforeEach: () => {
             // does NOT call Spy.initMocks
             data = {}; // reinitialize data
-            persistentSpy = Spy.on(Matrix, 'tearDown')
-                .returns(42)
-                .configure({
-                    persistent: true,
-                }); // persistent spies have to be restored individually and are not affected by Spy.restoreAll
+            persistentSpy = Spy.on(Matrix, 'tearDown').returns(42).configure({
+                persistent: true,
+            }); // persistent spies have to be restored individually and are not affected by Spy.restoreAll
         },
         afterEach: () => {
             // does NOT call Spy.restoreAll

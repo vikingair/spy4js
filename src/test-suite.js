@@ -14,7 +14,7 @@ import { setScope, createMock } from './mock';
 export const _testSuite = { isJest: !!(jest: any), isCJS: !!(require: any) };
 
 type Scope = string;
-type Runner = { afterEach?: Scope => void, beforeEach?: Scope => void };
+type Runner = { afterEach?: (Scope) => void, beforeEach?: (Scope) => void };
 const runner: Runner = {};
 
 const oldDescribe = describe;

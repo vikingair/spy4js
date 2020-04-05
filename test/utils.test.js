@@ -268,24 +268,30 @@ describe('Spy - Equality', () => {
 
     it('applies custom comparisons via SpyComparator', () => {
         expect(
-            differenceOf(COMPARE(arg => arg.length === 2), ['foo', 'bar'])
+            differenceOf(
+                COMPARE((arg) => arg.length === 2),
+                ['foo', 'bar']
+            )
         ).toBe(undefined);
         expect(
-            differenceOf(COMPARE(arg => arg.length !== 2), ['foo', 'bar'])
+            differenceOf(
+                COMPARE((arg) => arg.length !== 2),
+                ['foo', 'bar']
+            )
         ).toBe('Spy.COMPARE failed');
 
         const obj1 = { a: 'same', b1: undefined, c1: 'some' };
         const obj11 = {
             a: 'same',
             b2: undefined,
-            c1: COMPARE(arg => arg === 'some'),
+            c1: COMPARE((arg) => arg === 'some'),
         };
         expect(differenceOf(obj1, obj11)).toBe(undefined);
 
         const obj12 = {
             a: 'same',
             b2: undefined,
-            c1: COMPARE(arg => arg !== 'some'),
+            c1: COMPARE((arg) => arg !== 'some'),
         };
         expect(differenceOf(obj1, obj12)).toBe(
             "--> c1 / Spy.COMPARE failed [called with: 'some']"
