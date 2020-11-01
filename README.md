@@ -9,7 +9,6 @@
 ### Benefits
 
   - `TypeScript` support included
-  - `flow` support included
   - Performance
   - No foreign dependencies
   - Optimized error messages
@@ -48,10 +47,10 @@ A spy instance can be initialized differently.
 import { Spy } from 'spy4js';
 
 // initialize directly
-const spy1 = new Spy();
+const spy1 = Spy();
 
 // initialize directly and supply an identifier for debugging purpose (default: 'the spy')
-const spy2 = new Spy('special spy for me');
+const spy2 = Spy('special spy for me');
 
 // initialize by mocking another objects attribute (usually this attribute is a function)
 const someObject1 = new Date(2017, 1, 15);
@@ -142,12 +141,10 @@ given fact was a lie. By writing those facts in your tests, a big refactoring
 loses its scare.
 
 ```js
-const spy = new Spy();
+const spy = Spy();
 
 spy.wasNotCalled();
 
-// in fact: you never want to call a spy directly for any purpose
-// -> therefore using flow this line would complain
 spy([1, 'test', {attr: [4]}]);
 
 spy.wasCalled();  // called at least once
@@ -186,7 +183,7 @@ which the spy was called.
   - `getCallCount` (returns the number of made calls)
     
 ```js
-const spy = new Spy();
+const spy = Spy();
 
 // make some calls
 spy('string', 1);
@@ -360,7 +357,7 @@ configuration is set to favor own `equals` implementations while comparing objec
 Another possible configuration is to make the spy persist while other spies have to restore
 when ["restoreAll"](#restoreall) was called. This spy can ONLY RESTORE the mocked object when
 you configure it back to be NOT PERSISTENT. This configuration can only be applied to mocking
-spies. For Spies created with `new Spy()` this configuration will throw an exception.
+spies. For Spies created with `Spy()` this configuration will throw an exception.
 
 ### calls
 ```
@@ -522,7 +519,7 @@ spy.showCallArguments(additionalInformation: Array<string> = []) => string
 This primarily internally used method is responsible for returning formatted informative debug
 messages when facts are broken. Let's do an example:
 ```js
-const spy = new Spy('my awesome spy');
+const spy = Spy('my awesome spy');
 spy(42, 'test', { attr1: [1, 2, new Date(2017, 1, 20)], attr2: 1337 });
 spy(42, 'test', { attr1: [0, 2, new Date(2017, 1, 20)], attr2: 1336 });
 spy(42, 'test', { attr1: [1, 2, new Date(2017, 1, 21)], attr2: 1336 });

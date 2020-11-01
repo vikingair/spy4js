@@ -3,9 +3,7 @@
  *
  * The LICENSE file can be found in the root directory of this project.
  *
- * @flow
  */
-
 import { Spy } from '../../src/spy';
 
 const IRL = {
@@ -34,7 +32,7 @@ describe('Spy - Global- Mocks', () => {
         expect(IRL.doWithTree('burn')).toBe('burn the tree');
         expect(IRL.giveBanana('Mike')).toBe(undefined);
 
-        expect(IRL$Mock.doWithTree).toBe(undefined);
+        expect((IRL$Mock as any).doWithTree).toBe(undefined);
         IRL$Mock.saveTheWorld.wasCalled(1);
         IRL$Mock.giveBanana.hasCallHistory('Mike');
     });
@@ -45,7 +43,7 @@ describe('Spy - Global- Mocks', () => {
         expect(Matrix.startup()).toBe('done');
         expect(Matrix.tearDown()).toBe(1337);
 
-        expect(Matrix$Mock.tearDown).toBe(undefined);
+        expect((Matrix$Mock as any).tearDown).toBe(undefined);
         Matrix$Mock.startup.wasCalled(1);
     });
 });
@@ -64,7 +62,7 @@ describe('Spy - Scoped - Mocks - 1', () => {
         expect(Guy.swim()).toBe(42);
         expect(Guy.goTo('park')).toBe('go to --> park');
 
-        expect(Guy$Mock.goTo).toBe(undefined);
+        expect((Guy$Mock as any).goTo).toBe(undefined);
         Guy$Mock.swim.wasCalled(1);
     });
 });
@@ -74,7 +72,7 @@ describe('Spy - Scoped - Mocks - 2', () => {
 
     it('Guy$Mock: mocks swim to return 12', () => {
         Guy$Mock.swim.returns(12);
-        Guy$Mock.goTo.calls((s) => s);
+        Guy$Mock.goTo.calls((s: any) => s);
 
         expect(Guy.swim()).toBe(12);
         expect(Guy.goTo('park')).toBe('park');

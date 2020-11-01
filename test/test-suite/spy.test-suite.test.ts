@@ -3,17 +3,15 @@
  *
  * The LICENSE file can be found in the root directory of this project.
  *
- * @flow
  */
-
 import { Spy } from '../../src/spy';
 
 const Matrix = { tearDown: () => 1337, startup: () => 1 };
 const Matrix$Mock = Spy.mock(Matrix, 'startup');
 
 describe('Spy - Test-Suite', () => {
-    let data = {};
-    let persistentSpy = new Spy('persistentSpy');
+    let data = {} as { foo?: string };
+    let persistentSpy = Spy('persistentSpy');
 
     // the latest moment you might reconfigure the behaviour of
     // the applied test suite hooks is within a describe hook.
@@ -44,7 +42,7 @@ describe('Spy - Test-Suite', () => {
         expect(Matrix$Mock.startup).toThrowErrorMatchingInlineSnapshot(
             `"Method 'startup' was not initialized on Mock."`
         );
-        expect(Matrix$Mock.tearDown).toBe(undefined);
+        expect((Matrix$Mock as any).tearDown).toBe(undefined);
 
         expect(Matrix.startup()).toBe(1);
         expect(Matrix.tearDown()).toBe(42);

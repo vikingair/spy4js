@@ -1,16 +1,10 @@
-// @flow
-
 import { differenceOf } from '../../src/utils';
 import { Spy } from '../../src/spy';
 import { serialize } from '../../src/serializer';
 import { watch } from 'rollup';
 
-describe('Spy.moduleMock', () => {
-    const Mock$Utils = Spy.mockModule(
-        '../../src/utils',
-        'differenceOf',
-        'toError'
-    );
+describe('Spy.mockModule', () => {
+    const Mock$Utils = Spy.mockModule('../../src/utils', 'differenceOf', 'toError');
 
     it('does something', () => {
         Mock$Utils.differenceOf.returns(42);
@@ -19,7 +13,7 @@ describe('Spy.moduleMock', () => {
     });
 });
 
-describe('Spy.moduleMock.2', () => {
+describe('Spy.mockModule.2', () => {
     const Mock$Serializer = Spy.mockModule('../../src/serializer', 'serialize');
 
     it('does something', () => {
@@ -29,13 +23,13 @@ describe('Spy.moduleMock.2', () => {
     });
 });
 
-describe('Spy.moduleMock.3', () => {
+describe('Spy.mockModule.node_module', () => {
     const Mock$Rollup = Spy.mockModule('rollup', 'watch');
 
     it('does something', () => {
-        expect(watch()).toBe(undefined);
+        expect(watch({})).toBe(undefined);
         Mock$Rollup.watch.returns(42);
-        expect(watch('foo', 'bar')).toBe(42);
+        expect(watch({})).toBe(42);
     });
 });
 
@@ -43,7 +37,7 @@ describe('Spy.mockReactComponents', () => {
     const Mock$Rollup = Spy.mockReactComponents('rollup', 'watch');
 
     it('does something', () => {
-        expect(watch('foo', 'bar')).toBe(null);
-        Mock$Rollup.watch.wasCalledWith('foo', 'bar');
+        expect(watch({ watch: false })).toBe(null);
+        Mock$Rollup.watch.wasCalledWith({ watch: false });
     });
 });

@@ -3,7 +3,6 @@
  *
  * The LICENSE file can be found in the root directory of this project.
  *
- * @flow
  */
 
 import { Serializer } from 'serialize-as-code';
@@ -14,6 +13,4 @@ import { Serializer } from 'serialize-as-code';
  */
 export const IGNORE = Symbol.for('__Spy_IGNORE__');
 
-export const serialize = Serializer.create(
-    (o) => (o === IGNORE && '>IGNORED<') || undefined
-);
+export const serialize = Serializer.create((o) => (o === IGNORE && '>IGNORED<') || undefined);

@@ -3,72 +3,9 @@
  *
  * The LICENSE file can be found in the root directory of this project.
  *
- * @flow
  */
 
 import { IGNORE, serialize } from './serializer';
-
-/**
- * This function takes a handler as second argument to process
- * all key-value-pairs of the given object through this handler.
- *
- * For example:
- *
- * forEach({attr1: 'str1', attr2: 123}, (k, v) => {
- *      console.log(k + 'has value: ' + v);
- * });
- *
- * @param {Array<any>|Object} arrOrObj <- Array or Object to iterate.
- *                                      (Flow does not want to iterate
- *                                      over arrays with for-in, so we
- *                                      have to write here any.)
- * @param {Function} handler <- Handler function to process all values.
- *
- */
-const forEach = (
-    arrOrObj: any,
-    handler: (key: string, value: any) => any
-): void => {
-    for (let key in arrOrObj) {
-        // eslint-disable-next-line no-prototype-builtins
-        if (arrOrObj.hasOwnProperty(key)) {
-            handler(key, arrOrObj[key]);
-        }
-    }
-};
-
-/**
- * This function returns all own keys for the given
- * object or array as array.
- *
- * For example:
- *
- * objectKeys({attr1: 'something', attr2: 123, attr3: {deepAttr: 42}})
- *     === ['attr1', 'attr2', 'attr3']
- *
- * objectKeys(['something', 123, {attr: 42}]) === ['0', '1', '2']
- *
- * @param {Array<any>|Object} arrOrObj <- Array or Object to iterate.
- *                                      (Flow does not want to iterate
- *                                      over arrays with for-in, so we
- *                                      have to write here any.
- * @return {Array} <- containing all keys for the input object.
- */
-const objectKeys = (arrOrObj: any): Array<string> => {
-    const keys = [];
-    forEach(arrOrObj, (key: string) => keys.push(key));
-    return keys;
-};
-
-const mergeArrays = (arr1: Array<any>, arr2: Array<any>): Array<any> => {
-    const result = [...arr1];
-    forEach(arr2, (key, val) => {
-        if (arr1.indexOf(val) === -1) {
-            result.push(val);
-        }
-    });
-    return result;
-};
 
 type Comparator = (arg: any) => boolean | void;
 type ComparatorOrMapper = (arg: any) => boolean | void | string;
@@ -82,10 +19,9 @@ class SpyComparator {
     constructor(comparator: ComparatorOrMapper) {
         this._func = comparator;
     }
-    compare(arg: any): string[] | void {
+    compare(arg: any): string[] | undefined {
         const result = this._func(arg);
-        if (typeof result === 'string')
-            return [`${SPY_MAPPER_FAILED} [${result}]`];
+        if (typeof result === 'string') return [`${SPY_MAPPER_FAILED} [${result}]`];
         if (result === false) return [SPY_COMPARE_FAILED];
     }
 }
@@ -94,16 +30,13 @@ class SpyComparator {
  * to define argument based comparison for arbitrary
  * nested objects.
  */
-const COMPARE = (comparator: Comparator): SpyComparator =>
-    new SpyComparator(comparator);
+const COMPARE = (comparator: Comparator): SpyComparator => new SpyComparator(comparator);
 
 const MAPPER = (from: any | any[], to: any) =>
     new SpyComparator((mapper: Function) => {
         const result = mapper(...(Array.isArray(from) ? from : [from]));
         const diff = differenceOf(result, to);
-        return diff
-            ? `${serialize(result)} did not match ${serialize(to)}: ${diff}`
-            : undefined;
+        return diff ? `${serialize(result)} did not match ${serialize(to)}: ${diff}` : undefined;
     });
 
 const __different = (type: string) => ['different ' + type];
@@ -134,7 +67,7 @@ const __diff = (
     initial: boolean,
     useOwnEquals: boolean,
     alreadyComparedArray: Array<any> = []
-): string[] | void => {
+): string[] | undefined => {
     if (a === IGNORE || b === IGNORE) return;
     if (a instanceof SpyComparator) return a.compare(b);
     if (b instanceof SpyComparator) return b.compare(a);
@@ -143,8 +76,7 @@ const __diff = (
     if (a === null || b === null) return ['one was null'];
     const aClass = Object.prototype.toString.call(a);
     const bClass = Object.prototype.toString.call(b);
-    if (aClass !== bClass)
-        return __different(`object types: ${aClass} <-> ${bClass}`);
+    if (aClass !== bClass) return __different(`object types: ${aClass} <-> ${bClass}`);
     switch (aClass) {
         case '[object RegExp]':
             if (String(a) === String(b)) {
@@ -198,9 +130,8 @@ const __diff = (
         return;
     }
     const compared = [...alreadyComparedArray, a];
-    const keys = mergeArrays(objectKeys(a), objectKeys(b));
-    for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
+    const keys = new Set(Object.keys(a).concat(Object.keys(b)));
+    for (const key of keys) {
         const diff = __diff(a[key], b[key], false, useOwnEquals, compared);
         if (diff !== undefined) {
             return [key, ...diff];
@@ -260,7 +191,7 @@ const differenceOf = (
     a: any,
     b: any,
     config: { useOwnEquals: boolean } = { useOwnEquals: true }
-): string | void => {
+): string | undefined => {
     const diff = __diff(a, b, true, config.useOwnEquals);
     if (!diff) return;
     const diffStr = __diffToStr(diff);
@@ -275,10 +206,9 @@ const differenceOf = (
     return `${diffStr} [${info}]`;
 };
 
-export type OptionalMessageOrError = ?string | Error;
+export type MessageOrError = string | Error;
+export type OptionalMessageOrError = MessageOrError | undefined;
 const toError = (msgOrError: OptionalMessageOrError, spyName: string) =>
-    msgOrError instanceof Error
-        ? msgOrError
-        : new Error(msgOrError || `${spyName} was requested to throw`);
+    msgOrError instanceof Error ? msgOrError : new Error(msgOrError || `${spyName} was requested to throw`);
 
-export { differenceOf, forEach, objectKeys, COMPARE, toError, MAPPER };
+export { differenceOf, COMPARE, toError, MAPPER };

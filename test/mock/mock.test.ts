@@ -3,16 +3,8 @@
  *
  * The LICENSE file can be found in the root directory of this project.
  *
- * @flow
  */
-
-import {
-    createMock,
-    initMocks,
-    _mocks,
-    setScope,
-    defaultScope,
-} from '../../src/mock';
+import { createMock, initMocks, _mocks, setScope, defaultScope } from '../../src/mock';
 
 const IRL = {
     saveTheWorld: () => 'feed some koalas',
@@ -22,7 +14,7 @@ const IRL = {
 
 const Matrix = { tearDown: () => 1337, startup: () => 1 };
 
-const testSpyOn = (obj: Object, method: string) => ({
+const testSpyOn = (obj: Object, method: keyof typeof obj) => ({
     returns: () => obj[method],
 });
 
@@ -39,7 +31,7 @@ describe('Mocks', () => {
         expect(_mocks[defaultScope][0].mock).toBe(IRL$Mock);
         expect(_mocks[defaultScope][0].mocked).toBe(IRL);
 
-        expect(IRL$Mock.saveTheWorld).toBe(undefined);
+        expect((IRL$Mock as any).saveTheWorld).toBe(undefined);
         expect(IRL$Mock.doWithTree).toThrowErrorMatchingInlineSnapshot(
             `"Method 'doWithTree' was not initialized on Mock."`
         );
@@ -54,7 +46,7 @@ describe('Mocks', () => {
         expect(_mocks['Test Scope'].length).toBe(1);
         initMocks(testSpyOn, 'Test Scope');
 
-        expect(IRL$Mock.saveTheWorld).toBe(undefined);
+        expect((IRL$Mock as any).saveTheWorld).toBe(undefined);
         expect(IRL$Mock.doWithTree('kiss')).toBe('kiss the tree');
         expect(IRL$Mock.giveBanana('Joe')).toBe('Give Joe a banana');
     });
@@ -66,10 +58,10 @@ describe('Mocks', () => {
         initMocks(testSpyOn);
 
         expect(IRL$Mock.saveTheWorld()).toBe('feed some koalas');
-        expect(IRL$Mock.doWithTree).toBe(undefined);
-        expect(IRL$Mock.giveBanana).toBe(undefined);
+        expect((IRL$Mock as any).doWithTree).toBe(undefined);
+        expect((IRL$Mock as any).giveBanana).toBe(undefined);
 
         expect(Matrix$Mock.tearDown()).toBe(1337);
-        expect(Matrix$Mock.startup).toBe(undefined);
+        expect((Matrix$Mock as any).startup).toBe(undefined);
     });
 });

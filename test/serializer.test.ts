@@ -3,7 +3,6 @@
  *
  * The LICENSE file can be found in the root directory of this project.
  *
- * @flow
  */
 
 import { serialize, IGNORE } from '../src/serializer';
@@ -11,10 +10,9 @@ import { serialize, IGNORE } from '../src/serializer';
 describe('serialize', () => {
     it('serializes arrays with IGNORED entry', () => {
         expect(serialize([])).toBe('[]');
-        expect(serialize([1, 'test', IGNORE, /^abc$/])).toBe(
-            "[1, 'test', >IGNORED<, //^abc$//]"
-        );
+        expect(serialize([1, 'test', IGNORE, /^abc$/])).toBe("[1, 'test', >IGNORED<, //^abc$//]");
     });
+
     it('serializes all together', () => {
         const o: any = { prop1: 'test', prop2: { prop21: 12 } };
         o.prop3 = o;

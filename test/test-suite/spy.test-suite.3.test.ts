@@ -1,5 +1,3 @@
-// @flow
-
 import { Spy } from '../../src/spy';
 import { TestSuite } from '../../src/test-suite';
 
@@ -20,9 +18,7 @@ describe('Spy - Test-Suite with throwing scoped mock', () => {
         expect(Guy$Mock.swim).toBeDefined();
         expect(anotherGuy$Mock.swim).toBeDefined();
 
-        expect(() =>
-            Spy.initMocks('Spy - Test-Suite with throwing scoped mock')
-        ).toThrowErrorMatchingInlineSnapshot(`
+        expect(() => Spy.initMocks('Spy - Test-Suite with throwing scoped mock')).toThrowErrorMatchingInlineSnapshot(`
 "Could not initialize mock for scope \\"Spy - Test-Suite with throwing scoped mock\\", because:
 The objects attribute 'swim' was already spied. Please make sure to spy only once at a time at any attribute."
 `);

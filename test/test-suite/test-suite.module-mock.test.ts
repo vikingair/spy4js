@@ -1,5 +1,3 @@
-// @flow
-
 import { _testSuite } from '../../src/test-suite';
 import { Spy } from '../../src/spy';
 

@@ -3,9 +3,7 @@
  *
  * The LICENSE file can be found in the root directory of this project.
  *
- * @flow
  */
-
 import { TestSuite } from '../../src/test-suite';
 
 const counters = { beforeEach: 0, afterEach: 0 };

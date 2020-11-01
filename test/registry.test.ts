@@ -3,11 +3,8 @@
  *
  * The LICENSE file can be found in the root directory of this project.
  *
- * @flow
  */
-
 import { SpyRegistry } from '../src/registry';
-import { objectKeys } from '../src/utils';
 
 /**
  * The tests are written not method specific.
@@ -17,8 +14,7 @@ import { objectKeys } from '../src/utils';
  */
 describe('Spy - Utils', () => {
     it('should not allow to use the constructor of the Spy without new', () => {
-        // throws(SpyRegistry, { partOfMessage: 'only with "new" keyword' });
-        expect(SpyRegistry).toThrow(/.*only with "new" keyword.*/);
+        expect(SpyRegistry).toThrow();
     });
 
     it('should register an arbitrary object attribute correctly', () => {
@@ -123,39 +119,39 @@ describe('Spy - Utils', () => {
         };
         const reg: any = new SpyRegistry();
 
-        expect(objectKeys(reg.register).length).toEqual(0);
-        expect(objectKeys(reg.persReg).length).toEqual(0);
+        expect(Object.keys(reg.register).length).toEqual(0);
+        expect(Object.keys(reg.persReg).length).toEqual(0);
 
         const registerEntry1 = reg.push(testObject, 'func1');
         reg.push(testObject, 'func2');
 
-        expect(objectKeys(reg.register).length).toEqual(2);
-        expect(objectKeys(reg.persReg).length).toEqual(0);
+        expect(Object.keys(reg.register).length).toEqual(2);
+        expect(Object.keys(reg.persReg).length).toEqual(0);
 
         reg.persist(registerEntry1, true);
 
-        expect(objectKeys(reg.register).length).toEqual(1);
-        expect(objectKeys(reg.persReg).length).toEqual(1);
+        expect(Object.keys(reg.register).length).toEqual(1);
+        expect(Object.keys(reg.persReg).length).toEqual(1);
 
         reg.restore(registerEntry1);
 
-        expect(objectKeys(reg.register).length).toEqual(1);
-        expect(objectKeys(reg.persReg).length).toEqual(1);
+        expect(Object.keys(reg.register).length).toEqual(1);
+        expect(Object.keys(reg.persReg).length).toEqual(1);
 
         reg.restoreAll();
 
-        expect(objectKeys(reg.register).length).toEqual(0);
-        expect(objectKeys(reg.persReg).length).toEqual(1);
+        expect(Object.keys(reg.register).length).toEqual(0);
+        expect(Object.keys(reg.persReg).length).toEqual(1);
 
         reg.persist(registerEntry1, false);
 
-        expect(objectKeys(reg.register).length).toEqual(1);
-        expect(objectKeys(reg.persReg).length).toEqual(0);
+        expect(Object.keys(reg.register).length).toEqual(1);
+        expect(Object.keys(reg.persReg).length).toEqual(0);
 
         reg.restoreAll();
 
-        expect(objectKeys(reg.register).length).toEqual(0);
-        expect(objectKeys(reg.persReg).length).toEqual(0);
+        expect(Object.keys(reg.register).length).toEqual(0);
+        expect(Object.keys(reg.persReg).length).toEqual(0);
     });
 
     it('does nothing on persist for not existing key', () => {

@@ -3,21 +3,20 @@
  *
  * The LICENSE file can be found in the root directory of this project.
  *
- * @flow
  */
 
-import { forEach } from './utils';
+// returns a spy instance
+type SpyOn = (obj: Object, method: keyof typeof obj) => any;
 
-type SpyOn = (Object, string) => Function;
-
-const uninitialized = (method: string) => () => {
-    throw new Error(`Method '${method}' was not initialized on Mock.`);
+const uninitialized = (method: keyof any) => () => {
+    throw new Error(`Method '${String(method)}' was not initialized on Mock.`);
 };
 
-type MockInfo = { mock: Object, mocked: Object, scope: string, returns?: any };
+type MockInfo = { mock: Object; mocked: Object; scope: string; returns?: any };
 type MockScope = MockInfo[];
-export const defaultScope: string = (Symbol('__Spy_global__'): any);
-export const _mocks: { [string]: MockScope } = { [defaultScope]: [] };
+
+export const defaultScope: string = Symbol('__Spy_global__') as any;
+export const _mocks: { [scoping: string]: MockScope } = { [defaultScope]: [] };
 
 let scope = defaultScope;
 export const setScope = (scoping?: string): void => {
@@ -27,19 +26,15 @@ export const setScope = (scoping?: string): void => {
     } else scope = defaultScope;
 };
 
-const registerMock = (mocked: Object, returns?: any): Object => {
+const registerMock = (mocked: Object, returns?: any) => {
     const mock = {};
     _mocks[scope].push({ mocked, mock, scope, returns });
     return mock;
 };
 
-export const createMock = <T, K: $Keys<T>>(
-    obj: T,
-    methods: K[],
-    returns?: any
-): Object => {
-    const mock = registerMock(obj, returns);
-    forEach(methods, (_, method: string) => {
+export const createMock = <T, K extends keyof T>(obj: T, methods: K[], returns?: any): { [P in K]: any } => {
+    const mock = registerMock(obj, returns) as { [P in K]: any };
+    methods.forEach((method) => {
         mock[method] = uninitialized(method);
     });
     return mock;
@@ -52,13 +47,10 @@ const couldNotInitError = (scope: string, additional: string) =>
         }, because:\n${additional}`
     );
 
-const initMock = (
-    { mocked, mock, scope, returns }: MockInfo,
-    spyOn: SpyOn
-): void => {
-    forEach(mock, (method: string) => {
+const initMock = ({ mocked, mock, scope, returns }: MockInfo, spyOn: SpyOn): void => {
+    Object.keys(mock).forEach((method) => {
         try {
-            mock[method] = spyOn(mocked, method).returns(returns);
+            mock[method as keyof typeof mock] = spyOn(mocked, method as keyof typeof mock).returns(returns);
         } catch (e) {
             throw couldNotInitError(scope, e.message);
         }
@@ -66,7 +58,7 @@ const initMock = (
 };
 
 const initMockScope = (scoping: string, spyOn: SpyOn): void => {
-    forEach(_mocks[scoping], (_, mock: MockInfo) => initMock(mock, spyOn));
+    Object.values(_mocks[scoping]).forEach((mock) => initMock(mock, spyOn));
 };
 
 export const initMocks = (spyOn: SpyOn, scoping?: string): void => {

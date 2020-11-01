@@ -3,37 +3,43 @@
  *
  * The LICENSE file can be found in the root directory of this project.
  *
- * @flow
  */
 
 import { setScope, createMock } from './mock';
+import { SpyInstance } from './spy';
 
 // we have to cheat here flow since it might be the case that "jest" was not
 // configured correctly or the jest test runner might not even be present
 // $FlowFixMe
-export const _testSuite = { isJest: !!(jest: any), isCJS: !!(require: any) };
+export const _testSuite = { isJest: !!jest, isCJS: !!require };
 
 type Scope = string;
-type Runner = { afterEach?: (Scope) => void, beforeEach?: (Scope) => void };
+type Runner = { afterEach?: (scope: Scope) => void; beforeEach?: (scope: Scope) => void };
 const runner: Runner = {};
 
 const oldDescribe = describe;
 
 // eslint-disable-next-line
-describe = (name: string, suite: Function) => {
+const newDescribe: jest.Describe = (name, suite) => {
     oldDescribe(name, () => {
-        setScope(name);
+        const scoping = String(name);
+        setScope(scoping);
         beforeEach(() => {
-            runner.beforeEach && runner.beforeEach(name);
+            runner.beforeEach && runner.beforeEach(scoping);
         });
         afterEach(() => {
-            runner.afterEach && runner.afterEach(name);
+            runner.afterEach && runner.afterEach(scoping);
         });
         const rv = suite();
         setScope(undefined);
         return rv;
     });
 };
+newDescribe.each = oldDescribe.each;
+newDescribe.only = oldDescribe.only;
+newDescribe.skip = oldDescribe.skip;
+// eslint-disable-next-line no-global-assign
+describe = newDescribe;
 
 const configure = (other: Runner): void => {
     if (other.afterEach) runner.afterEach = other.afterEach;
@@ -41,23 +47,19 @@ const configure = (other: Runner): void => {
 };
 
 const addSnapshotSerializer = (serializer: any) => {
-    _testSuite.isJest &&
-        (expect: any) &&
-        (expect: any).addSnapshotSerializer &&
-        (expect: any).addSnapshotSerializer(serializer);
+    _testSuite.isJest && expect && expect.addSnapshotSerializer && expect.addSnapshotSerializer(serializer);
 };
 
 const __caller = (stackNum: number) => {
     const traceFn = Error.prepareStackTrace;
     Error.prepareStackTrace = (err, stack) => stack;
-    const stack = new Error().stack;
+    const stack = new Error().stack as any;
     Error.prepareStackTrace = traceFn;
     // it highly depends from were the functionality will be called
-    return (stack[stackNum]: any).getFileName();
+    return stack[stackNum].getFileName();
 };
 
-const __callerBasedir = (stackNum: number) =>
-    require('path').dirname(__caller(stackNum));
+const __callerBasedir = (stackNum: number) => require('path').dirname(__caller(stackNum));
 
 const __getAbsolutePath = (stackNum: number, moduleName: string) =>
     require('path').join(__callerBasedir(stackNum), moduleName);
@@ -68,25 +70,19 @@ const __getAbsolutePath = (stackNum: number, moduleName: string) =>
 // 4. __callerBasedir from test-suite.js
 // 5. __caller from test-suite.js
 const STACK_NUM_CREATE_MOCK = 5;
-const createModuleMock = (
+const createModuleMock = <K extends string>(
     moduleName: string,
-    names: string[],
+    names: K[],
     returns?: any
-): Object => {
-    if (!_testSuite.isCJS)
-        throw new Error(
-            'Spy.moduleMock works only if your test runner executes with CommonJS'
-        );
+): { [P in K]: SpyInstance } => {
+    if (!_testSuite.isCJS) throw new Error('Spy.moduleMock works only if your test runner executes with CommonJS');
 
-    const isNodeModule =
-        moduleName.indexOf('.') !== 0 && moduleName.indexOf('/') !== 0;
+    const isNodeModule = moduleName.indexOf('.') !== 0 && moduleName.indexOf('/') !== 0;
 
     // now we are free to use "require('path')" to calculate the correct
     // module path for the mocking.
     return createMock(
-        require(isNodeModule
-            ? moduleName
-            : __getAbsolutePath(STACK_NUM_CREATE_MOCK, moduleName)),
+        require(isNodeModule ? moduleName : __getAbsolutePath(STACK_NUM_CREATE_MOCK, moduleName)),
         names,
         returns
     );
