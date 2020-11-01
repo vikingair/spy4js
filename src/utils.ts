@@ -130,7 +130,7 @@ const __diff = (
         return;
     }
     const compared = [...alreadyComparedArray, a];
-    const keys = new Set(Object.keys(a).concat(Object.keys(b)));
+    const keys = Array.from(new Set(Object.keys(a).concat(Object.keys(b))));
     for (const key of keys) {
         const diff = __diff(a[key], b[key], false, useOwnEquals, compared);
         if (diff !== undefined) {
