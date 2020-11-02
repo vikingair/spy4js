@@ -29,10 +29,15 @@ class SpyComparator {
  * This function may create individual comparators
  * to define argument based comparison for arbitrary
  * nested objects.
+ *
+ * Returning "any" because this return value should be usable anywhere.
  */
-const COMPARE = (comparator: Comparator): SpyComparator => new SpyComparator(comparator);
+const COMPARE = (comparator: Comparator): any => new SpyComparator(comparator);
 
-const MAPPER = (from: any | any[], to: any) =>
+/**
+ * Returning "any" because this return value should be usable anywhere.
+ */
+const MAPPER = (from: any | any[], to: any): any =>
     new SpyComparator((mapper: Function) => {
         const result = mapper(...(Array.isArray(from) ? from : [from]));
         const diff = differenceOf(result, to);
