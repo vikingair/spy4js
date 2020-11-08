@@ -27,7 +27,18 @@ come with a lot of useful features. See below for more.
 **Hint**:
 My favorite test framework is [Jest](https://jestjs.io/). If you are using other
 frameworks you might get issues related to automatically applied test suite hooks.
-To overcome this default behaviour see [here](#configure-static).
+To overcome this default behaviour see [here](#configure-static). Since Jest already
+includes excellent spies itself, you might ask yourself, why `spy4js`. Because it's better.
+
+Advantages over Jest spies:
+- Very important for tests is their readability. This spy API is much easier to learn, and
+  the tests can be understood even without any previous knowledge.
+- Error messages should be extremely helpful, because development time is very valuable.
+  In error cases made comparisons will be printed with detailed information.
+- The used serialization for objects can be directly copied into your test code, which increases
+  your speed while writing tests.
+- Last but not least there are several nice features Jest doesn't provide out-of-the-box, and you
+  could even combine both spy sorts.
 
 ### Installation
 ##### With yarn
@@ -229,7 +240,7 @@ The scope param will contain the test-suite name, which was provided as first pa
 of the `describe` function.
 The configuration possibility are:
 - **useOwnEquals**: Applies for all spy instances. See [configure](#configure) for more details.
-- **enforceOrder**: Applies for all spy instances. See [configure](#configure) for more details.
+- **enforceOrder**: Opt-in to the [enforce-order mode](#enforce-order-mode).
 - **beforeEach**: Lets you override the default beforeEach test suite hook.
 - **afterEach**: Lets you override the default afterEach test suite hook.
 
@@ -564,9 +575,9 @@ const callArgs = spy.getCallArguments(0/* for the 0'th call above*/);
 const differentNumber = callArgs[2]['attr2'];
 ```
 
-## 
-Or you want to opt-in into the enforce-order mode. Which might become the default in some
-future version but will need first further evaluation.
+## Enforce-Order Mode
+You can opt-in to the enforce-order mode. Which might become the default in some
+future version but will need first further evaluation and will always stay configurable.
 ```ts
 Spy.configure({ enforceOrder: true });
 ```
