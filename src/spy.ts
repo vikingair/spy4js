@@ -10,6 +10,11 @@ import { serialize, IGNORE } from './serializer';
 import { createMock, initMocks } from './mock';
 import { TestSuite } from './test-suite';
 
+const CallOrder = {
+    Idx: 0,
+    lastCheck: 0,
+};
+
 /**
  *
  * Instantiating the SpyRegistry to handle all
@@ -53,6 +58,8 @@ TestSuite.addSnapshotSerializer({
     print: (spy: any) => spy[Symbols.snap],
 });
 
+export type GeneralSpyConfig = { useOwnEquals: boolean; enforceOrder: boolean };
+export type SpyConfig = { useOwnEquals: boolean; persistent: boolean };
 /**
  * Initial default settings for every
  * spy instance. Can be modified only
@@ -60,13 +67,14 @@ TestSuite.addSnapshotSerializer({
  *
  * @type {{useOwnEquals: boolean}}
  */
-const DefaultSettings = {
+const DefaultSettings: GeneralSpyConfig = {
     useOwnEquals: true,
+    enforceOrder: false,
 };
 
 export type SpyInstance = {
     (...args: any[]): any;
-    configure: (config: { useOwnEquals?: boolean; persistent?: boolean }) => SpyInstance;
+    configure: (config: Partial<SpyConfig>) => SpyInstance;
     calls: (...funcs: Function[]) => SpyInstance;
     returns: (...args: any[]) => SpyInstance;
     resolves: (...args: any[]) => SpyInstance;
@@ -89,10 +97,20 @@ export type SpyInstance = {
 
     // hidden attributes
     [Symbols.name]: string;
-    [Symbols.calls]: { args: any[] }[];
+    [Symbols.snap]: string;
+    [Symbols.calls]: { args: any[]; order: number }[];
     [Symbols.index]: number;
+    [Symbols.isSpy]: boolean;
     [Symbols.func]: Function;
-    [Symbols.config]: { useOwnEquals: boolean; persistent: boolean };
+    [Symbols.config]: SpyConfig;
+};
+
+const SpyHelperFunctions = {
+    getCalls: (spy: SpyInstance) => {
+        const allCalls = spy[Symbols.calls];
+        if (!DefaultSettings.enforceOrder) return allCalls;
+        return allCalls.filter(({ order }) => order > CallOrder.lastCheck);
+    },
 };
 
 const SpyFunctions = {
@@ -114,7 +132,7 @@ const SpyFunctions = {
      *                         for special configuration
      * @return {SpyInstance} <- BuilderPattern.
      */
-    configure(this: SpyInstance, config: { useOwnEquals?: boolean; persistent?: boolean }): SpyInstance {
+    configure(this: SpyInstance, config: Partial<SpyConfig>): SpyInstance {
         if (config.useOwnEquals !== undefined) {
             this[Symbols.config].useOwnEquals = config.useOwnEquals;
         }
@@ -332,8 +350,10 @@ const SpyFunctions = {
      * @param {?number} callCount -> Is the number of expected calls made.
      */
     wasCalled(this: SpyInstance, callCount?: number) {
-        const madeCalls = this[Symbols.calls].length;
-        if (typeof callCount === 'number') {
+        const calls = SpyHelperFunctions.getCalls(this);
+        const madeCalls = calls.length;
+        if (callCount !== undefined) {
+            // check exactly the number of calls
             if (madeCalls !== callCount) {
                 throw new Error(
                     `\n\n${this[Symbols.name]} was called ${madeCalls} times,` +
@@ -343,7 +363,20 @@ const SpyFunctions = {
                 );
             }
         } else if (madeCalls === 0) {
-            throw new Error(`\n\n${this[Symbols.name]} was never called!\n\n`);
+            if (this[Symbols.calls].length) {
+                throw new Error(
+                    `\n\n${this[Symbols.name]} was not called,` +
+                        ` but there was expected at least one call.\n\n` +
+                        'Actually there were:\n\n' +
+                        this.showCallArguments()
+                );
+            } else {
+                throw new Error(`\n\n${this[Symbols.name]} was never called!\n\n`);
+            }
+        }
+        if (callCount !== 0) {
+            const checked = calls[(callCount || 1) - 1];
+            CallOrder.lastCheck = checked.order;
         }
     },
 
@@ -361,19 +394,23 @@ const SpyFunctions = {
      *          -> Are the expected made call arguments in correct order.
      */
     hasCallHistory(this: SpyInstance, ...callHistory: Array<Array<any> | any>): void {
-        const madeCalls = this[Symbols.calls];
+        const calls = SpyHelperFunctions.getCalls(this);
+        const madeCalls = calls.length;
         const callCount = callHistory.length;
-        if (madeCalls.length !== callCount) {
+        if (madeCalls !== callCount) {
             throw new Error(
-                `\n\n${this[Symbols.name]} was called ${madeCalls.length} times,` +
+                `\n\n${this[Symbols.name]} was called ${madeCalls} times,` +
                     ` but the expected call history includes exactly ${callHistory.length} calls.\n\n` +
                     'Actually there were:\n\n' +
                     this.showCallArguments()
             );
         }
+        if (callCount === 0) {
+            throw new Error("\n\nPlease use 'wasNotCalled' instead of calling 'hasCallHistory' without any arguments");
+        }
         const modifiedCallHistory = callHistory.map((arg) => (Array.isArray(arg) ? arg : [arg]));
         let hasErrors = false;
-        const diffInfo = madeCalls.map((call, index) => {
+        const diffInfo = calls.map((call, index) => {
             const diff = differenceOf(call.args, modifiedCallHistory[index], this[Symbols.config]);
             if (diff) hasErrors = true;
             return diff;
@@ -388,6 +425,8 @@ const SpyFunctions = {
                     'Actually there were:\n\n' +
                     this.showCallArguments(diffInfo)
             );
+
+        CallOrder.lastCheck = calls[callCount - 1].order;
     },
 
     /**
@@ -395,11 +434,11 @@ const SpyFunctions = {
      * Throws an error if the spy was called at least once.
      */
     wasNotCalled(this: SpyInstance): void {
-        const madeCalls = this[Symbols.calls];
-        if (madeCalls.length !== 0) {
+        const calls = SpyHelperFunctions.getCalls(this);
+        const madeCalls = calls.length;
+        if (madeCalls !== 0) {
             throw new Error(
-                `\n\n${this[Symbols.name]} was not` +
-                    ' considered to be called.\n\n' +
+                `\n\n${this[Symbols.name]} was not considered to be called, but was called ${madeCalls} times.\n\n` +
                     'Actually there were:\n\n' +
                     this.showCallArguments()
             );
@@ -423,14 +462,14 @@ const SpyFunctions = {
      *                           for any made call.
      */
     wasCalledWith(this: SpyInstance, ...args: Array<any>): void {
-        const madeCalls = this[Symbols.calls];
-        if (madeCalls.length === 0) {
-            throw new Error(`\n\n${this[Symbols.name]} was never called!\n\n`);
-        }
+        const calls = SpyHelperFunctions.getCalls(this);
+        const madeCalls = calls.length;
         const diffInfo = [];
-        for (let i = 0; i < madeCalls.length; i++) {
-            const diff = differenceOf(madeCalls[i].args, args, this[Symbols.config]);
+        for (let i = 0; i < madeCalls; i++) {
+            const checked = calls[i];
+            const diff = differenceOf(checked.args, args, this[Symbols.config]);
             if (!diff) {
+                CallOrder.lastCheck = checked.order;
                 return;
             }
             diffInfo.push(diff);
@@ -598,16 +637,21 @@ const SpyFunctions = {
      * @return {string} -> The information about made calls.
      */
     showCallArguments(this: SpyInstance, additionalInformation: (string | undefined)[] = []): string {
-        const madeCalls = this[Symbols.calls];
-        if (madeCalls.length === 0) {
+        const allMadeCalls = this[Symbols.calls];
+        const madeCalls = SpyHelperFunctions.getCalls(this);
+        const earlierCalls = allMadeCalls.length - madeCalls.length;
+        const usedAdditionalInfo = new Array(earlierCalls)
+            .fill('!!! was called earlier (#enforceOrder)')
+            .concat(additionalInformation);
+        if (allMadeCalls.length === 0) {
             return `${this[Symbols.name]} was never called!\n`;
         }
         let response = '';
-        for (let i = 0; i < madeCalls.length; i++) {
-            const args = serialize(madeCalls[i].args);
-            response += `call ${i}: ${args}\n`;
-            if (additionalInformation[i]) {
-                response += `        ${additionalInformation[i]}\n`;
+        for (let i = 0; i < allMadeCalls.length; i++) {
+            const args = serialize(allMadeCalls[i].args);
+            response += `call ${i - earlierCalls}: ${args}\n`;
+            if (usedAdditionalInfo[i]) {
+                response += `        ${usedAdditionalInfo[i]}\n`;
             }
         }
         return response;
@@ -618,11 +662,12 @@ const AllCreatedSpies: Array<SpyInstance> = [];
 
 type ISpy = {
     (name?: string): SpyInstance;
-    configure(config: {
-        useOwnEquals?: boolean;
-        afterEach?: (scope: string) => void;
-        beforeEach?: (scope: string) => void;
-    }): void;
+    configure(
+        config: Partial<GeneralSpyConfig> & {
+            afterEach?: (scope: string) => void;
+            beforeEach?: (scope: string) => void;
+        }
+    ): void;
     IGNORE: Symbol;
     COMPARE: typeof COMPARE;
     MAPPER: typeof MAPPER;
@@ -637,7 +682,7 @@ type ISpy = {
 
 const _createSpy = (name: string = '', __mock?: any): SpyInstance => {
     const spy: any = function (...args: Array<any>) {
-        spy[Symbols.calls].push({ args });
+        spy[Symbols.calls].push({ args, order: ++CallOrder.Idx });
         return spy[Symbols.func](...args);
     };
     if (__mock && !__LOCK__) {
@@ -645,14 +690,14 @@ const _createSpy = (name: string = '', __mock?: any): SpyInstance => {
         spy[Symbols.name] = `the spy on '${name}'`;
         spy[Symbols.snap] = `Spy.on(${name})`;
     } else {
-        spy[Symbols.index] = null;
+        spy[Symbols.index] = 0;
         spy[Symbols.name] = name || 'the spy';
         spy[Symbols.snap] = `Spy(${name})`;
     }
     spy[Symbols.isSpy] = true;
     spy[Symbols.func] = () => {};
     spy[Symbols.calls] = [];
-    spy[Symbols.config] = { useOwnEquals: DefaultSettings.useOwnEquals };
+    spy[Symbols.config] = { ...DefaultSettings };
     Object.entries(SpyFunctions).forEach(([key, value]) => {
         spy[key] = value;
     });
@@ -693,7 +738,7 @@ const Spy: ISpy = (name?: string): SpyInstance => _createSpy(name);
  *
  * For example,
  *
- * Spy.configure({useOwnEquals: false});
+ * Spy.configure({ useOwnEquals: false });
  *
  * would initially configure every spy to not
  * favor own "equals" implementation while
@@ -704,13 +749,17 @@ const Spy: ISpy = (name?: string): SpyInstance => _createSpy(name);
  *
  * @param {Object} config <- Holds the configuration params.
  */
-Spy.configure = (config: {
-    useOwnEquals?: boolean;
-    afterEach?: (scoping: string) => void;
-    beforeEach?: (scoping: string) => void;
-}): void => {
+Spy.configure = (
+    config: Partial<GeneralSpyConfig> & {
+        afterEach?: (scoping: string) => void;
+        beforeEach?: (scoping: string) => void;
+    }
+): void => {
     if (config.useOwnEquals !== undefined) {
         DefaultSettings.useOwnEquals = config.useOwnEquals;
+    }
+    if (config.enforceOrder !== undefined) {
+        DefaultSettings.enforceOrder = config.enforceOrder;
     }
     TestSuite.configure({
         afterEach: config.afterEach,

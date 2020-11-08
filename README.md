@@ -22,7 +22,7 @@
 and other assertion frameworks.
 
 **spy4js** exports only one object called `Spy`. The spy instances
-are treated as class instances and come with a lot of useful features. See below for more.
+come with a lot of useful features. See below for more.
 
 **Hint**:
 My favorite test framework is [Jest](https://jestjs.io/). If you are using other
@@ -43,7 +43,7 @@ npm install --save-dev spy4js
 
 A spy instance can be initialized differently.
 
-```js
+```ts
 import { Spy } from 'spy4js';
 
 // initialize directly
@@ -68,15 +68,9 @@ const myModuleMocks = Spy.mockModule('./my-module', 'useMe');
 const { Calculator } = Spy.mockModule('./my/fancy/Calculator', 'Calculator');
 ```
 
-Any spy instance can be configured by overriding the default configuration. For
-example if you want to configure all spies not to favor own "equals" implementations.
-```js
-Spy.configure({useOwnEquals: false});
-```
-
 You may apply additional behaviour to every spy. The valid operations here are:
     
-  - `configure` (some external libraries may use own "equals" implementations in an unexpected way)
+  - `configure` (some external libraries may use own "equals" implementations unexpectedly)
   - `calls` (does make the spy call the provided functions sequentially)
   - `returns` (does make the spy return the provided params sequentially)
   - `throws` (does make the spy throw an error when called)
@@ -85,10 +79,10 @@ You may apply additional behaviour to every spy. The valid operations here are:
   - `reset` (resets the registered calls which were already made)
   - `restore` (does make the spy restore the mocked object)
     
-All those methods on a spy are designed in a builder pattern. So you may chain any of
-these configurations. But be aware that some behaviours override existing behaviours.
+All those methods on a spy has been designed in a builder pattern. So you may chain any of
+these configurations. Be aware some behaviours override existing behaviours.
 
-```js
+```ts
 const spy = Spy.on(someObject, 'someMethod');
 
 // configure it to use NOT own "equals" implementations
@@ -127,20 +121,20 @@ spy.reset();
 spy.restore(); // other than "transparent" does not control input and output of the mocked function anymore
 ```
 
-Even as important are the facts, we want to display:
+Even as important are the "facts", we want to display:
 
-  - `wasCalled` (does display that the spy was called a specifiable amount of times)
-  - `wasNotCalled` (does display that the spy was never called)
-  - `wasCalledWith` (does display that the spy was called at least once like with the provided params)
+  - `wasCalled` (does display that the spy has been called a specifiable amount of times)
+  - `wasNotCalled` (does display that the spy has never been called)
+  - `wasCalledWith` (does display that the spy has been called at least once like with the provided params)
   - `wasNotCalledWith` (does display that the spy was never like with the provided params)
-  - `hasCallHistory` (does display that the spy was called with the following params in the given order)
+  - `hasCallHistory` (does display that the spy has been called with the following params in the given order)
 
 Those methods on a spy display facts. Facts have to be true, otherwise they
 will throw an Exception, which displays in a formatted debug message why the
 given fact was a lie. By writing those facts in your tests, a big refactoring
 loses its scare.
 
-```js
+```ts
 const spy = Spy();
 
 spy.wasNotCalled();
@@ -165,24 +159,24 @@ spy.hasCallHistory([ [1, 'test', {attr: [4]}] ], 'with this text');
 ```
 
 There is one static method that does restore all existing spies in all tests.
-This is extremely useful to clean up all still existing mocks and also
-a very comfortable to this automatically after every test (this is done by default).
+This is extremely useful to clean up all still existing mocks. By default, this is
+automatically done after every test run (this is done by default).
     
   - `restoreAll` (does restore every existing spy)
 
-```js
+```ts
 Spy.restoreAll();
 ```
 
-And also sometimes it is necessary to have access to some of the call arguments with
-which the spy was called.
+Sometimes it is necessary to have access to some call arguments with
+which the spy had been called.
 
   - `getAllCallArguments` (returns all call arguments for all calls in an array containing arrays)
   - `getCallArguments` (returns all call arguments for a specified call in an array)
   - `getCallArgument` (same as getCallArguments, but returns only a single element of the array)
   - `getCallCount` (returns the number of made calls)
     
-```js
+```ts
 const spy = Spy();
 
 // make some calls
@@ -211,20 +205,21 @@ spy.getCallArgument(4);                 // throws same Exception
 ```
 
 The last method is `showCallArguments`. It is mostly used internally to improve the
-debug messages, but can be while you are in a console.log-mania.
+debugging messages, but can be while you are in a console.log-mania.
 
 ## Method-Details
 
 ### Constructor
-```
+```ts
 Spy(spyName:string = 'the spy') => SpyInstance
 ```
 The returned Spy instance has his own name-attribute (only) for debugging purpose.
 
 ### configure (static)
-```
+```ts
 Spy.configure(config: {
-    useOwnEquals?:boolean,
+    useOwnEquals?: boolean,
+    enforceOrder?: boolean,
     beforeEach?: (scope: string) => void,
     afterEach?: (scope: string) => void,
 }) => void
@@ -234,36 +229,37 @@ The scope param will contain the test-suite name, which was provided as first pa
 of the `describe` function.
 The configuration possibility are:
 - **useOwnEquals**: Applies for all spy instances. See [configure](#configure) for more details.
-- **beforeEach**: Let's you override the default beforeEach test suite hook.
-- **afterEach**: Let's you override the default afterEach test suite hook.
+- **enforceOrder**: Applies for all spy instances. See [configure](#configure) for more details.
+- **beforeEach**: Lets you override the default beforeEach test suite hook.
+- **afterEach**: Lets you override the default afterEach test suite hook.
 
 ### on (static)
-```
+```ts
 Spy.on(object:Object, methodName:string) => SpyInstance
 ```
 Initializing a spy on an object, simply replaces the original function by a spy and 
 stores the necessary information to be able to restore the mocked method. 
 
-If the attribute was already spied or is not a function, the Spy will throw an exception
+If the attribute has already been spied or is not a function, the Spy will throw an exception
 to avoid unexpected behaviour. You never want to spy other attributes than functions and
 for no purpose a spy should ever be spied.
 
 ### mock (static)
-```
+```ts
 Spy.mock(object:Object, ...methodNames: string[]) => Object (Mock)
 ```
 Creating an object that references spies for all given methodNames.
-Initialize as many spies as required for one and the same object. Only
+Initialize as many spies as required for the same object. Only
 after `Spy.initMocks` gets called, the created mock does affect the given object.
 
 ### mockModule (static)
-```
+```ts
 Spy.mockModule(moduleName: string, ...methodNames: string[]) => Object (Mock)
 ```
 Same as [mock](#mock) but only necessary if you want to mock exported functions.
 
 ### mockReactComponents (static)
-```
+```ts
 Spy.mockReactComponents(moduleName: string, ...methodNames: string[]) => Object (Mock)
 ```
 Same as [mockModule](#mockModule) but designed for ReactJS components. The registered
@@ -274,7 +270,7 @@ with [enzyme](https://www.npmjs.com/package/enzyme) and
 [@testing-library/react](https://testing-library.com/docs/react-testing-library/intro).
 
 ### initMocks (static)
-```
+```ts
 Spy.initMocks(scope?: string) => void
 ```
 Does initialize all global and scope-related mocks by applying spies. Mocks can be
@@ -282,7 +278,7 @@ created with [mock](#mock) or [mockModule](#mockModule). This function has not t
 be called manually, if you rely on the default test suite hooks.
 
 ### restoreAll (static)
-```
+```ts
 Spy.restoreAll() => void
 ```
 Does restore all mocked objects to their original state. See [restore](#restore) for
@@ -290,21 +286,21 @@ further information. This function has not be called manually, if you rely on
 the default test suite hooks.
 
 ### resetAll (static)
-```
+```ts
 Spy.resetAll() => void
 ```
-Does reset all existing spies. This effects even persistent spies.
-See [reset](#reset) for further information. This function has not be
+Does reset all existing spies. This applies even to persistent spies.
+See [reset](#reset) for further information. This function has not to be
 called manually in between different tests, if you rely on the default
 test suite hooks.
 
 ### IGNORE (static)
-```
+```ts
 Spy.IGNORE = $Internal Symbol$
 ```
-This object can be passed anywhere where you want the "[wasCalledWith](#wasCalledWith)"
-or "[hasCallHistory](#hasCallHistory)" to ignore that object or value for comparison.
-```js
+This object can be passed anywhere where you want the "[wasCalledWith](#wascalledwith-fact)"
+or "[hasCallHistory](#hascallhistory-fact)" to ignore that object or value for comparison.
+```ts
 spy({prop: 'value', other: 13}, 12);
 
 spy.wasCalledWith(Spy.IGNORE, 12);
@@ -312,13 +308,13 @@ spy.wasCalledWith({prop: Spy.IGNORE, other: 13}, 12);
 ```
 
 ### COMPARE (static)
-```
+```ts
 Spy.COMPARE(comparator: (arg: any) => boolean | void) => SpyComparator
 ```
-This function can be called with a custom comparator and passed anywhere where you want the "[wasCalledWith](#wasCalledWith)"
-or "[hasCallHistory](#hasCallHistory)" to apply your custom comparison. Very useful if
+This function can be called with a custom comparator and passed anywhere where you want the "[wasCalledWith](#wascalledwith-fact)"
+or "[hasCallHistory](#hasCallHistory-fact)" to apply your custom comparison. Very useful if
 the spy gets called with functions that you want to test additionally.
-```js
+```ts
 spy(() => ({ prop: 'value', other: 13 }), 12);
 
 spy.wasCalledWith(Spy.COMPARE(fn => fn().prop === 'value'), 12);
@@ -328,7 +324,7 @@ spy.wasCalledWith(Spy.COMPARE(fn => {
 ```
 
 ### MAPPER (static)
-```
+```ts
 Spy.MAPPER(from: any | any[], to: any) => SpyComparator
 ```
 This function can be called in the same places like `Spy.COMPARE`. It is not that much
@@ -336,7 +332,7 @@ customizable but provides a nice way to evaluate mapper functions. Meaning pure
 functions that return some output for given inputs. The function will be called exactly
 once for each comparison, so you can even rely on site effects you might want to test,
 if you want to use this for non-pure functions.
-```js
+```ts
 spy((value: number) => ({ prop: 'here', other: value }), 12);
 spy((value: number, num: number) => ({ prop: 'here', value, num }), 12);
 
@@ -344,15 +340,14 @@ spy.wasCalledWith(Spy.MAPPER('foo', { prop: 'here', other: 'foo' }), 12);
 spy.wasCalledWith(Spy.MAPPER(['foo', 44], { prop: 'here', value: 'foo', num: 44 }), 12);
 ```
 
-
 ### configure
-```
+```ts
 spy.configure(config: { useOwnEquals?: boolean, persistent?: boolean }) => (this) SpyInstance
 ```
 With `configure` the spy can be configured. One configuration possibility
 is to ignore any `equals` methods while comparing objects. There might be libraries which
-come with those methods, but do not support ES6 classes or anything else. By default this
-configuration is set to favor own `equals` implementations while comparing objects. 
+come with those methods, but do not support ES6 classes or anything else. By default, this
+configuration has been set to favor own `equals` implementations while comparing objects. 
 
 Another possible configuration is to make the spy persist while other spies have to restore
 when ["restoreAll"](#restoreall) was called. This spy can ONLY RESTORE the mocked object when
@@ -360,7 +355,7 @@ you configure it back to be NOT PERSISTENT. This configuration can only be appli
 spies. For Spies created with `Spy()` this configuration will throw an exception.
 
 ### calls
-```
+```ts
 spy.calls(...functions:Array<Function>) => (this) SpyInstance
 ```
 The provided functions will be called sequentially in order when the spy will be called.
@@ -368,7 +363,7 @@ Meaning `spy.calls(func1, func2, func3)` will call first `func1` then `func2` an
 of the time `func3`.
 
 ### returns
-```
+```ts
 spy.returns(...args: Array<any>) => (this) SpyInstance
 ```
 The provided arguments will be returned sequentially in order when the spy will be called.
@@ -376,7 +371,7 @@ Meaning `spy.returns(arg1, arg2, arg3)` will return first `arg1` then `arg2` and
 of the time `arg3`.
 
 ### resolves
-```
+```ts
 spy.resolves(...args: Array<any>) => (this) SpyInstance
 ```
 The provided arguments will be resolved sequentially in order when the spy will be called.
@@ -385,7 +380,7 @@ of the time `Promise.resolve(arg3)`.
 
 
 ### rejects
-```
+```ts
 spy.rejects(...args: Array<?string | Error>) => (this) SpyInstance
 ```
 The provided arguments will be rejected sequentially in order when the spy will be called.
@@ -394,31 +389,31 @@ then `Promise.reject(new Error('<SPY_NAME> was requested to throw'))` and the re
 of the time `Promise.reject(new Error('bar'))`.
 
 ### throws
-```
+```ts
 spy.throws(message: ?string | Error) => (this) SpyInstance
 ```
 Perform this on a spy to make it throw an error when called. The error message can be
-provided but a default is also implemented. If an Error instance gets passed, exactly this one will
-be thrown.
+provided, but a default has also been implemented. If an Error instance will be passed,
+exactly this one will be thrown.
 
 ### reset
-```
+```ts
 spy.reset() => (this) SpyInstance
 ```
 Does reset the registered calls on that spy.
 
 ### restore
-```
+```ts
 spy.restore() => (this) SpyInstance
 ```
 Restores the spied object, if existing, to its original state. The spy won't lose any
 other information. So it is still aware of made calls, can be plugged anywhere else
-and can still be called anywhere else. But it loses all references to the spied object.
+and can still be called anywhere else, but it loses all references to the spied object.
 
-If the spy was configured to be persistent this method will throw an error.
+If the spy has been configured persistent this method will throw an error.
 
 ### transparent
-```
+```ts
 spy.transparent() => (this) SpyInstance
 ```
 Can be useful with spies on objects. It does make the spy behave like not existing. So
@@ -426,71 +421,71 @@ the original function of the "mocked" object will be called, but the spy does re
 the call information.
 
 ### transparentAfter
-```
+```ts
 spy.transparentAfter(callCount:number) => (this) SpyInstance
 ```
 Works like [transparent](#transparent) but the spy will get transparent after called as
 often as specified. Meaning `spy.transparentAfter(num)` will not be transparent on the first
 `num` calls.
 
-### wasCalled
-```
-spy.wasCalled(callCount: number = 0) => (fact) void
+### wasCalled (fact)
+```ts
+spy.wasCalled(callCount: number = 0) => void
 ```
 This call does display a fact. So if the spy is violating the fact, it is told to throw
 an error. The provided argument does represent the registered calls on that spy.
 
-### wasNotCalled
+### wasNotCalled (fact)
+```ts
+spy.wasNotCalled() => void
 ```
-spy.wasNotCalled() => (fact) void
-```
-This fact displays that the spy was never called. Directly after the spy was [reset](#reset)ed,
+This fact displays that the spy has never been called. Directly after the spy was [reset](#reset)ed,
 this fact will be given.
 
-### wasCalledWith
+### wasCalledWith (fact)
+```ts
+spy.wasCalledWith(...args: Array<any>) => void
 ```
-spy.wasCalledWith(...args: Array<any>) => (fact) void
-```
-This fact displays that the spy was called at least once with equal arguments. 
+This fact displays that the spy has been called at least once with equal arguments. 
 
 The equality check is a deep equality check, which (by default) does consider
 own "equals" implementations.
 
 By supplying `Spy.IGNORE` anywhere inside the expected call arguments, you
-can avoid that the comparison is further executed. See [Spy.IGNORE](#IGNORE) for further information and examples.
+can avoid that the comparison will be further executed. See [Spy.IGNORE](#IGNORE) for further information and examples.
 
 The deep equality check does also recursively iterate to the first difference found and is able
 to return a string which contains valuable information about the first found difference. 
 
-If any difference was detected. The fact is broken and a helpful error message will be displayed.
+If any difference will be detected, the fact isn't true, and a helpful error message will be displayed.
 If using monospaced consoles for the output which do support new lines, there will be really
-neat output. For examples see [showCallArguments](#showcallarguments)
+neat output. For examples see [showCallArguments](#showcallarguments).
 
-### wasNotCalledWith
+### wasNotCalledWith (fact)
+```ts
+spy.wasNotCalledWith(...args: Array<any>) => void
 ```
-spy.wasNotCalledWith(...args: Array<any>) => (fact) void
-```
-This fact displays simply the opposite of [wasCalledWith](#wascalledwith).
+This fact displays simply the opposite of [wasCalledWith](#wascalledwith-fact).
 
-### hasCallHistory
+### hasCallHistory (fact)
+```ts
+spy.hasCallHistory(...callHistory: Array<Array<any> | any>) => void
 ```
-spy.hasCallHistory(...callHistory: Array<Array<any> | any>) => (fact) void
-```
-Works similar to [wasCalledWith](#wascalledwith) but instead matches each
+Works similar to [wasCalledWith](#wascalledwith-fact) but instead matches each
 call one by one in **correct order** and **correct call count**.
-ATTENTION: single argument calls can be provided without wrapping into an array. But e.g. if
-the single argument is an array itself, than you have to warp it also yourself. (Inspired by jest
+ATTENTION: single argument calls can be provided without wrapping into an array. E.g. if
+the single argument is an array itself, then you have to warp it also yourself. (Inspired by jest
 data providers)
 
 ### getAllCallArguments
-```
+```ts
 spy.getAllCallArguments() => Array<any[]>
 ```
 Returns the call arguments of all made calls to the spy.
-Especially returning an empty array if the spy was never called.
+Especially returning an empty array if the spy has never been called.
 
 ### getCallArguments
-```
+```ts
 spy.getCallArguments(callNr: number = 0) => Array<any>
 ```
 Returns the call arguments that were registered on the given call. Meaning
@@ -499,7 +494,7 @@ Returns the call arguments that were registered on the given call. Meaning
 Throws an exception if the provided (`callNr` - 1) is bigger than the made calls.
 
 ### getCallArgument
-```
+```ts
 spy.getCallArgument(callNr: number = 0, argNr: number = 0) => any
 ```
 Same as [getCallArguments](#getcallarguments) but returns only a single entry out
@@ -507,18 +502,18 @@ of the array of arguments. Most useful in situations where exactly one call para
 If `argNr` is given, it returns the (argNr + 1)'th argument of the call.
 
 ### getCallCount
-```
+```ts
 spy.getCallCount() => number
 ```
 This method simply returns the number of made calls on the spy.
 
 ### showCallArguments
-```
+```ts
 spy.showCallArguments(additionalInformation: Array<string> = []) => string
 ```
 This primarily internally used method is responsible for returning formatted informative debug
-messages when facts are broken. Let's do an example:
-```js
+messages when facts aren't true. Let's do an example:
+```ts
 const spy = Spy('my awesome spy');
 spy(42, 'test', { attr1: [1, 2, new Date(2017, 1, 20)], attr2: 1337 });
 spy(42, 'test', { attr1: [0, 2, new Date(2017, 1, 20)], attr2: 1336 });
@@ -527,7 +522,7 @@ spy(42, 'tes', { attr1: [1, 2, new Date(2017, 1, 20)], attr2: 1336 });
 spy(42, 'test');
 ```
 The following broken fact...
-```js
+```ts
 spy.wasCalledWith(42, 'test', {attr1: [1, 2, new Date(2017, 1, 20)], attr2: 1336});
 ```
 ...would produce the following error output:
@@ -564,11 +559,63 @@ its attribute `attr2` because there was a different number.
 While recursively traversing down in the deep equality check, the object keys will be reported.
 Meaning that `2` is representing the index of the array. So for example if you want to grep the
 different objects you could:
-```js
+```ts
 const callArgs = spy.getCallArguments(0/* for the 0'th call above*/);
 const differentNumber = callArgs[2]['attr2'];
 ```
-  
+
+## 
+Or you want to opt-in into the enforce-order mode. Which might become the default in some
+future version but will need first further evaluation.
+```ts
+Spy.configure({ enforceOrder: true });
+```
+This mode enforces that the "facts" will be called in the correct order.
+```ts
+// success
+spy1();
+spy2();
+spy1.wasCalled();
+spy2.wasCalled();
+
+// error
+spy1();
+spy2();
+spy2.wasCalled();
+spy1.wasCalled(); // would fail here because spy1 wasn't called after spy2 was called
+```
+Be aware "facts" that you might need to get used to it, because the following would be valid, too.
+```ts
+// success
+spy();
+spy.wasCalled();
+spy.wasNotCalled();
+
+// error
+spy();
+spy.wasCalled();
+spy.wasCalled(); // would fail here because we already checked that the spy was called
+```
+Nevertheless, this mode should make your tests more readable and clear, because you can avoid
+checking the same things on and on again or resetting the spies in tests. Another example:
+```ts
+const mock_WS = Spy.mock(WS, 'fetchData', 'fetchFallback');
+
+it('fetches fallback data if fetching data does not work', async () => {
+    // given
+    const dummyData = Symbol('dummyData'); 
+    mock_WS.fetchData.rejects('ups');
+    mock_WS.fetchFallback.resolves(dummyData);
+
+    // when
+    expect(await MyService.fetchAppData({ filtered: true })).toBe(dummyData);
+
+    // then
+    mock_WS.fetchData.hasCallHistory({ filtered: true }, { filtered: true, retry: true });
+    mock_WS.fetchFallback.wasCalledWith({ filtered: true, reason: 'ups' });
+});
+```
+
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: https://github.com/fdc-viktor-luft/form4react/blob/master/LICENSE
 [build-image]: https://img.shields.io/travis/fdc-viktor-luft/spy4js/master.svg?style=flat-square

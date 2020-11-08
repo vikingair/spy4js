@@ -4,7 +4,7 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
-import { Spy } from '../src/spy';
+import { Spy, SpyInstance } from '../src/spy';
 
 describe('Spy - Utils', () => {
     class CustomError extends Error {
@@ -260,18 +260,33 @@ describe('Spy - Utils', () => {
         expect(spy.getCallCount()).toEqual(1);
     });
 
-    it('should return call arguments in an appropriate display string', () => {
+    it('showCallArguments: with diff info', () => {
         const spy = Spy();
-        spy.wasNotCalled();
-        spy({ _key: 'myTestArguments' });
-        spy({ _key: 'someOtherArguments' }, 42);
-        const displayString = spy.showCallArguments();
-        expect(displayString.indexOf('myTestArguments')).not.toBe(-1);
-        expect(displayString.indexOf('someOtherArguments')).not.toBe(-1);
-        expect(displayString.indexOf('42')).not.toBe(-1);
+        spy('foo');
+        spy('bar', 42);
+        spy('test');
+        expect(spy.showCallArguments([' -> ??? <- ', '\t no way'])).toMatchInlineSnapshot(`
+            "call 0: ['foo']
+                     -> ??? <- 
+            call 1: ['bar', 42]
+                    	 no way
+            call 2: ['test']
+            "
+        `);
     });
 
-    it('shows that the spy was not called if this is the fact', () => {
+    it('showCallArguments: without diff info', () => {
+        const spy = Spy();
+        spy({ _key: 'myTestArguments' });
+        spy({ _key: 'someOtherArguments' }, 42);
+        expect(spy.showCallArguments()).toMatchInlineSnapshot(`
+            "call 0: [{_key: 'myTestArguments'}]
+            call 1: [{_key: 'someOtherArguments'}, 42]
+            "
+        `);
+    });
+
+    it('showCallArguments: without calls', () => {
         const spy = Spy();
         expect(spy.showCallArguments()).toBe('the spy was never called!\n');
     });
@@ -573,9 +588,16 @@ describe('Spy - Utils', () => {
         spy.wasCalledWith('test4');
     });
 
+    it('"hasCallHistory" throws if used for checking "wasNotCalled"', () => {
+        const spy = Spy();
+        expect(() => spy.hasCallHistory()).toThrow(/Please use 'wasNotCalled'/);
+        spy('foo');
+        expect(() => spy.hasCallHistory()).toThrow(/the spy was called 1 time/);
+    });
+
     it('checks the call history', () => {
         const testObject = { someFunc: errorThrower };
-        const spy: any = Spy.on(testObject, 'someFunc');
+        const spy = Spy.on(testObject, 'someFunc');
         testObject.someFunc('test1', 42);
         testObject.someFunc();
         testObject.someFunc('test3');
@@ -600,7 +622,7 @@ describe('Spy - Utils', () => {
 
     it('should do nothing after for transparent restored spy', () => {
         const testObject = { someFunc: errorThrower };
-        const spy: any = Spy.on(testObject, 'someFunc').transparentAfter(3);
+        const spy = Spy.on(testObject, 'someFunc').transparentAfter(3);
         testObject.someFunc('test1', 42);
         testObject.someFunc();
         testObject.someFunc();
@@ -692,7 +714,7 @@ describe('Spy - Utils', () => {
         reconfiguredSpy1(testInstance1);
         testObj3.func3(testInstance1);
 
-        const wasCalledChecksForOwnEquals = (spy: any) => {
+        const wasCalledChecksForOwnEquals = (spy: SpyInstance) => {
             // default config
             spy.wasCalledWith(testInstance1);
             spy.wasCalledWith(testInstance2);
@@ -700,7 +722,7 @@ describe('Spy - Utils', () => {
             spy.wasNotCalledWith(testInstance4);
         };
 
-        const wasCalledChecksForNotOwnEquals = (spy: any) => {
+        const wasCalledChecksForNotOwnEquals = (spy: SpyInstance) => {
             // after configuration
             spy.wasCalledWith(testInstance1);
             spy.wasCalledWith(testInstance2);
