@@ -95,7 +95,7 @@ export class SpyRegistry {
      *                   BUT: Usually this method returns a function or
      *                        undefined.
      */
-    getOriginalMethod(index: number): Function | undefined {
+    getOriginalMethod(index: number): Function | void {
         const entry = this.register[index];
         if (entry) {
             return entry.method;

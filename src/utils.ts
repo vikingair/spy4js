@@ -19,7 +19,7 @@ class SpyComparator {
     constructor(comparator: ComparatorOrMapper) {
         this._func = comparator;
     }
-    compare(arg: any): string[] | undefined {
+    compare(arg: any): string[] | void {
         const result = this._func(arg);
         if (typeof result === 'string') return [`${SPY_MAPPER_FAILED} [${result}]`];
         if (result === false) return [SPY_COMPARE_FAILED];
@@ -53,8 +53,6 @@ const __different = (type: string) => ['different ' + type];
  *
  * @param {any} a <- any param.
  * @param {any} b <- any param to compare with the first param.
- * @param {boolean} initial <- is responsible for result
- *                             string building for deep equal checks.
  * @param {boolean} useOwnEquals <-  enables/disables the usage
  *                                   of own "equals" implementations.
  * @param {Array<any>} alreadyComparedArray
@@ -66,13 +64,7 @@ const __different = (type: string) => ['different ' + type];
  * @return {string|void} <- information about the difference
  *                           of the provided arguments.
  */
-const __diff = (
-    a: any,
-    b: any,
-    initial: boolean,
-    useOwnEquals: boolean,
-    alreadyComparedArray: Array<any> = []
-): string[] | undefined => {
+const __diff = (a: any, b: any, useOwnEquals: boolean, alreadyComparedArray: Array<any> = []): string[] | void => {
     if (a === IGNORE || b === IGNORE) return;
     if (a instanceof SpyComparator) return a.compare(b);
     if (b instanceof SpyComparator) return b.compare(a);
@@ -137,7 +129,7 @@ const __diff = (
     const compared = [...alreadyComparedArray, a];
     const keys = Array.from(new Set(Object.keys(a).concat(Object.keys(b))));
     for (const key of keys) {
-        const diff = __diff(a[key], b[key], false, useOwnEquals, compared);
+        const diff = __diff(a[key], b[key], useOwnEquals, compared);
         if (diff !== undefined) {
             return [key, ...diff];
         }
@@ -197,7 +189,7 @@ const differenceOf = (
     b: any,
     config: { useOwnEquals: boolean } = { useOwnEquals: true }
 ): string | undefined => {
-    const diff = __diff(a, b, true, config.useOwnEquals);
+    const diff = __diff(a, b, config.useOwnEquals);
     if (!diff) return;
     const diffStr = __diffToStr(diff);
     if (diff.length < 2) return diffStr;

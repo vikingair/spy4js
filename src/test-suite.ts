@@ -52,7 +52,7 @@ const addSnapshotSerializer = (serializer: any) => {
 
 const __caller = (stackNum: number) => {
     const traceFn = Error.prepareStackTrace;
-    Error.prepareStackTrace = (err, stack) => stack;
+    Error.prepareStackTrace = (_error, stack) => stack;
     const stack = new Error().stack as any;
     Error.prepareStackTrace = traceFn;
     // it highly depends from were the functionality will be called

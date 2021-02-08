@@ -630,7 +630,7 @@ it('fetches fallback data if fetching data does not work', async () => {
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: https://github.com/fdc-viktor-luft/form4react/blob/master/LICENSE
 [build-image]: https://img.shields.io/travis/fdc-viktor-luft/spy4js/master.svg?style=flat-square
-[build-url]: https://travis-ci.org/fdc-viktor-luft/spy4js
+[build-url]: https://travis-ci.com/fdc-viktor-luft/spy4js
 [npm-image]: https://img.shields.io/npm/v/spy4js.svg?style=flat-square
 [npm-url]: https://www.npmjs.org/package/spy4js
 [coveralls-image]: https://coveralls.io/repos/github/fdc-viktor-luft/spy4js/badge.svg?branch=master
