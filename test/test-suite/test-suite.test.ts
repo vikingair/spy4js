@@ -37,4 +37,9 @@ describe('TestSuite - with added counters', () => {
 describe('TestSuite - another one', () => {
     expect(counters.beforeEach).toBe(0); // notice this
     expect(counters.afterEach).toBe(0); //  --> jest executes first all describes and then applies hooks to each test
+
+    it('test 1', () => {
+        expect(counters.beforeEach).toBe(3);
+        expect(counters.afterEach).toBe(2);
+    });
 });

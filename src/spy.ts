@@ -224,8 +224,8 @@ const SpyFunctions = {
      */
     rejects(this: SpyInstance, ...msgOrErrors: Array<OptionalMessageOrError>): SpyInstance {
         return this.calls(
-            ...(msgOrErrors.length ? msgOrErrors : [undefined]).map((msgOrError) => () =>
-                Promise.reject(toError(msgOrError, this[Symbols.name]))
+            ...(msgOrErrors.length ? msgOrErrors : [undefined]).map(
+                (msgOrError) => () => Promise.reject(toError(msgOrError, this[Symbols.name]))
             )
         );
     },

@@ -28,7 +28,7 @@ describe('TestSuite - with added custom hooks', () => {
         counters.beforeEach = counters.beforeEach * 3; // will be applied right after the configured beforeEach
     });
     afterEach(() => {
-        counters.afterEach = counters.afterEach * 7; // will be applied right before the configured afterEach
+        counters.afterEach = counters.afterEach * 7; // will be applied right after the configured afterEach
     });
     it('test 1', () => {
         expect(counters.beforeEach).toBe(3); // first hook 0 + 1 --> 1, second hook 1 * 3 --> 3
@@ -36,10 +36,10 @@ describe('TestSuite - with added custom hooks', () => {
     });
     it('test 2', () => {
         expect(counters.beforeEach).toBe(12); // first hook 3 + 1 --> 4, second hook 4 * 3 --> 12
-        expect(counters.afterEach).toBe(1); // first hook 0 * 7 --> 0, second hook 0 + 1 --> 1
+        expect(counters.afterEach).toBe(7); // first hook 0 + 1 --> 1, second hook 1 * 7 --> 7
     });
     it('test 3', () => {
         expect(counters.beforeEach).toBe(39); // first hook 12 + 1 --> 13, second hook 13 * 3 --> 39
-        expect(counters.afterEach).toBe(8); // first hook 1 * 7 --> 7, second hook 7 + 1 --> 8
+        expect(counters.afterEach).toBe(56); // first hook 7 + 1 --> 8, second hook 8 * 7 --> 56
     });
 });
