@@ -665,7 +665,7 @@ describe('Spy - Utils', () => {
     const testInstance3 = new TestClass(4);
     const testInstance4 = new TestClass(5);
 
-    it('should use own "equals" implementations as default, but is able to reconfigure this behaviour', () => {
+    it('should use own "equals" implementations as default, but is able to reconfigure this behavior', () => {
         const spy = Spy();
 
         spy(testInstance1);
@@ -685,14 +685,14 @@ describe('Spy - Utils', () => {
         spy.wasNotCalledWith(testInstance4);
     });
 
-    it('does override the default behaviour for the use of own "equals" implementations. ', () => {
+    it('does override the default behavior for the use of own "equals" implementations. ', () => {
         const testObj1 = { func1: noop };
         const testObj2 = { func2: noop };
         const testObj3 = { func3: noop };
         // still the initial default config
         const defaultSpy1 = Spy('defaultSpy1');
         // using configure without the "useOwnEquals"-config
-        // does not effect the behaviour
+        // does not effect the behavior
         Spy.configure({});
         const defaultSpy2 = Spy.on(testObj1, 'func1');
 

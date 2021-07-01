@@ -13,7 +13,7 @@ describe('Spy - Test-Suite', () => {
     let data = {} as { foo?: string };
     let persistentSpy = Spy('persistentSpy');
 
-    // the latest moment you might reconfigure the behaviour of
+    // the latest moment you might reconfigure the behavior of
     // the applied test suite hooks is within a describe hook.
     // But you shouldn't because it affects also other describe-blocks
     Spy.configure({

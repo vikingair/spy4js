@@ -27,7 +27,7 @@ come with a lot of useful features. See below for more.
 **Hint**:
 My favorite test framework is [Jest](https://jestjs.io/). If you are using other
 frameworks you might get issues related to automatically applied test suite hooks.
-To overcome this default behaviour see [here](#configure-static). Since Jest already
+To overcome this default behavior see [here](#configure-static). Since Jest already
 includes excellent spies itself, you might ask yourself, why `spy4js`. Because it's better.
 
 Advantages over Jest spies:
@@ -79,7 +79,7 @@ const myModuleMocks = Spy.mockModule('./my-module', 'useMe');
 const { Calculator } = Spy.mockModule('./my/fancy/Calculator', 'Calculator');
 ```
 
-You may apply additional behaviour to every spy. The valid operations here are:
+You may apply additional behavior to every spy. The valid operations here are:
     
   - `configure` (some external libraries may use own "equals" implementations unexpectedly)
   - `calls` (does make the spy call the provided functions sequentially)
@@ -91,7 +91,7 @@ You may apply additional behaviour to every spy. The valid operations here are:
   - `restore` (does make the spy restore the mocked object)
     
 All those methods on a spy has been designed in a builder pattern. So you may chain any of
-these configurations. Be aware some behaviours override existing behaviours.
+these configurations. Be aware some behaviors override existing behaviors.
 
 ```ts
 const spy = Spy.on(someObject, 'someMethod');
@@ -120,7 +120,7 @@ someObject.someMethod(arg); // throws new Error('throw this')
 spy.calls(() => new Date()).transparentAfter(2);
 someObject.someMethod(arg); // returns new Date()
 someObject.someMethod(arg1, arg2); // returns new(er) Date()
-someObject.someMethod(arg); // returns someObject.someMethod(arg) // sticks to this behaviour
+someObject.someMethod(arg); // returns someObject.someMethod(arg) // sticks to this behavior
 
 // make it immediatly transparent
 spy.transparent();
@@ -235,7 +235,7 @@ Spy.configure(config: {
     afterEach?: (scope: string) => void,
 }) => void
 ```
-Using this function you may edit the default behaviour spy4js itself.
+Using this function you may edit the default behavior spy4js itself.
 The scope param will contain the test-suite name, which was provided as first parameter
 of the `describe` function.
 The configuration possibility are:
@@ -252,7 +252,7 @@ Initializing a spy on an object, simply replaces the original function by a spy 
 stores the necessary information to be able to restore the mocked method. 
 
 If the attribute has already been spied or is not a function, the Spy will throw an exception
-to avoid unexpected behaviour. You never want to spy other attributes than functions and
+to avoid unexpected behavior. You never want to spy other attributes than functions and
 for no purpose a spy should ever be spied.
 
 ### mock (static)

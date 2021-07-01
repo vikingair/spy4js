@@ -47,7 +47,7 @@ const Symbols = {
 } as const;
 
 /**
- * Very jest specific snapshot serialization behaviour.
+ * Very jest specific snapshot serialization behavior.
  *
  * Hint: We are casting here anything to any, because not all users might
  * have typed those functions correctly and should not see flow errors
@@ -115,7 +115,7 @@ const SpyHelperFunctions = {
 
 const SpyFunctions = {
     /**
-     * Configures this spy behaviour in a special
+     * Configures this spy behavior in a special
      * way. Passing in an object that contains
      * meaningful attributes can configure:
      *
@@ -260,7 +260,7 @@ const SpyFunctions = {
      * and removes this special mock.
      *
      * Restoring objects does not disable any
-     * other behaviours/features of the spies.
+     * other behaviors/features of the spies.
      *
      * If the spy was configured persistent, than this
      * method will throw an exception.
@@ -731,7 +731,7 @@ const Spy: ISpy = (name?: string): SpyInstance => _createSpy(name);
 
 /**
  * This static method can be used to configure
- * the default behaviour of created spy instances.
+ * the default behavior of created spy instances.
  * The most suited place where you could configure
  * spy4js is the "setupTests"-File, which runs
  * before each test suite.
@@ -805,7 +805,7 @@ Spy.MAPPER = MAPPER;
  * - The attribute to spy should not be spied already.
  *
  * If the upper conditions are not fulfilled, this
- * method will throw to avoid unexpected behaviour.
+ * method will throw to avoid unexpected behavior.
  *
  * @param {Object} obj -> The manipulated object.
  * @param {string} methodName -> The mocked attributes name.
@@ -866,7 +866,7 @@ Spy.mock = <T, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyI
 
 /**
  * This static method enables you to create mocks on module scope.
- * As long as jest will support this behaviour, the Spy will too. If
+ * As long as jest will support this behavior, the Spy will too. If
  * you are calling this function on other test runners you will
  * encounter an exception. You should favor to use "Spy.mock" but there
  * might be reasons that this will not work. E.g. if you want to mock
@@ -936,7 +936,7 @@ Spy.initMocks = (scope?: string): void => {
  * all mocks.
  *
  * Restoring objects does not disable any
- * other behaviours/features of the spies.
+ * other behaviors/features of the spies.
  *
  * Usually it should get called within one "afterEach"-Hook.
  */
