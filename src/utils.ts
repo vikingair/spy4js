@@ -19,10 +19,11 @@ class SpyComparator {
     constructor(comparator: ComparatorOrMapper) {
         this._func = comparator;
     }
-    compare(arg: any): string[] | void {
+    compare(arg: any): string[] | undefined {
         const result = this._func(arg);
         if (typeof result === 'string') return [`${SPY_MAPPER_FAILED} [${result}]`];
         if (result === false) return [SPY_COMPARE_FAILED];
+        return undefined;
     }
 }
 /**
@@ -64,11 +65,11 @@ const __different = (type: string) => ['different ' + type];
  * @return {string|void} <- information about the difference
  *                           of the provided arguments.
  */
-const __diff = (a: any, b: any, useOwnEquals: boolean, alreadyComparedArray: Array<any> = []): string[] | void => {
-    if (a === IGNORE || b === IGNORE) return;
+const __diff = (a: any, b: any, useOwnEquals: boolean, alreadyComparedArray: Array<any> = []): string[] | undefined => {
+    if (a === IGNORE || b === IGNORE) return undefined;
     if (a instanceof SpyComparator) return a.compare(b);
     if (b instanceof SpyComparator) return b.compare(a);
-    if (a === b) return;
+    if (a === b) return undefined;
     if (a === undefined || b === undefined) return ['one was undefined'];
     if (a === null || b === null) return ['one was null'];
     const aClass = Object.prototype.toString.call(a);
@@ -77,7 +78,7 @@ const __diff = (a: any, b: any, useOwnEquals: boolean, alreadyComparedArray: Arr
     switch (aClass) {
         case '[object RegExp]':
             if (String(a) === String(b)) {
-                return;
+                return undefined;
             }
             return __different('regexp');
         case '[object String]':
@@ -88,14 +89,14 @@ const __diff = (a: any, b: any, useOwnEquals: boolean, alreadyComparedArray: Arr
             return __different('async function');
         case '[object Number]':
             if (isNaN(a) && isNaN(b)) {
-                return;
+                return undefined;
             }
             return __different('number');
         case '[object BigInt]':
             return __different('BigInt');
         case '[object Date]':
             if (Number(a) === Number(b)) {
-                return;
+                return undefined;
             }
             return __different('date');
         case '[object Boolean]':
@@ -104,7 +105,7 @@ const __diff = (a: any, b: any, useOwnEquals: boolean, alreadyComparedArray: Arr
             return __different('symbols');
         case '[object Error]':
             if (String(a) === String(b)) {
-                return;
+                return undefined;
             }
             return __different('error');
         default:
@@ -114,7 +115,7 @@ const __diff = (a: any, b: any, useOwnEquals: boolean, alreadyComparedArray: Arr
     }
     if (useOwnEquals && a.equals instanceof Function) {
         if (a.equals(b)) {
-            return;
+            return undefined;
         }
         return [
             'own equals method failed <- ' +
@@ -124,7 +125,7 @@ const __diff = (a: any, b: any, useOwnEquals: boolean, alreadyComparedArray: Arr
         ];
     }
     if (alreadyComparedArray.indexOf(a) !== -1) {
-        return;
+        return undefined;
     }
     const compared = [...alreadyComparedArray, a];
     const keys = Array.from(new Set(Object.keys(a).concat(Object.keys(b))));
@@ -134,6 +135,7 @@ const __diff = (a: any, b: any, useOwnEquals: boolean, alreadyComparedArray: Arr
             return [key, ...diff];
         }
     }
+    return undefined;
 };
 
 const __serializeDifferentProp = (obj: any, diff: string[]): string => {
@@ -190,7 +192,7 @@ const differenceOf = (
     config: { useOwnEquals: boolean } = { useOwnEquals: true }
 ): string | undefined => {
     const diff = __diff(a, b, config.useOwnEquals);
-    if (!diff) return;
+    if (!diff) return undefined;
     const diffStr = __diffToStr(diff);
     if (diff.length < 2) return diffStr;
     const diffProp1 = __serializeDifferentProp(a, diff);
