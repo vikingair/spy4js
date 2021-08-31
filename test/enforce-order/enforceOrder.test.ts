@@ -88,7 +88,7 @@ describe('enforceOrder', () => {
         try {
             spy.wasCalled(3);
         } catch (e) {
-            expect(e.message).toMatchInlineSnapshot(`
+            expect((e as Error).message).toMatchInlineSnapshot(`
                 "
 
                 the spy was called 2 times, but there were expected 3 calls.
@@ -106,7 +106,7 @@ describe('enforceOrder', () => {
         try {
             spy.wasCalledWith('foo');
         } catch (e) {
-            expect(e.message).toMatchInlineSnapshot(`
+            expect((e as Error).message).toMatchInlineSnapshot(`
                 "
 
                 the spy was considered to be called with the following arguments:
@@ -128,7 +128,7 @@ describe('enforceOrder', () => {
         try {
             spy.hasCallHistory('foo', 'test');
         } catch (e) {
-            expect(e.message).toMatchInlineSnapshot(`
+            expect((e as Error).message).toMatchInlineSnapshot(`
                 "
 
                 the spy was considered to be called with the following arguments in the given order:
@@ -150,7 +150,7 @@ describe('enforceOrder', () => {
         try {
             spy.wasNotCalled();
         } catch (e) {
-            expect(e.message).toMatchInlineSnapshot(`
+            expect((e as Error).message).toMatchInlineSnapshot(`
                 "
 
                 the spy was not considered to be called, but was called 2 times.
@@ -168,7 +168,7 @@ describe('enforceOrder', () => {
         try {
             spy.wasNotCalledWith('test');
         } catch (e) {
-            expect(e.message).toMatchInlineSnapshot(`
+            expect((e as Error).message).toMatchInlineSnapshot(`
                 "
 
                 the spy was called unexpectedly with the following arguments:

@@ -52,7 +52,7 @@ const initMock = ({ mocked, mock, scope, returns }: MockInfo, spyOn: SpyOn): voi
         try {
             mock[method as keyof typeof mock] = spyOn(mocked, method as keyof typeof mock).returns(returns);
         } catch (e) {
-            throw couldNotInitError(scope, e.message);
+            throw couldNotInitError(scope, (e as Error).message);
         }
     });
 };
