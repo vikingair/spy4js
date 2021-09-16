@@ -1,7 +1,5 @@
 import { Spy } from '../../src/spy';
 import { TestSuite } from '../../src/test-suite';
-// @ts-ignore
-import { buildExternalHelpers } from '@babel/core';
 
 TestSuite.configure({
     beforeEach: () => {},
