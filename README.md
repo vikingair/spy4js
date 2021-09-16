@@ -85,6 +85,8 @@ You may apply additional behavior to every spy. The valid operations here are:
   - `calls` (does make the spy call the provided functions sequentially)
   - `returns` (does make the spy return the provided params sequentially)
   - `throws` (does make the spy throw an error when called)
+  - `resolves` (does make the spy resolve the provided params sequentially) #Promise
+  - `rejects` (does make the spy reject an error when called) #Promise
   - `transparent` (does make the spy call the original method of a mocked object)
   - `transparentAfter` (does make the spy call the original method of a mocked object after a certain amount of made calls)
   - `reset` (resets the registered calls which were already made)
@@ -540,7 +542,7 @@ spy.wasCalledWith(42, 'test', {attr1: [1, 2, new Date(2017, 1, 20)], attr2: 1336
 ```
 Error: 
 
-my awesome spy was considered to be called with the following arguments:
+my awesome spy was expected to be called with the following arguments:
 
     --> [42, 'test', {attr1: [1, 2, new Date(1487545200000)], attr2: 1336}]
 

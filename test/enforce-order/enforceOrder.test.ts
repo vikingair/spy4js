@@ -109,7 +109,7 @@ describe('enforceOrder', () => {
             expect((e as Error).message).toMatchInlineSnapshot(`
                 "
 
-                the spy was considered to be called with the following arguments:
+                the spy was expected to be called with the following arguments:
 
                     --> ['foo']
 
@@ -131,7 +131,7 @@ describe('enforceOrder', () => {
             expect((e as Error).message).toMatchInlineSnapshot(`
                 "
 
-                the spy was considered to be called with the following arguments in the given order:
+                the spy was expected to be called with the following arguments in the given order:
 
                 call 0: ['foo']
                 call 1: ['test']
@@ -153,7 +153,7 @@ describe('enforceOrder', () => {
             expect((e as Error).message).toMatchInlineSnapshot(`
                 "
 
-                the spy was not considered to be called, but was called 2 times.
+                the spy was not expected to be called, but was called 2 times.
 
                 Actually there were:
 

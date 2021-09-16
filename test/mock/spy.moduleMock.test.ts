@@ -2,6 +2,8 @@ import { differenceOf } from '../../src/utils';
 import { Spy } from '../../src/spy';
 import { serialize } from '../../src/serializer';
 import { watch } from 'rollup';
+// @ts-ignore
+import { buildExternalHelpers } from '@babel/core';
 
 describe('Spy.mockModule', () => {
     const Mock$Utils = Spy.mockModule('../../src/utils', 'differenceOf', 'toError');
@@ -39,5 +41,16 @@ describe('Spy.mockReactComponents', () => {
     it('does something', () => {
         expect(watch({ watch: false })).toBe(null);
         Mock$Rollup.watch.wasCalledWith({ watch: false });
+    });
+});
+
+jest.mock('@babel/core');
+describe('Spy.mockModule - with only getter property', () => {
+    const Mock$BabelCore = Spy.mockModule('@babel/core', 'buildExternalHelpers');
+
+    it('replaces the function by our spy', () => {
+        expect(buildExternalHelpers).toBe(Mock$BabelCore.buildExternalHelpers);
+        expect(buildExternalHelpers('foo')).toBe(undefined);
+        Mock$BabelCore.buildExternalHelpers.wasCalledWith('foo');
     });
 });

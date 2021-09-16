@@ -417,7 +417,7 @@ const SpyFunctions = {
         });
         if (hasErrors)
             throw new Error(
-                `\n\n${this[Symbols.name]} was considered` +
+                `\n\n${this[Symbols.name]} was expected` +
                     ' to be called with the following arguments in the given order:\n\n' +
                     `${modifiedCallHistory
                         .map((entry, index) => `call ${index}: ${serialize(entry)}`)
@@ -438,7 +438,7 @@ const SpyFunctions = {
         const madeCalls = calls.length;
         if (madeCalls !== 0) {
             throw new Error(
-                `\n\n${this[Symbols.name]} was not considered to be called, but was called ${madeCalls} times.\n\n` +
+                `\n\n${this[Symbols.name]} was not expected to be called, but was called ${madeCalls} times.\n\n` +
                     'Actually there were:\n\n' +
                     this.showCallArguments()
             );
@@ -475,7 +475,7 @@ const SpyFunctions = {
             diffInfo.push(diff);
         }
         throw new Error(
-            `\n\n${this[Symbols.name]} was considered` +
+            `\n\n${this[Symbols.name]} was expected` +
                 ' to be called with the following arguments:\n\n' +
                 `    --> ${serialize(args)}\n\n` +
                 'Actually there were:\n\n' +

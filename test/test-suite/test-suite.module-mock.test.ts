@@ -1,5 +1,5 @@
-import { _testSuite } from '../../src/test-suite';
 import { Spy } from '../../src/spy';
+import { Env } from '../../src/env';
 
 describe('Spy.mockModule', () => {
     it('throws if specified node module cannot be found', () => {
@@ -11,7 +11,7 @@ describe('Spy.mockModule', () => {
     });
 
     it('throws if no CommonJS is used', () => {
-        _testSuite.isCJS = false;
+        Env.isCJS = false;
 
         expect(() => Spy.mockModule('foo', 'bar')).toThrow(
             'spy4js: Mocking a module only works if your test runner executes with CommonJS'

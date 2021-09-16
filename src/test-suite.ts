@@ -7,6 +7,7 @@
 
 import { setScope, createMock } from './mock';
 import { SpyInstance } from './spy';
+import { Env } from './env';
 
 // 'path' and 'fs' have to be lazy loaded because we first need to validate
 // if the CommonJS context is used by the test runner.
@@ -14,18 +15,12 @@ const pathDirname = (p: string) => require('path').dirname(p);
 const pathJoin = (...p: string[]) => require('path').join(...p);
 const fsExistsSync = (p: string) => require('fs').existsSync(p);
 
-// we have to cheat here flow since it might be the case that "jest" was not
-// configured correctly or the jest test runner might not even be present
-// $FlowFixMe
-export const _testSuite = { isJest: !!jest, isCJS: !!require };
-
 type Scope = string;
 type Runner = { afterEach?: (scope: Scope) => void; beforeEach?: (scope: Scope) => void };
 const runner: Runner = {};
 
 const oldDescribe = describe;
 
-// eslint-disable-next-line
 const newDescribe: jest.Describe = (name, suite) => {
     oldDescribe(name, () => {
         const scoping = String(name);
@@ -53,7 +48,7 @@ const configure = (other: Runner): void => {
 };
 
 const addSnapshotSerializer = (serializer: any) => {
-    _testSuite.isJest && expect && expect.addSnapshotSerializer && expect.addSnapshotSerializer(serializer);
+    Env.isJest && expect && expect.addSnapshotSerializer && expect.addSnapshotSerializer(serializer);
 };
 
 // 1. Spy.createMock in some test
@@ -106,18 +101,14 @@ const createModuleMock = <K extends string>(
     names: K[],
     returns?: any
 ): { [P in K]: SpyInstance } => {
-    if (!_testSuite.isCJS)
-        throw new Error('spy4js: Mocking a module only works if your test runner executes with CommonJS');
+    if (!Env.isCJS) throw new Error('spy4js: Mocking a module only works if your test runner executes with CommonJS');
 
     const isNodeModule = moduleName.indexOf('.') !== 0 && moduleName.indexOf('/') !== 0;
+    const modulePath = isNodeModule ? __getNodeModulePath(moduleName) : __getAbsolutePath(moduleName);
 
     // now we are free to use "require('path')" to calculate the correct
     // module path for the mocking.
-    return createMock(
-        require(isNodeModule ? __getNodeModulePath(moduleName) : __getAbsolutePath(moduleName)),
-        names,
-        returns
-    );
+    return createMock(require(modulePath), names, returns, moduleName);
 };
 
 export const TestSuite = { addSnapshotSerializer, createModuleMock, configure };

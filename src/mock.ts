@@ -4,6 +4,7 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
+import { Env } from './env';
 
 // returns a spy instance
 type SpyOn = (obj: Object, method: keyof typeof obj) => any;
@@ -12,7 +13,7 @@ const uninitialized = (method: keyof any) => () => {
     throw new Error(`Method '${String(method)}' was not initialized on Mock.`);
 };
 
-type MockInfo = { mock: Object; mocked: Object; scope: string; returns?: any };
+type MockInfo = { mock: Object; mocked: Object; scope: string; returns?: any; moduleName?: string };
 type MockScope = MockInfo[];
 
 export const defaultScope: string = Symbol('__Spy_global__') as any;
@@ -26,14 +27,19 @@ export const setScope = (scoping?: string): void => {
     } else scope = defaultScope;
 };
 
-const registerMock = (mocked: Object, returns?: any) => {
+const registerMock = (mocked: Object, returns?: any, moduleName?: string) => {
     const mock = {};
-    _mocks[scope].push({ mocked, mock, scope, returns });
+    _mocks[scope].push({ mocked, mock, scope, returns, moduleName });
     return mock;
 };
 
-export const createMock = <T, K extends keyof T>(obj: T, methods: K[], returns?: any): { [P in K]: any } => {
-    const mock = registerMock(obj, returns) as { [P in K]: any };
+export const createMock = <T, K extends keyof T>(
+    obj: T,
+    methods: K[],
+    returns?: any,
+    moduleName?: string
+): { [P in K]: any } => {
+    const mock = registerMock(obj, returns, moduleName) as { [P in K]: any };
     methods.forEach((method) => {
         mock[method] = uninitialized(method);
     });
@@ -47,12 +53,26 @@ const couldNotInitError = (scope: string, additional: string) =>
         }, because:\n${additional}`
     );
 
-const initMock = ({ mocked, mock, scope, returns }: MockInfo, spyOn: SpyOn): void => {
+const initMock = ({ mocked, mock, scope, returns, moduleName }: MockInfo, spyOn: SpyOn): void => {
     Object.keys(mock).forEach((method) => {
         try {
             mock[method as keyof typeof mock] = spyOn(mocked, method as keyof typeof mock).returns(returns);
         } catch (e) {
-            throw couldNotInitError(scope, (e as Error).message);
+            let msg = (e as Error).message;
+            if (Env.isJest && msg.includes('has only a getter')) {
+                msg += `
+Inserting a jest module mock might resolve this problem. Put this outside of the "describe":
+
+jest.mock('${moduleName}');
+
+Or if you don't want to mock everything from this module, you can use this:
+
+jest.mock('${moduleName}', () => ({
+    ...jest.requireActual('${moduleName}'),
+    '${method}': () => {},
+}));`;
+            }
+            throw couldNotInitError(scope, msg);
         }
     });
 };

@@ -176,7 +176,7 @@ describe('Spy - Utils', () => {
         spy.wasNotCalled();
         spy({ _key: 'test' });
         spy.wasCalledWith({ _key: 'test' });
-        expect(() => spy.wasNotCalled()).toThrow(/.*was not considered to be called.*/);
+        expect(() => spy.wasNotCalled()).toThrow(/.*was not expected to be called.*/);
     });
 
     it('should inspect calls for given arguments of the Spy correctly', () => {
