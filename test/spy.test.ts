@@ -755,6 +755,7 @@ describe('Spy - Utils', () => {
             'restore',
             'transparent',
             'transparentAfter',
+            'addSnapshotSerializer',
             'wasCalled',
             'wasNotCalled',
             'wasCalledWith',
@@ -849,6 +850,20 @@ describe('Spy - Utils', () => {
         const testObj = { func: () => {} };
         const spyOn = Spy.on(testObj, 'func');
         expect(spyOn).toMatchInlineSnapshot('Spy.on(func)');
+    });
+
+    it('allows custom snapshot rendering of spies', () => {
+        const spy = Spy().addSnapshotSerializer((foo) => `Called with ${foo}`);
+        expect(spy).toMatchInlineSnapshot('Called with undefined');
+
+        spy('bar');
+        expect(spy).toMatchInlineSnapshot('Called with bar');
+
+        spy.addSnapshotSerializer((foo) => `<div>${foo}</div>`);
+        expect(spy).toMatchInlineSnapshot('<div>bar</div>');
+
+        spy.addSnapshotSerializer('<div>Fancy</div>');
+        expect(spy).toMatchInlineSnapshot('<div>Fancy</div>');
     });
 
     it('can spy on bound functions (bound to object)', () => {

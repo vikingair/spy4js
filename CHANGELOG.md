@@ -4,28 +4,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2021-11-24
+### Added
+- [spy.addSnapshotSerializer](/fdc-viktor-luft/spy4js#addSnapshotSerializer)
+### Fixed
+- Serialization of `window` and `document` globals of `jest-dom` caused errors.
+
 ## [3.1.5] - 2021-09-16
 ### Added
 - Mocking instructions in case of modules exporting properties with only getters.
-### Fix
+### Fixed
 - CommonJS and Jest runner detection.
 
 ## [3.1.4] - 2021-08-31
-### Fix
+### Fixed
 - Fix some types after TS update.
 - Fix serialization problems of Jest-DOM `HTMLElement`s.
 
 ## [3.1.3] - 2021-07-03
-### Fix
+### Fixed
 - Fix some types for packages using "strict" TS option with value `false` (not recommended).
 
 ## [3.1.2] - 2021-07-01
-### Fix
+### Fixed
 - NextJS stopped working because setting `"type": "module"` in own `package.json` was overriding
   the default of the package importer. Hence, the package could only be used as ESM.
 
 ## [3.1.1] - 2021-06-30
-### Fix
+### Fixed
 - Stricter TS checks and some typing improvements to be included in packages with stricter type
   checking without causing issues.
 
@@ -38,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `spy.wasNotCalled()` instead if the spy wasn't called.
 
 ## [3.0.0] - 2020-11-01
-### Fix
+### Fixed
 - `spy.getAllCallArguments` was returning a wrong value.
 
 ### Removed
@@ -56,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `spy.getAllCallArguments`: Provides a little more flexibility when observing call arguments.
 
 ## [2.9.1] - 2019-11-04
-### Fix
+### Fixed
 - Fixed node module resolution for `Spy.mockModule`
 
 ## [2.9.0] - 2019-11-03
@@ -173,7 +179,7 @@ spy.wasCalledWith(Spy.COMPARE(fn => {
 - `spy.hasCallHistory` as more explicit check on call count and order.
 
 ## [1.3.2] - 2017-11-21
-### Fix
+### Fixed
 - Treating a property with undefined value the same as a not existing property
 
 ### Added
@@ -184,9 +190,9 @@ spy.wasCalledWith(Spy.COMPARE(fn => {
 - `Spy.IGNORE` as flexible replacement for object properties or whole arguments which should be
   ignored on comparison with `spy.wasCalledWith`
   
-### Fix
+### Fixed
 - Instead of rendering `undefined` just like `null` as `null` it will be rendered as the string "UNDEFINED"
 
 ## [1.2.2] - 2017-10-29
-### Fix
+### Fixed
 - Comparing Functions returns only equality if functions are identical

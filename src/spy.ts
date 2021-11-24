@@ -31,6 +31,7 @@ let __LOCK__ = true;
  */
 const symbolName = Symbol('__Spy_name__');
 const symbolSnap = Symbol('__Spy_snap__');
+const symbolSnapSerializer = Symbol('__Spy_snapSerializer__');
 const symbolIsSpy = Symbol('__Spy_isSpy__');
 const symbolFunc = Symbol('__Spy_func__');
 const symbolCalls = Symbol('__Spy_calls__');
@@ -39,6 +40,7 @@ const symbolIndex = Symbol('__Spy_index__');
 const Symbols = {
     name: symbolName,
     snap: symbolSnap,
+    snapSerializer: symbolSnapSerializer,
     isSpy: symbolIsSpy,
     func: symbolFunc,
     calls: symbolCalls,
@@ -84,6 +86,7 @@ export type SpyInstance = {
     restore: () => SpyInstance;
     transparent: () => SpyInstance;
     transparentAfter: (callCount: number) => SpyInstance;
+    addSnapshotSerializer: (serialize: string | ((...args: any[]) => string)) => SpyInstance;
     wasCalled: (callCount?: number) => void;
     hasCallHistory: (...callHistory: Array<any[] | any>) => void;
     wasNotCalled: () => void;
@@ -98,6 +101,7 @@ export type SpyInstance = {
     // hidden attributes
     [Symbols.name]: string;
     [Symbols.snap]: string;
+    [Symbols.snapSerializer]?: (...args: any[]) => string;
     [Symbols.calls]: { args: any[]; order: number }[];
     [Symbols.index]: number;
     [Symbols.isSpy]: boolean;
@@ -336,6 +340,24 @@ const SpyFunctions = {
             }
             return oldFunc(...args);
         };
+        return this;
+    },
+
+    /**
+     * This method allows to customize the snapshot serialization of the spy.
+     * Only works for Jest test runner as of now.
+     *
+     * @return {SpyInstance} <- BuilderPattern
+     */
+    addSnapshotSerializer(this: SpyInstance, serialize: string | ((...args: any[]) => string)): SpyInstance {
+        if (typeof serialize === 'function') {
+            this[Symbols.snapSerializer] = serialize;
+            const calls = this[Symbols.calls];
+            const lastArgs = calls.length ? calls[calls.length - 1].args : [];
+            this[Symbols.snap] = serialize(...lastArgs);
+        } else {
+            this[Symbols.snap] = serialize;
+        }
         return this;
     },
 
@@ -683,6 +705,9 @@ type ISpy = {
 const _createSpy = (name: string = '', __mock?: any): SpyInstance => {
     const spy: any = function (...args: Array<any>) {
         spy[Symbols.calls].push({ args, order: ++CallOrder.Idx });
+        if (spy[Symbols.snapSerializer]) {
+            spy[Symbols.snap] = spy[Symbols.snapSerializer](...args);
+        }
         return spy[Symbols.func](...args);
     };
     if (__mock && !__LOCK__) {

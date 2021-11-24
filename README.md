@@ -91,6 +91,7 @@ You may apply additional behavior to every spy. The valid operations here are:
   - `transparentAfter` (does make the spy call the original method of a mocked object after a certain amount of made calls)
   - `reset` (resets the registered calls which were already made)
   - `restore` (does make the spy restore the mocked object)
+  - `addSnapshotSerializer` (defines in `jest` snapshots how the spy will be serialized)
     
 All those methods on a spy has been designed in a builder pattern. So you may chain any of
 these configurations. Be aware some behaviors override existing behaviors.
@@ -248,7 +249,7 @@ The configuration possibility are:
 
 ### on (static)
 ```ts
-Spy.on(object:Object, methodName:string) => SpyInstance
+Spy.on(object: object, methodName: string) => SpyInstance
 ```
 Initializing a spy on an object, simply replaces the original function by a spy and 
 stores the necessary information to be able to restore the mocked method. 
@@ -259,7 +260,7 @@ for no purpose a spy should ever be spied.
 
 ### mock (static)
 ```ts
-Spy.mock(object:Object, ...methodNames: string[]) => Object (Mock)
+Spy.mock(object: object, ...methodNames: string[]) => Object (Mock)
 ```
 Creating an object that references spies for all given methodNames.
 Initialize as many spies as required for the same object. Only
@@ -440,6 +441,12 @@ spy.transparentAfter(callCount:number) => (this) SpyInstance
 Works like [transparent](#transparent) but the spy will get transparent after called as
 often as specified. Meaning `spy.transparentAfter(num)` will not be transparent on the first
 `num` calls.
+
+### addSnapshotSerializer
+```ts
+spy.addSnapshotSerializer(serialize: string | ((...args: any[]) => string)) => (this) SpyInstance
+```
+Determines the rendered output of `jest` snapshots when the certain spy would get rendered.
 
 ### wasCalled (fact)
 ```ts
