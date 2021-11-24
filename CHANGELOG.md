@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.2.0] - 2021-11-24
 ### Added
-- [spy.addSnapshotSerializer](/fdc-viktor-luft/spy4js#addSnapshotSerializer)
+- [spy.addSnapshotSerializer](//github.com/fdc-viktor-luft/spy4js#addSnapshotSerializer)
 ### Fixed
 - Serialization of `window` and `document` globals of `jest-dom` caused errors.
 
