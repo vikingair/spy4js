@@ -13,7 +13,13 @@ const uninitialized = (method: keyof any) => () => {
     throw new Error(`Method '${String(method)}' was not initialized on Mock.`);
 };
 
-type MockInfo = { mock: Object; mocked: Object; scope: string; returns?: any; moduleName?: string };
+type MockInfo = {
+    mock: Object;
+    mocked: Object;
+    scope: string;
+    callsFactory?: (methodName: string) => (...args: any[]) => any;
+    moduleName?: string;
+};
 type MockScope = MockInfo[];
 
 export const defaultScope: string = Symbol('__Spy_global__') as any;
@@ -27,19 +33,19 @@ export const setScope = (scoping?: string): void => {
     } else scope = defaultScope;
 };
 
-const registerMock = (mocked: Object, returns?: any, moduleName?: string) => {
+const registerMock = (mocked: Object, callsFactory?: MockInfo['callsFactory'], moduleName?: string) => {
     const mock = {};
-    _mocks[scope].push({ mocked, mock, scope, returns, moduleName });
+    _mocks[scope].push({ mocked, mock, scope, callsFactory, moduleName });
     return mock;
 };
 
 export const createMock = <T, K extends keyof T>(
     obj: T,
     methods: K[],
-    returns?: any,
+    callsFactory?: MockInfo['callsFactory'],
     moduleName?: string
 ): { [P in K]: any } => {
-    const mock = registerMock(obj, returns, moduleName) as { [P in K]: any };
+    const mock = registerMock(obj, callsFactory, moduleName) as { [P in K]: any };
     methods.forEach((method) => {
         mock[method] = uninitialized(method);
     });
@@ -53,10 +59,12 @@ const couldNotInitError = (scope: string, additional: string) =>
         }, because:\n${additional}`
     );
 
-const initMock = ({ mocked, mock, scope, returns, moduleName }: MockInfo, spyOn: SpyOn): void => {
+const initMock = ({ mocked, mock, scope, callsFactory, moduleName }: MockInfo, spyOn: SpyOn): void => {
     Object.keys(mock).forEach((method) => {
         try {
-            mock[method as keyof typeof mock] = spyOn(mocked, method as keyof typeof mock).returns(returns);
+            const spy = spyOn(mocked, method as keyof typeof mock);
+            if (callsFactory) spy.calls(callsFactory(method));
+            mock[method as keyof typeof mock] = spy;
         } catch (e) {
             let msg = (e as Error).message;
             if (Env.isJest && msg.includes('has only a getter')) {

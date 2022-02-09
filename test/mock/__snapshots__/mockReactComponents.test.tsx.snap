@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`mockReactComponents - generic renders component snapshot - contained mock 1`] = `
+<div>
+  <div
+    id="component-3"
+  >
+    <samp
+      data-component="Component1"
+      foo="in-component-3"
+    />
+  </div>
+</div>
+`;
+
+exports[`mockReactComponents - generic renders component snapshot - nested mocks 1`] = `
+<div>
+  <samp
+    data-component="Component2"
+  >
+    <samp
+      data-component="Component1"
+      foo="bar"
+    />
+  </samp>
+</div>
+`;
+
+exports[`mockReactComponents - minimal renders component snapshot - contained mock 1`] = `
+<div>
+  <div
+    id="component-3"
+  />
+</div>
+`;
+
+exports[`mockReactComponents - minimal renders component snapshot - nested mocks 1`] = `<div />`;

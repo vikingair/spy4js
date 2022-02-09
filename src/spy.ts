@@ -9,6 +9,8 @@ import { SpyRegistry } from './registry';
 import { serialize, IGNORE } from './serializer';
 import { createMock, initMocks } from './mock';
 import { TestSuite } from './test-suite';
+import { Symbols } from './symbols';
+import { createMinimalComponent, createGenericComponent } from './react';
 
 const CallOrder = {
     Idx: 0,
@@ -27,28 +29,6 @@ const registry = new SpyRegistry();
 let __LOCK__ = true;
 
 /**
- * Those symbols are used to protect the private spy properties from outer manipulation by mistake.
- */
-const symbolName = Symbol('__Spy_name__');
-const symbolSnap = Symbol('__Spy_snap__');
-const symbolSnapSerializer = Symbol('__Spy_snapSerializer__');
-const symbolIsSpy = Symbol('__Spy_isSpy__');
-const symbolFunc = Symbol('__Spy_func__');
-const symbolCalls = Symbol('__Spy_calls__');
-const symbolConfig = Symbol('__Spy_config__');
-const symbolIndex = Symbol('__Spy_index__');
-const Symbols = {
-    name: symbolName,
-    snap: symbolSnap,
-    snapSerializer: symbolSnapSerializer,
-    isSpy: symbolIsSpy,
-    func: symbolFunc,
-    calls: symbolCalls,
-    config: symbolConfig,
-    index: symbolIndex,
-} as const;
-
-/**
  * Very jest specific snapshot serialization behavior.
  *
  * Hint: We are casting here anything to any, because not all users might
@@ -57,10 +37,10 @@ const Symbols = {
  */
 TestSuite.addSnapshotSerializer({
     test: (v: any) => v && v[Symbols.isSpy],
-    print: (spy: any) => spy[Symbols.snap],
+    print: (spy: SpyInstance) => spy[Symbols.snap],
 });
 
-export type GeneralSpyConfig = { useOwnEquals: boolean; enforceOrder: boolean };
+export type GeneralSpyConfig = { useOwnEquals: boolean; enforceOrder: boolean; useGenericReactMocks: boolean };
 export type SpyConfig = { useOwnEquals: boolean; persistent: boolean };
 /**
  * Initial default settings for every
@@ -72,6 +52,7 @@ export type SpyConfig = { useOwnEquals: boolean; persistent: boolean };
 const DefaultSettings: GeneralSpyConfig = {
     useOwnEquals: true,
     enforceOrder: false,
+    useGenericReactMocks: false,
 };
 
 export type SpyInstance = {
@@ -95,6 +76,8 @@ export type SpyInstance = {
     getAllCallArguments: () => Array<any[]>;
     getCallArguments: (callNr?: number) => any[];
     getCallArgument: (callNr?: number, argNr?: number) => any;
+    getLatestCallArgument: (argNr?: number) => any;
+    getProps: () => any;
     getCallCount: () => number;
     showCallArguments: (additionalInformation?: (string | undefined)[]) => string;
 
@@ -618,6 +601,32 @@ const SpyFunctions = {
     },
 
     /**
+     * Returns the latest call argument.
+     *
+     * @param {number} argNr -> represents position of the argument
+     *                          when the corresponding call was made.
+     *
+     * @return {any} -> the props
+     */
+    getLatestCallArgument(this: SpyInstance, argNr: number = 0): any {
+        const allArgs = this.getAllCallArguments();
+        if (!allArgs.length) {
+            throw new Error(`\n\n${this[Symbols.name]} was never called!\n\n`);
+        }
+        return this.getCallArgument(allArgs.length - 1, argNr);
+    },
+
+    /**
+     * This method returns the props of a mocked React component.
+     * Convenience naming for already existing functionality.
+     *
+     * @return {any} -> the props
+     */
+    getProps(this: SpyInstance): any {
+        return this.getLatestCallArgument();
+    },
+
+    /**
      * This method returns the number of made calls on the spy.
      *
      * @return {number} -> the number of made calls.
@@ -786,6 +795,9 @@ Spy.configure = (
     if (config.enforceOrder !== undefined) {
         DefaultSettings.enforceOrder = config.enforceOrder;
     }
+    if (config.useGenericReactMocks !== undefined) {
+        DefaultSettings.useGenericReactMocks = config.useGenericReactMocks;
+    }
     TestSuite.configure({
         afterEach: config.afterEach,
         beforeEach: config.beforeEach,
@@ -934,7 +946,11 @@ Spy.mockModule = <K extends string>(moduleName: string, ...methodNames: K[]): { 
  * @return {Object} Mock.
  */
 Spy.mockReactComponents = <K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance } =>
-    TestSuite.createModuleMock(moduleName, methodNames, null);
+    TestSuite.createModuleMock(
+        moduleName,
+        methodNames,
+        DefaultSettings.useGenericReactMocks ? createGenericComponent : createMinimalComponent
+    );
 
 /**
  * This static method initializes all created

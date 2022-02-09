@@ -99,7 +99,7 @@ const __getNodeModulePath = (moduleName: string) => {
 const createModuleMock = <K extends string>(
     moduleName: string,
     names: K[],
-    returns?: any
+    callsFactory?: (methodName: string) => (...args: any[]) => any
 ): { [P in K]: SpyInstance } => {
     if (!Env.isCJS) throw new Error('spy4js: Mocking a module only works if your test runner executes with CommonJS');
 
@@ -108,7 +108,7 @@ const createModuleMock = <K extends string>(
 
     // now we are free to use "require('path')" to calculate the correct
     // module path for the mocking.
-    return createMock(require(modulePath), names, returns, moduleName);
+    return createMock(require(modulePath), names, callsFactory, moduleName);
 };
 
 export const TestSuite = { addSnapshotSerializer, createModuleMock, configure };

@@ -35,15 +35,6 @@ describe('Spy.mockModule.node_module', () => {
     });
 });
 
-describe('Spy.mockReactComponents', () => {
-    const Mock$Rollup = Spy.mockReactComponents('rollup', 'watch');
-
-    it('does something', () => {
-        expect(watch({ watch: false })).toBe(null);
-        Mock$Rollup.watch.wasCalledWith({ watch: false });
-    });
-});
-
 jest.mock('@babel/core');
 describe('Spy.mockModule - with only getter property', () => {
     const Mock$BabelCore = Spy.mockModule('@babel/core', 'buildExternalHelpers');

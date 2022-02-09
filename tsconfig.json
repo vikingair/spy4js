@@ -5,6 +5,7 @@
       "esnext",
       "dom"
     ],
+    "sourceMap": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

@@ -100,7 +100,7 @@ these configurations. Be aware some behaviors override existing behaviors.
 const spy = Spy.on(someObject, 'someMethod');
 
 // configure it to use NOT own "equals" implementations
-spy.configure({useOwnEquals: false});
+spy.configure({ useOwnEquals: false });
 
 // make it call any functions
 spy.calls(func1, func2, func3);
@@ -188,6 +188,8 @@ which the spy had been called.
   - `getAllCallArguments` (returns all call arguments for all calls in an array containing arrays)
   - `getCallArguments` (returns all call arguments for a specified call in an array)
   - `getCallArgument` (same as getCallArguments, but returns only a single element of the array)
+  - `getLatestCallArgument` (same as getCallArgument, but for the latest call)
+  - `getProps` (same as getLatestCallArgument, but only for the first param. Can be useful for mocked React components)
   - `getCallCount` (returns the number of made calls)
     
 ```ts
@@ -234,6 +236,7 @@ The returned Spy instance has his own name-attribute (only) for debugging purpos
 Spy.configure(config: {
     useOwnEquals?: boolean,
     enforceOrder?: boolean,
+    useGenericReactMocks?: boolean,
     beforeEach?: (scope: string) => void,
     afterEach?: (scope: string) => void,
 }) => void
@@ -244,6 +247,8 @@ of the `describe` function.
 The configuration possibility are:
 - **useOwnEquals**: Applies for all spy instances. See [configure](#configure) for more details.
 - **enforceOrder**: Opt-in to the [enforce-order mode](#enforce-order-mode).
+- **useGenericReactMocks**: Lets you opt in into using generic react components for mocks 
+  created via [mockReactComponents](#mockreactcomponents-static).
 - **beforeEach**: Lets you override the default beforeEach test suite hook.
 - **afterEach**: Lets you override the default afterEach test suite hook.
 
@@ -270,13 +275,13 @@ after `Spy.initMocks` gets called, the created mock does affect the given object
 ```ts
 Spy.mockModule(moduleName: string, ...methodNames: string[]) => Object (Mock)
 ```
-Same as [mock](#mock) but only necessary if you want to mock exported functions.
+Same as [mock](#mock-static) but only necessary if you want to mock exported functions.
 
 ### mockReactComponents (static)
 ```ts
 Spy.mockReactComponents(moduleName: string, ...methodNames: string[]) => Object (Mock)
 ```
-Same as [mockModule](#mockModule) but designed for ReactJS components. The registered
+Same as [mockModule](#mockModule-static) but designed for ReactJS components. The registered
 spies return `null` instead of `undefined`. This makes minimal usable React components.
 Even if in most cases the pure mocking is nice enough, you can even test the number
 of rerender cycles and the provided props of the mocked component. Works perfectly
@@ -520,6 +525,19 @@ spy.getCallArgument(callNr: number = 0, argNr: number = 0) => any
 Same as [getCallArguments](#getcallarguments) but returns only a single entry out
 of the array of arguments. Most useful in situations where exactly one call param is expected.
 If `argNr` is given, it returns the (argNr + 1)'th argument of the call.
+
+### getLatestCallArgument
+```ts
+spy.getLatestCallArgument(argNr: number = 0) => any
+```
+Same as [getCallArgument](#getcallargument) but uses only the latest call.
+
+### getProps
+```ts
+spy.getProps() => any
+```
+Same as [getLatestCallArgument](#getlatestcallargument) but uses only the first arg. Can be useful in
+combination with [mockReactComponents](#mockreactcomponents-static).
 
 ### getCallCount
 ```ts
