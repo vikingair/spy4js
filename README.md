@@ -243,7 +243,7 @@ Spy.configure(config: {
 ```
 Using this function you may edit the default behavior spy4js itself.
 The scope param will contain the test-suite name, which was provided as first parameter
-of the `describe` function.
+of the `describe` function. Please make sure that every scope name is unique per test file.
 The configuration possibility are:
 - **useOwnEquals**: Applies for all spy instances. See [configure](#configure) for more details.
 - **enforceOrder**: Opt-in to the [enforce-order mode](#enforce-order-mode).

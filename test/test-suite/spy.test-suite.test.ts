@@ -7,9 +7,11 @@
 import { Spy } from '../../src/spy';
 
 const Matrix = { tearDown: () => 1337, startup: () => 1 };
+const Stuff = { foo: () => {} };
 const Matrix$Mock = Spy.mock(Matrix, 'startup');
 
 describe('Spy - Test-Suite', () => {
+    Spy.mock(Stuff, 'foo');
     let data = {} as { foo?: string };
     let persistentSpy = Spy('persistentSpy');
 
@@ -53,9 +55,27 @@ describe('Spy - Test-Suite', () => {
         Matrix$Mock.startup.returns('go go go');
         expect(Matrix.startup()).toBe('go go go');
 
+        // double init skips the initialization. Important for nested "describe"
+        Spy.initMocks();
+    });
+
+    it('initializes mock on global scope when already spied', () => {
+        Spy.restoreAll();
+        Spy.on(Matrix, 'startup');
+
         expect(Spy.initMocks).toThrowErrorMatchingInlineSnapshot(`
 "Could not initialize mock for global scope, because:
 The objects attribute 'startup' was already spied. Please make sure to spy only once at a time at any attribute."
-`); // double init not allowed
+`);
+    });
+
+    it('initializes mock on nested scope when already spied', () => {
+        Spy.restoreAll();
+        Spy.on(Stuff, 'foo');
+
+        expect(() => Spy.initMocks('Spy - Test-Suite')).toThrowErrorMatchingInlineSnapshot(`
+"Could not initialize mock for scope \\"Spy - Test-Suite\\", because:
+The objects attribute 'foo' was already spied. Please make sure to spy only once at a time at any attribute."
+`);
     });
 });

@@ -1,3 +1,5 @@
+import { Symbols } from './symbols';
+
 /**
  * This file is part of spy4js which is released under MIT license.
  *
@@ -7,6 +9,7 @@
 const restoreAttributeForEntry = (value: any): void => {
     const { obj, method, methodName } = value;
     if (obj) {
+        obj[methodName]?.[Symbols.onRestore]?.();
         obj[methodName] = method;
     }
 };

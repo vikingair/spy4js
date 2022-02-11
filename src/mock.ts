@@ -5,6 +5,7 @@
  *
  */
 import { Env } from './env';
+import { Symbols } from './symbols';
 
 // returns a spy instance
 type SpyOn = (obj: Object, method: keyof typeof obj) => any;
@@ -19,6 +20,7 @@ type MockInfo = {
     scope: string;
     callsFactory?: (methodName: string) => (...args: any[]) => any;
     moduleName?: string;
+    active: boolean;
 };
 type MockScope = MockInfo[];
 
@@ -35,7 +37,7 @@ export const setScope = (scoping?: string): void => {
 
 const registerMock = (mocked: Object, callsFactory?: MockInfo['callsFactory'], moduleName?: string) => {
     const mock = {};
-    _mocks[scope].push({ mocked, mock, scope, callsFactory, moduleName });
+    _mocks[scope].push({ mocked, mock, scope, callsFactory, moduleName, active: false });
     return mock;
 };
 
@@ -52,18 +54,24 @@ export const createMock = <T, K extends keyof T>(
     return mock;
 };
 
-const couldNotInitError = (scope: string, additional: string) =>
+export const couldNotInitError = (scope: string, additional: string) =>
     new Error(
         `Could not initialize mock for ${
             scope === defaultScope ? 'global scope' : `scope "${scope}"`
         }, because:\n${additional}`
     );
 
-const initMock = ({ mocked, mock, scope, callsFactory, moduleName }: MockInfo, spyOn: SpyOn): void => {
+const initMock = (mockInfo: MockInfo, spyOn: SpyOn): void => {
+    const { mocked, mock, scope, callsFactory, moduleName, active } = mockInfo;
     Object.keys(mock).forEach((method) => {
+        if (active) return;
         try {
             const spy = spyOn(mocked, method as keyof typeof mock);
+            mockInfo.active = true;
             if (callsFactory) spy.calls(callsFactory(method));
+            spy[Symbols.onRestore] = () => {
+                mockInfo.active = false;
+            };
             mock[method as keyof typeof mock] = spy;
         } catch (e) {
             let msg = (e as Error).message;

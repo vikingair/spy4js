@@ -9,6 +9,7 @@ const symbolFunc = Symbol('__Spy_func__');
 const symbolCalls = Symbol('__Spy_calls__');
 const symbolConfig = Symbol('__Spy_config__');
 const symbolIndex = Symbol('__Spy_index__');
+const symbolOnRestore = Symbol('__Spy_onRestore__');
 export const Symbols = {
     name: symbolName,
     snap: symbolSnap,
@@ -18,4 +19,5 @@ export const Symbols = {
     calls: symbolCalls,
     config: symbolConfig,
     index: symbolIndex,
+    onRestore: symbolOnRestore,
 } as const;

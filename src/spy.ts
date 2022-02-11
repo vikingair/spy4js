@@ -90,6 +90,7 @@ export type SpyInstance = {
     [Symbols.isSpy]: boolean;
     [Symbols.func]: Function;
     [Symbols.config]: SpyConfig;
+    [Symbols.onRestore]?: () => void;
 };
 
 const SpyHelperFunctions = {
