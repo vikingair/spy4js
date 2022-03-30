@@ -142,6 +142,8 @@ Even as important are the "facts", we want to display:
   - `wasCalledWith` (does display that the spy has been called at least once like with the provided params)
   - `wasNotCalledWith` (does display that the spy was never like with the provided params)
   - `hasCallHistory` (does display that the spy has been called with the following params in the given order)
+  - `hasProps` (does display that the spy has been called with the given argument on the last invocation. In the
+                context of React: The spy being a mocked React component has currently the given props.)
 
 Those methods on a spy display facts. Facts have to be true, otherwise they
 will throw an Exception, which displays in a formatted debug message why the
@@ -501,6 +503,14 @@ call one by one in **correct order** and **correct call count**.
 ATTENTION: single argument calls can be provided without wrapping into an array. E.g. if
 the single argument is an array itself, then you have to warp it also yourself. (Inspired by jest
 data providers)
+
+### hasProps (fact)
+```ts
+spy.hasProps(props: any) => void
+```
+This fact displays that the spy has currently the given props in React context of a mocked component.
+
+This is the corresponding fact for [getProps](#getprops) using the spy diffing.
 
 ### getAllCallArguments
 ```ts

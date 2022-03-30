@@ -213,16 +213,21 @@ describe('Spy - Utils', () => {
         const testArg2 = { _key: 'test2' };
         const testArg3 = { _key: 'test3' };
         expect(() => spy.getLatestCallArgument()).toThrow(/spy was never called/);
+        expect(() => spy.hasProps(testArg1)).toThrow(/spy was never called/);
         spy(testArg1);
         expect(spy.getProps()).toBe(testArg1);
+        spy.hasProps(testArg1);
+        expect(() => spy.hasProps(testArg2)).toThrow(/But the current props are:\s+{_key: 'test1'}/);
         spy(testArg1, testArg2);
         expect(spy.getProps()).toBe(testArg1);
         expect(spy.getLatestCallArgument(1)).toBe(testArg2);
         spy(testArg3, testArg2, testArg1);
         expect(spy.getProps()).toBe(testArg3);
+        spy.hasProps(testArg3);
         expect(spy.getLatestCallArgument(2)).toBe(testArg1);
         spy(testArg2);
         expect(spy.getProps()).toBe(testArg2);
+        spy.hasProps(testArg2);
 
         expect(spy.getCallArguments()).toEqual([testArg1]);
         expect(spy.getCallArguments(0)).toEqual([testArg1]);
@@ -773,6 +778,7 @@ describe('Spy - Utils', () => {
             'getCallArgument',
             'getLatestCallArgument',
             'getProps',
+            'hasProps',
             'getCallCount',
             'showCallArguments',
         ];

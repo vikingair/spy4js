@@ -78,6 +78,7 @@ export type SpyInstance = {
     getCallArgument: (callNr?: number, argNr?: number) => any;
     getLatestCallArgument: (argNr?: number) => any;
     getProps: () => any;
+    hasProps: (props: any) => void;
     getCallCount: () => number;
     showCallArguments: (additionalInformation?: (string | undefined)[]) => string;
 
@@ -496,14 +497,6 @@ const SpyFunctions = {
      *
      * It throws an error if the upper method would not.
      *
-     * For example:
-     * const spy = Spy();
-     * spy(arg1, arg2, arg3);
-     * spy(arg4, arg5);
-     * spy.wasCalledWith(arg1); // no error
-     * spy.wasCalledWith(arg4, arg3); // no error
-     * spy.wasCalledWith(arg4, arg5); // error!!!
-     *
      * @param {Array<any>} args -> The not expected arguments
      *                             for any made call.
      */
@@ -625,6 +618,28 @@ const SpyFunctions = {
      */
     getProps(this: SpyInstance): any {
         return this.getLatestCallArgument();
+    },
+
+    /**
+     * Checks if the spy was last call was done with the provided first argument.
+     *
+     * It throws an error otherwise.
+     *
+     * @param {any} props
+     *
+     */
+    hasProps(this: SpyInstance, props: any) {
+        const currentProps = this.getProps();
+        const diff = differenceOf(currentProps, props, this[Symbols.config]);
+        if (!diff) return;
+        throw new Error(
+            `\n\n${this[Symbols.name]} was expected` +
+                ' to have the following props:\n\n' +
+                `    --> ${serialize(props)}\n\n` +
+                'But the current props are:\n\n' +
+                `    ${serialize(currentProps)}\n` +
+                `    ${diff}`
+        );
     },
 
     /**
