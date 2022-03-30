@@ -68,7 +68,10 @@ const initMock = (mockInfo: MockInfo, spyOn: SpyOn): void => {
         try {
             const spy = spyOn(mocked, method as keyof typeof mock);
             mockInfo.active = true;
-            if (callsFactory) spy.calls(callsFactory(method));
+            if (callsFactory) {
+                spy.calls(callsFactory(method));
+                spy.displayName = method; // TODO: test if name works, too
+            }
             spy[Symbols.onRestore] = () => {
                 mockInfo.active = false;
             };

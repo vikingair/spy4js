@@ -907,4 +907,26 @@ describe('Spy - Utils', () => {
         expect(window.console.error('foo')).toBe('spied!');
         spy.hasCallHistory('foo');
     });
+
+    it('can compare self expanding proxy', () => {
+        // code that caused the error
+        const proxyTarget = {};
+        const _dotPrefix = (name: string, prefix = ''): string => (prefix && prefix + '.') + name;
+        const _createFieldNameProxy = (pt: any, prefix = ''): any =>
+            new Proxy(pt, {
+                get(target, prop) {
+                    if (prop === 'toString' || typeof prop === 'symbol') return () => prefix;
+                    // let the target grow with that property
+                    if (!target[prop]) target[prop] = _createFieldNameProxy(pt, _dotPrefix(prop, prefix));
+                    return target[prop];
+                },
+            });
+
+        const spy = Spy();
+
+        spy(_createFieldNameProxy(proxyTarget));
+
+        spy.wasCalledWith(proxyTarget);
+        expect(() => spy.wasCalledWith({ foo: 'bar' })).toThrow(/.*{foo: {foo: >CYCLOMATIC<}}.*/);
+    });
 });

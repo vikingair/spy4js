@@ -2,6 +2,7 @@ import React from 'react';
 import { Spy } from '../../src/spy';
 import { Component1, Component2, Component3 } from './test.reactComponents';
 import { render } from '@testing-library/react';
+import { _GenericComponent } from '../../src/react';
 
 describe('mockReactComponents - minimal', () => {
     Spy.configure({ useGenericReactMocks: false });
@@ -28,18 +29,33 @@ describe('mockReactComponents - minimal', () => {
 });
 
 describe('mockReactComponents - generic', () => {
+    beforeEach(() => {
+        _GenericComponent.serializeAllProps = true;
+    });
     Spy.configure({ useGenericReactMocks: true });
     const Mock$TestReactComponents = Spy.mockReactComponents('./test.reactComponents', 'Component1', 'Component2');
 
     it('mocks as plain function', () => {
-        expect(Component1({ foo: 'bar' })!.props.foo).toBe('bar');
+        expect(Component1({ foo: 'bar' })!.props['data-prop-foo']).toBe("'bar'");
+        expect(Mock$TestReactComponents.Component1.getProps().foo).toBe('bar');
         Mock$TestReactComponents.Component1.wasCalledWith({ foo: 'bar' });
     });
 
     it('renders component snapshot - nested mocks', () => {
         const { container } = render(
             <Component2>
-                <Component1 foo={'bar'} />
+                <Component1 foo={'bar'} oneMore={{ data: Symbol('oneMore'), elem: <div>Test</div> }} />
+            </Component2>
+        );
+        expect(container).toMatchSnapshot();
+    });
+
+    it('renders component snapshot - nested mocks - without props', () => {
+        _GenericComponent.serializeAllProps = false;
+        const { container } = render(
+            <Component2>
+                <Component1 foo={'bar'} oneMore={{ data: Symbol('oneMore'), elem: <div>Test</div> }} />
+                <div>More children</div>
             </Component2>
         );
         expect(container).toMatchSnapshot();

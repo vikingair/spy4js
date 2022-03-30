@@ -25,6 +25,7 @@ The objects attribute 'swim' was already spied. Please make sure to spy only onc
     });
 });
 
+// TODO: Investigate if the whole module could be replaced by a Proxy to overcome this issue. Also check for ESM compat
 describe('Spy - Test-Suite with throwing scoped mock because of getters only', () => {
     const Mock$BabelCore = Spy.mockModule('@babel/core', 'buildExternalHelpers');
 

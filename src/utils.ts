@@ -113,7 +113,7 @@ const __diff = (a: any, b: any, useOwnEquals: boolean, alreadyComparedArray: Arr
                 return __different('constructor');
             }
     }
-    if (useOwnEquals && a.equals instanceof Function) {
+    if (useOwnEquals && 'equals' in a && typeof a.equals === 'function') {
         if (a.equals(b)) {
             return undefined;
         }
