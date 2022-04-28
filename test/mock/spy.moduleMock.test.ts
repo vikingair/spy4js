@@ -1,9 +1,8 @@
 import { differenceOf } from '../../src/utils';
 import { Spy } from '../../src/spy';
 import { serialize } from '../../src/serializer';
-import { watch } from 'rollup';
-// @ts-ignore
-import { buildExternalHelpers } from '@babel/core';
+import { render } from '@testing-library/react';
+import { watch } from 'rollup/dist/rollup.js';
 
 describe('Spy.mockModule', () => {
     const Mock$Utils = Spy.mockModule('../../src/utils', 'differenceOf', 'toError');
@@ -26,7 +25,7 @@ describe('Spy.mockModule.2', () => {
 });
 
 describe('Spy.mockModule.node_module', () => {
-    const Mock$Rollup = Spy.mockModule('rollup', 'watch');
+    const Mock$Rollup = Spy.mockModule('rollup/dist/rollup.js', 'watch');
 
     it('does something', () => {
         expect(watch({})).toBe(undefined);
@@ -35,13 +34,13 @@ describe('Spy.mockModule.node_module', () => {
     });
 });
 
-jest.mock('@babel/core');
+jest.mock('@testing-library/react');
 describe('Spy.mockModule - with only getter property', () => {
-    const Mock$BabelCore = Spy.mockModule('@babel/core', 'buildExternalHelpers');
+    const Mock$ReactTestingLibrary = Spy.mockModule('@testing-library/react', 'render');
 
     it('replaces the function by our spy', () => {
-        expect(buildExternalHelpers).toBe(Mock$BabelCore.buildExternalHelpers);
-        expect(buildExternalHelpers('foo')).toBe(undefined);
-        Mock$BabelCore.buildExternalHelpers.wasCalledWith('foo');
+        expect(render).toBe(Mock$ReactTestingLibrary.render);
+        expect(render('foo' as any)).toBe(undefined);
+        Mock$ReactTestingLibrary.render.wasCalledWith('foo');
     });
 });
