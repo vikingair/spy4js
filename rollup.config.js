@@ -6,7 +6,7 @@ const extensions = ['.ts', '.tsx'];
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
 
 export default {
-    input: 'index.ts',
+    input: 'src/index.ts',
     plugins: [
         resolve({ extensions }),
         babel({

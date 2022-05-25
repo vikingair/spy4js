@@ -1,15 +1,12 @@
 {
   "name": "spy4js",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "Smart, compact and powerful spy test framework",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "types": "index.d.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
-    "dist/cjs",
-    "dist/esm",
-    "src",
-    "index.d.ts"
+    "dist"
   ],
   "repository": {
     "type": "git",
@@ -25,7 +22,7 @@
   "author": "Viktor Luft <viktor.luft@freiheit.com> (https://github.com/fdc-viktor-luft)",
   "license": "MIT",
   "scripts": {
-    "dist": "rm -rf dist && rollup -c && cp index.ts index.d.ts",
+    "dist": "rm -rf dist && rollup -c && tsc -p tsconfig.publish.json",
     "lint": "pnpm lint:es && pnpm lint:ts",
     "lint:es": "eslint --ext .ts src/ test/",
     "lint:ts": "tsc",
