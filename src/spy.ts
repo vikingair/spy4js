@@ -4,10 +4,10 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
-import { COMPARE, MAPPER, differenceOf, OptionalMessageOrError, toError, MessageOrError } from './utils';
+import { COMPARE, MAPPER, differenceOf, type OptionalMessageOrError, toError, type MessageOrError } from './utils';
 import { SpyRegistry } from './registry';
 import { serialize, IGNORE } from './serializer';
-import { createMock, initMocks } from './mock';
+import { createMock, initMocks, type Mockable } from './mock';
 import { TestSuite } from './test-suite';
 import { Symbols } from './symbols';
 import { createMinimalComponent, createGenericComponent } from './react';
@@ -718,8 +718,8 @@ type ISpy = {
     IGNORE: Symbol;
     COMPARE: typeof COMPARE;
     MAPPER: typeof MAPPER;
-    on<T, K extends keyof T>(obj: T, methodName: K): SpyInstance;
-    mock<T, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance };
+    on<T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInstance;
+    mock<T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance };
     mockModule<K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance };
     mockReactComponents<K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance };
     initMocks(scope?: string): void;
@@ -843,16 +843,16 @@ Spy.MAPPER = MAPPER;
 
 /**
  * This static method is an alternative way to
- * create a Spy which mocks the an objects attribute.
+ * create a Spy which mocks the objects attribute.
  *
  * The attribute of the object "obj[methodName]" will
  * be replaced by the spy and the previous attribute
  * will be stored in the spy registry.
- * Therefore this information is always restorable.
+ * Therefore, this information is always restorable.
  * The most common use case, will be to mock
  * another function as attribute of the object.
  *
- * The method has to met the following conditions:
+ * The method has to meet the following conditions:
  *
  * - The attribute to spy has to be function itself.
  * - The attribute to spy should not be spied already.
@@ -865,18 +865,18 @@ Spy.MAPPER = MAPPER;
  *
  * @return {SpyInstance}
  */
-Spy.on = <T, K extends keyof T>(obj: T, methodName: K): SpyInstance => {
+Spy.on = <T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInstance => {
     const method = obj[methodName];
     if (!(typeof method === 'function')) {
         throw new Error(
-            `The object attribute '${methodName}' ` +
+            `The object attribute '${String(methodName)}' ` +
                 `was: ${serialize(method)}\n\n` +
                 'You should only spy on functions!'
         );
     }
     if ((method as any)[Symbols.isSpy]) {
         throw new Error(
-            `The objects attribute '${methodName}'` +
+            `The objects attribute '${String(methodName)}'` +
                 ' was already spied. Please make sure to spy' +
                 ' only once at a time at any attribute.'
         );
@@ -914,7 +914,7 @@ Spy.on = <T, K extends keyof T>(obj: T, methodName: K): SpyInstance => {
  *
  * @return {Object} Mock.
  */
-Spy.mock = <T, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance } =>
+Spy.mock = <T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance } =>
     createMock(obj, methodNames);
 
 /**

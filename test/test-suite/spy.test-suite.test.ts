@@ -74,7 +74,7 @@ The objects attribute 'startup' was already spied. Please make sure to spy only 
         Spy.on(Stuff, 'foo');
 
         expect(() => Spy.initMocks('Spy - Test-Suite')).toThrowErrorMatchingInlineSnapshot(`
-"Could not initialize mock for scope \\"Spy - Test-Suite\\", because:
+"Could not initialize mock for scope "Spy - Test-Suite", because:
 The objects attribute 'foo' was already spied. Please make sure to spy only once at a time at any attribute."
 `);
     });

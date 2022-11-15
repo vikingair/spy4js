@@ -16,13 +16,13 @@
     "node": true
   },
   "rules": {
-    "prettier/prettier": "error",
-    "arrow-body-style": ["error", "as-needed"],
+    "prettier/prettier": "warn",
+    "arrow-body-style": ["warn", "as-needed"],
     "no-unused-vars": "off",
-    "no-duplicate-imports": "error",
+    "no-duplicate-imports": "warn",
     "@typescript-eslint/no-array-constructor": "error",
     "@typescript-eslint/no-namespace": "error",
     "@typescript-eslint/no-unused-vars": ["error", {"args": "none", "ignoreRestSiblings": true}],
-    "no-console": "error"
+    "no-console": "warn"
   }
 }

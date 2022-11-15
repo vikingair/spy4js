@@ -4,7 +4,7 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
-import { createMock, initMocks, _mocks, setScope, defaultScope } from '../../src/mock';
+import { createMock, initMocks, _mocks, setScope, defaultScope, Mockable } from '../../src/mock';
 
 const IRL = {
     saveTheWorld: () => 'feed some koalas',
@@ -14,7 +14,7 @@ const IRL = {
 
 const Matrix = { tearDown: () => 1337, startup: () => 1 };
 
-const testSpyOn = (obj: Object, method: keyof typeof obj) => obj[method];
+const testSpyOn = (obj: Mockable, method: keyof typeof obj) => obj[method];
 
 describe('Mocks', () => {
     beforeEach(() => {

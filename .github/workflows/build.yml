@@ -1,0 +1,17 @@
+name: Build
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/pnpm-install
+        with:
+          target: '.'
+      - name: Lint
+        run: pnpm lint
+      - name: Test
+        run: pnpm test
