@@ -26,7 +26,7 @@
     "lint": "pnpm lint:es && pnpm lint:ts",
     "lint:es": "eslint --ext .ts src/ test/ --max-warnings 0",
     "lint:ts": "tsc",
-    "test": "jest --all --coverage",
+    "test": "jest --all --coverage --color",
     "test:update": "jest -u",
     "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
