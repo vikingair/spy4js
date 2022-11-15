@@ -1,8 +1,7 @@
 [![GitHub license][license-image]][license-url]
-[![npm package][npm-image]][npm-url] 
-[![Travis][build-image]][build-url]
+[![npm package][npm-image]][npm-url]
+[![GitHub Push][push-image]][push-url]
 [![Coverage Status][coveralls-image]][coveralls-url]
-[![styled with prettier][prettier-image]][prettier-url]
 
 # ![spy4js logo](spy-logo.svg?sanitize=true) spy4js
 
@@ -665,12 +664,10 @@ it('fetches fallback data if fetching data does not work', async () => {
 ```
 
 [license-image]: https://img.shields.io/badge/license-MIT-blue.svg
-[license-url]: https://github.com/fdc-viktor-luft/form4react/blob/master/LICENSE
-[build-image]: https://img.shields.io/travis/fdc-viktor-luft/spy4js/master.svg?style=flat-square
-[build-url]: https://app.travis-ci.com/github/fdc-viktor-luft/spy4js
+[license-url]: https://github.com/fdc-viktor-luft/spy4js/blob/master/LICENSE
+[push-image]: https://github.com/fdc-viktor-luft/spy4js/actions/workflows/push.yml/badge.svg
+[push-url]: https://github.com/fdc-viktor-luft/spy4js/actions/workflows/push.yml
 [npm-image]: https://img.shields.io/npm/v/spy4js.svg?style=flat-square
 [npm-url]: https://www.npmjs.org/package/spy4js
 [coveralls-image]: https://coveralls.io/repos/github/fdc-viktor-luft/spy4js/badge.svg?branch=master
 [coveralls-url]: https://coveralls.io/github/fdc-viktor-luft/spy4js?branch=master
-[prettier-image]: https://img.shields.io/badge/styled_with-prettier-ff69b4.svg
-[prettier-url]: https://github.com/prettier/prettier

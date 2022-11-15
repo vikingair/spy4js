@@ -1,6 +1,6 @@
 const { BABEL_ENV } = process.env
 const cjs = BABEL_ENV === 'commonjs'
-const envConfig = cjs ? { targets: { node: 12 }} : {
+const envConfig = cjs ? { targets: { node: 14 }} : {
   targets: { esmodules: true },
   bugfixes: true,
   modules: false,

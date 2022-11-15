@@ -7,16 +7,18 @@
 import { Env } from './env';
 import { Symbols } from './symbols';
 
+export type Mockable = Record<string, any>;
+
 // returns a spy instance
-type SpyOn = (obj: Object, method: keyof typeof obj) => any;
+type SpyOn = (obj: Mockable, method: keyof typeof obj) => any;
 
 const uninitialized = (method: keyof any) => () => {
     throw new Error(`Method '${String(method)}' was not initialized on Mock.`);
 };
 
 type MockInfo = {
-    mock: Object;
-    mocked: Object;
+    mock: Mockable;
+    mocked: Mockable;
     scope: string;
     callsFactory?: (methodName: string) => (...args: any[]) => any;
     moduleName?: string;
@@ -35,13 +37,13 @@ export const setScope = (scoping?: string): void => {
     } else scope = defaultScope;
 };
 
-const registerMock = (mocked: Object, callsFactory?: MockInfo['callsFactory'], moduleName?: string) => {
+const registerMock = (mocked: Mockable, callsFactory?: MockInfo['callsFactory'], moduleName?: string) => {
     const mock = {};
     _mocks[scope].push({ mocked, mock, scope, callsFactory, moduleName, active: false });
     return mock;
 };
 
-export const createMock = <T, K extends keyof T>(
+export const createMock = <T extends Mockable, K extends keyof T>(
     obj: T,
     methods: K[],
     callsFactory?: MockInfo['callsFactory'],

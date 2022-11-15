@@ -19,7 +19,7 @@ describe('Spy - Test-Suite with throwing scoped mock', () => {
         expect(anotherGuy$Mock.swim).toBeDefined();
 
         expect(() => Spy.initMocks('Spy - Test-Suite with throwing scoped mock')).toThrowErrorMatchingInlineSnapshot(`
-"Could not initialize mock for scope \\"Spy - Test-Suite with throwing scoped mock\\", because:
+"Could not initialize mock for scope "Spy - Test-Suite with throwing scoped mock", because:
 The objects attribute 'swim' was already spied. Please make sure to spy only once at a time at any attribute."
 `);
     });
@@ -34,9 +34,9 @@ describe('Spy - Test-Suite with throwing scoped mock because of getters only', (
 
         expect(() => Spy.initMocks('Spy - Test-Suite with throwing scoped mock because of getters only'))
             .toThrowErrorMatchingInlineSnapshot(`
-"Could not initialize mock for scope \\"Spy - Test-Suite with throwing scoped mock because of getters only\\", because:
+"Could not initialize mock for scope "Spy - Test-Suite with throwing scoped mock because of getters only", because:
 Cannot set property buildExternalHelpers of [object Object] which has only a getter
-Inserting a jest module mock might resolve this problem. Put this outside of the \\"describe\\":
+Inserting a jest module mock might resolve this problem. Put this outside of the "describe":
 
 jest.mock('@babel/core');
 
