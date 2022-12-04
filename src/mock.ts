@@ -4,8 +4,9 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
-import { Env } from './env';
 import { Symbols } from './symbols';
+import { Spy } from './spy';
+import { Config } from './config';
 
 export type Mockable = Record<string, any>;
 
@@ -19,27 +20,24 @@ const uninitialized = (method: keyof any) => () => {
 type MockInfo = {
     mock: Mockable;
     mocked: Mockable;
-    scope: string;
+    // scope: string;
     callsFactory?: (methodName: string) => (...args: any[]) => any;
     moduleName?: string;
     active: boolean;
 };
-type MockScope = MockInfo[];
-
-export const defaultScope: string = Symbol('__Spy_global__') as any;
-export const _mocks: { [scoping: string]: MockScope } = { [defaultScope]: [] };
-
-let scope = defaultScope;
-export const setScope = (scoping?: string): void => {
-    if (scoping) {
-        _mocks[scoping] = [];
-        scope = scoping;
-    } else scope = defaultScope;
-};
 
 const registerMock = (mocked: Mockable, callsFactory?: MockInfo['callsFactory'], moduleName?: string) => {
     const mock = {};
-    _mocks[scope].push({ mocked, mock, scope, callsFactory, moduleName, active: false });
+    const { beforeEach, expect } = Config;
+
+    if (!beforeEach || !expect) throw new Error('You need to call Spy.setup() in order to use mocks.');
+    const { currentTestName } = expect.getState();
+    if (currentTestName) throw new Error('Mocks can only be created outside of tests');
+
+    beforeEach(() => {
+        initMock({ mocked, mock, callsFactory, moduleName, active: false }, Spy.on);
+    });
+
     return mock;
 };
 
@@ -56,15 +54,10 @@ export const createMock = <T extends Mockable, K extends keyof T>(
     return mock;
 };
 
-export const couldNotInitError = (scope: string, additional: string) =>
-    new Error(
-        `Could not initialize mock for ${
-            scope === defaultScope ? 'global scope' : `scope "${scope}"`
-        }, because:\n${additional}`
-    );
+export const couldNotInitError = (additional: string) => new Error(`Could not initialize mock because:\n${additional}`);
 
 const initMock = (mockInfo: MockInfo, spyOn: SpyOn): void => {
-    const { mocked, mock, scope, callsFactory, moduleName, active } = mockInfo;
+    const { mocked, mock, callsFactory, moduleName, active } = mockInfo;
     Object.keys(mock).forEach((method) => {
         if (active) return;
         try {
@@ -80,29 +73,21 @@ const initMock = (mockInfo: MockInfo, spyOn: SpyOn): void => {
             mock[method as keyof typeof mock] = spy;
         } catch (e) {
             let msg = (e as Error).message;
-            if (Env.isJest && msg.includes('has only a getter')) {
+            const utilName = Config.runner === 'jest' ? 'jest' : Config.runner === 'vitest' ? 'vi' : undefined;
+            if (utilName && msg.includes('has only a getter')) {
                 msg += `
-Inserting a jest module mock might resolve this problem. Put this outside of the "describe":
+Inserting a module mock might resolve this problem. Add this code first:
 
-jest.mock('${moduleName}');
+${utilName}.mock('${moduleName}');
 
 Or if you don't want to mock everything from this module, you can use this:
 
-jest.mock('${moduleName}', () => ({
-    ...jest.requireActual('${moduleName}'),
-    '${method}': () => {},
+${utilName}.mock('${moduleName}', () => ({
+    ...${utilName}.requireActual('${moduleName}'),
+    '${method}': () => undefined,
 }));`;
             }
-            throw couldNotInitError(scope, msg);
+            throw couldNotInitError(msg);
         }
     });
-};
-
-const initMockScope = (scoping: string, spyOn: SpyOn): void => {
-    Object.values(_mocks[scoping]).forEach((mock) => initMock(mock, spyOn));
-};
-
-export const initMocks = (spyOn: SpyOn, scoping?: string): void => {
-    initMockScope(defaultScope, spyOn);
-    scoping && initMockScope(scoping, spyOn);
 };

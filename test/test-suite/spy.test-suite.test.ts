@@ -1,81 +1,53 @@
-/**
- * This file is part of spy4js which is released under MIT license.
- *
- * The LICENSE file can be found in the root directory of this project.
- *
- */
 import { Spy } from '../../src/spy';
 
-const Matrix = { tearDown: () => 1337, startup: () => 1 };
-const Stuff = { foo: () => {} };
-const Matrix$Mock = Spy.mock(Matrix, 'startup');
+const beforeEachSpy = Spy('beforeEach');
+Spy.setup({ beforeEach: beforeEachSpy, afterEach: () => {} });
 
-describe('Spy - Test-Suite', () => {
-    Spy.mock(Stuff, 'foo');
-    let data = {} as { foo?: string };
-    let persistentSpy = Spy('persistentSpy');
+const Guy = {
+    swim: () => 'fish',
+    goTo: (where: string) => 'go to --> ' + where,
+};
 
-    // the latest moment you might reconfigure the behavior of
-    // the applied test suite hooks is within a describe hook.
-    // But you shouldn't because it affects also other describe-blocks
-    Spy.configure({
-        beforeEach: () => {
-            // does NOT call Spy.initMocks
-            data = {}; // reinitialize data
-            persistentSpy = Spy.on(Matrix, 'tearDown').returns(42).configure({
-                persistent: true,
-            }); // persistent spies have to be restored individually and are not affected by Spy.restoreAll
-        },
-        afterEach: () => {
-            // does NOT call Spy.restoreAll
-            persistentSpy.configure({ persistent: false }).restore(); // restore this one (--> else spying again would fail)
-        },
-    });
-    it('modifies the data part 1', () => {
-        expect(data).toEqual({});
-        data.foo = 'bar';
-    });
+describe('Spy - Test-Suite with throwing scoped mock', () => {
+    const Guy$Mock = Spy.mock(Guy, 'swim');
+    const anotherGuy$Mock = Spy.mock(Guy, 'swim');
 
-    it('modifies the data part 2', () => {
-        expect(data).toEqual({});
-    });
-
-    it('initializes mock not manually', () => {
-        expect(Matrix$Mock.startup).toThrowErrorMatchingInlineSnapshot(
-            `"Method 'startup' was not initialized on Mock."`
-        );
-        expect((Matrix$Mock as any).tearDown).toBe(undefined);
-
-        expect(Matrix.startup()).toBe(1);
-        expect(Matrix.tearDown()).toBe(42);
-
-        persistentSpy.wasCalled();
-
-        Spy.initMocks();
-        Matrix$Mock.startup.returns('go go go');
-        expect(Matrix.startup()).toBe('go go go');
-
-        // double init skips the initialization. Important for nested "describe"
-        Spy.initMocks();
-    });
-
-    it('initializes mock on global scope when already spied', () => {
+    afterEach(() => {
         Spy.restoreAll();
-        Spy.on(Matrix, 'startup');
+    });
 
-        expect(Spy.initMocks).toThrowErrorMatchingInlineSnapshot(`
-"Could not initialize mock for global scope, because:
-The objects attribute 'startup' was already spied. Please make sure to spy only once at a time at any attribute."
+    it('throws an error if scoped mocks can not initialize', () => {
+        expect(Guy$Mock.swim).toBeDefined();
+        expect(anotherGuy$Mock.swim).toBeDefined();
+
+        beforeEachSpy.getCallArgument(0)(); // does not fail
+        expect(() => beforeEachSpy.getCallArgument(1)()).toThrowErrorMatchingInlineSnapshot(`
+"Could not initialize mock because:
+The objects attribute 'swim' was already spied. Please make sure to spy only once at a time at any attribute."
 `);
     });
+});
 
-    it('initializes mock on nested scope when already spied', () => {
-        Spy.restoreAll();
-        Spy.on(Stuff, 'foo');
+// TODO: Investigate if the whole module could be replaced by a Proxy to overcome this issue. Also check for ESM compat
+describe('Spy - Test-Suite with throwing scoped mock because of getters only', () => {
+    const Mock$BabelCore = Spy.mockModule('@babel/core', 'buildExternalHelpers');
 
-        expect(() => Spy.initMocks('Spy - Test-Suite')).toThrowErrorMatchingInlineSnapshot(`
-"Could not initialize mock for scope "Spy - Test-Suite", because:
-The objects attribute 'foo' was already spied. Please make sure to spy only once at a time at any attribute."
+    it('throws an error if scoped mocks can not initialize', () => {
+        expect(Mock$BabelCore.buildExternalHelpers).toBeDefined();
+
+        expect(() => beforeEachSpy.getCallArgument(2)()).toThrowErrorMatchingInlineSnapshot(`
+"Could not initialize mock because:
+Cannot set property buildExternalHelpers of [object Object] which has only a getter
+Inserting a module mock might resolve this problem. Add this code first:
+
+jest.mock('@babel/core');
+
+Or if you don't want to mock everything from this module, you can use this:
+
+jest.mock('@babel/core', () => ({
+    ...jest.requireActual('@babel/core'),
+    'buildExternalHelpers': () => undefined,
+}));"
 `);
     });
 });

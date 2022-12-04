@@ -4,6 +4,8 @@ import { Component1, Component2, Component3 } from './test.reactComponents';
 import { render } from '@testing-library/react';
 import { _GenericComponent } from '../../src/react';
 
+Spy.setup();
+
 describe('mockReactComponents - minimal', () => {
     Spy.configure({ useGenericReactMocks: false });
     const Mock$TestReactComponents = Spy.mockReactComponents('./test.reactComponents', 'Component1', 'Component2');

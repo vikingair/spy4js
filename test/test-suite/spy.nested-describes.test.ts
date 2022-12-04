@@ -1,5 +1,7 @@
 import { Spy } from '../../src/spy';
 
+Spy.setup();
+
 const toBeMocked1 = { func: (v: string) => 'foo:' + v };
 const toBeMocked2 = { func: (v: string) => 'foo:' + v };
 const toBeMocked3 = { func: (v: string) => 'foo:' + v };

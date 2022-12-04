@@ -4,6 +4,8 @@ import { serialize } from '../../src/serializer';
 import { render } from '@testing-library/react';
 import { watch } from 'rollup/dist/rollup.js';
 
+Spy.setup();
+
 describe('Spy.mockModule', () => {
     const Mock$Utils = Spy.mockModule('../../src/utils', 'differenceOf', 'toError');
 

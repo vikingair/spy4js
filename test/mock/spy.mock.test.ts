@@ -6,6 +6,8 @@
  */
 import { Spy } from '../../src/spy';
 
+Spy.setup();
+
 const IRL = {
     saveTheWorld: () => 'feed some koalas',
     doWithTree: (action: string) => `${action} the tree`,
@@ -24,7 +26,7 @@ const IRL$Mock = Spy.mock(IRL, 'saveTheWorld', 'giveBanana');
 
 const Matrix$Mock = Spy.mock(Matrix, 'startup');
 
-describe('Spy - Global- Mocks', () => {
+describe('Spy - Global - Mocks', () => {
     it('IRL$Mock: did mock the methods and applied spies', () => {
         IRL$Mock.saveTheWorld.returns('saved it!');
 

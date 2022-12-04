@@ -6,6 +6,8 @@
  */
 import { Spy, SpyInstance } from '../src/spy';
 
+Spy.setup({ enforceOrder: false });
+
 describe('Spy - Utils', () => {
     class CustomError extends Error {
         constructor(m: string) {
@@ -96,79 +98,6 @@ describe('Spy - Utils', () => {
         const spy = Spy();
         spy(123);
         expect(() => spy.getCallArguments(0.5)).toThrow(/.*callNr "0.5" was not valid.*/);
-    });
-
-    it('should restore all Spies', (cb) => {
-        const testObject = {
-            func1: noop,
-            func2: errorThrower,
-            func3: (arg: string) => {
-                expect(arg).toEqual('testCall8');
-                cb();
-            },
-            func4: errorThrower,
-        };
-        Spy.restoreAll();
-        const testObject$Mock = Spy.mock(testObject, 'func1', 'func2', 'func3', 'func4');
-        Spy.initMocks();
-        testObject.func1('testCall1');
-        testObject.func2('testCall2');
-        testObject.func3('testCall3');
-        testObject.func4('testCall4');
-
-        // this removes all spies from the testObject,
-        // but does not destroy their functionality
-        Spy.restoreAll();
-
-        testObject.func1('testCall5');
-        expect(() => testObject.func2('testCall6')).toThrow();
-        testObject$Mock.func1.wasCalledWith('testCall1');
-        expect(() => testObject$Mock.func1.wasCalledWith('testCall5')).toThrow();
-        expect(() => testObject$Mock.func2.wasCalledWith('testCall6')).toThrow();
-        if (testObject$Mock.func1 instanceof Function) {
-            testObject$Mock.func1('testCall7');
-        } else {
-            throw new Error('spy should always be callable');
-        }
-        testObject$Mock.func1.wasCalledWith('testCall7');
-        // if this would get spied, the test callback would
-        // never be called which would make the test fail
-        testObject.func3('testCall8');
-    });
-
-    it('should restore single Spies', (cb) => {
-        const testObject = {
-            func1: noop,
-            func2: errorThrower,
-            func3: (arg: string) => {
-                expect(arg).toEqual('testCall8');
-                cb();
-            },
-            func4: errorThrower,
-        };
-        Spy.restoreAll();
-        const testObject$Mock = Spy.mock(testObject, 'func1', 'func2', 'func3', 'func4');
-        Spy.initMocks();
-        testObject.func1('testCall1');
-        testObject.func2('testCall2');
-        testObject.func3('testCall3');
-        testObject.func4('testCall4');
-
-        // this removes first spy from the testObject
-        testObject$Mock.func1.restore();
-
-        testObject.func1('testCall5');
-        testObject.func3('testCall6');
-
-        testObject$Mock.func1.wasCalledWith('testCall1');
-        expect(() => testObject$Mock.func1.wasCalledWith('testCall5')).toThrow();
-
-        testObject$Mock.func3.wasCalledWith('testCall3');
-        testObject$Mock.func3.wasCalledWith('testCall6');
-        testObject$Mock.func3.restore();
-        // if this would get spied, the test callback
-        // would never be called which would make the test fail
-        testObject.func3('testCall8');
     });
 
     it('should recognize when the Spy was not called', () => {

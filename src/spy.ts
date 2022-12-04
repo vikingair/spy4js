@@ -7,10 +7,11 @@
 import { COMPARE, MAPPER, differenceOf, type OptionalMessageOrError, toError, type MessageOrError } from './utils';
 import { SpyRegistry } from './registry';
 import { serialize, IGNORE } from './serializer';
-import { createMock, initMocks, type Mockable } from './mock';
+import { createMock, type Mockable } from './mock';
 import { TestSuite } from './test-suite';
 import { Symbols } from './symbols';
 import { createMinimalComponent, createGenericComponent } from './react';
+import { Config, configure } from './config';
 
 const CallOrder = {
     Idx: 0,
@@ -28,32 +29,7 @@ const registry = new SpyRegistry();
 
 let __LOCK__ = true;
 
-/**
- * Very jest specific snapshot serialization behavior.
- *
- * Hint: We are casting here anything to any, because not all users might
- * have typed those functions correctly and should not see flow errors
- * related to those types.
- */
-TestSuite.addSnapshotSerializer({
-    test: (v: any) => v && v[Symbols.isSpy],
-    print: (spy: SpyInstance) => spy[Symbols.snap],
-});
-
-export type GeneralSpyConfig = { useOwnEquals: boolean; enforceOrder: boolean; useGenericReactMocks: boolean };
-export type SpyConfig = { useOwnEquals: boolean; persistent: boolean };
-/**
- * Initial default settings for every
- * spy instance. Can be modified only
- * implicitly by "Spy.configure".
- *
- * @type {{useOwnEquals: boolean}}
- */
-const DefaultSettings: GeneralSpyConfig = {
-    useOwnEquals: true,
-    enforceOrder: false,
-    useGenericReactMocks: false,
-};
+type SpyConfig = { useOwnEquals: boolean; persistent: boolean };
 
 export type SpyInstance = {
     (...args: any[]): any;
@@ -97,7 +73,7 @@ export type SpyInstance = {
 const SpyHelperFunctions = {
     getCalls: (spy: SpyInstance) => {
         const allCalls = spy[Symbols.calls];
-        if (!DefaultSettings.enforceOrder) return allCalls;
+        if (!Config.enforceOrder) return allCalls;
         return allCalls.filter(({ order }) => order > CallOrder.lastCheck);
     },
 };
@@ -709,12 +685,8 @@ const AllCreatedSpies: Array<SpyInstance> = [];
 
 type ISpy = {
     (name?: string): SpyInstance;
-    configure(
-        config: Partial<GeneralSpyConfig> & {
-            afterEach?: (scope: string) => void;
-            beforeEach?: (scope: string) => void;
-        }
-    ): void;
+    configure: typeof configure;
+    setup: typeof configure;
     IGNORE: Symbol;
     COMPARE: typeof COMPARE;
     MAPPER: typeof MAPPER;
@@ -722,7 +694,6 @@ type ISpy = {
     mock<T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance };
     mockModule<K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance };
     mockReactComponents<K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance };
-    initMocks(scope?: string): void;
     restoreAll(): void;
     resetAll(): void;
 };
@@ -747,7 +718,7 @@ const _createSpy = (name: string = '', __mock?: any): SpyInstance => {
     spy[Symbols.isSpy] = true;
     spy[Symbols.func] = () => {};
     spy[Symbols.calls] = [];
-    spy[Symbols.config] = { ...DefaultSettings };
+    spy[Symbols.config] = { ...Config };
     Object.entries(SpyFunctions).forEach(([key, value]) => {
         spy[key] = value;
     });
@@ -796,29 +767,8 @@ const Spy: ISpy = (name?: string): SpyInstance => _createSpy(name);
  *
  * You may also override default test suite hooks
  * by providing afterEach or beforeEach respectively.
- *
- * @param {Object} config <- Holds the configuration params.
  */
-Spy.configure = (
-    config: Partial<GeneralSpyConfig> & {
-        afterEach?: (scoping: string) => void;
-        beforeEach?: (scoping: string) => void;
-    }
-): void => {
-    if (config.useOwnEquals !== undefined) {
-        DefaultSettings.useOwnEquals = config.useOwnEquals;
-    }
-    if (config.enforceOrder !== undefined) {
-        DefaultSettings.enforceOrder = config.enforceOrder;
-    }
-    if (config.useGenericReactMocks !== undefined) {
-        DefaultSettings.useGenericReactMocks = config.useGenericReactMocks;
-    }
-    TestSuite.configure({
-        afterEach: config.afterEach,
-        beforeEach: config.beforeEach,
-    });
-};
+Spy.configure = configure;
 
 /**
  * This static attribute can be used to ignore the match
@@ -965,27 +915,8 @@ Spy.mockReactComponents = <K extends string>(moduleName: string, ...methodNames:
     TestSuite.createModuleMock(
         moduleName,
         methodNames,
-        DefaultSettings.useGenericReactMocks ? createGenericComponent : createMinimalComponent
+        Config.useGenericReactMocks ? createGenericComponent : createMinimalComponent
     );
-
-/**
- * This static method initializes all created
- * mocks (see Spy.mock). This is necessary, because
- * it has to apply before each test run, to ensure
- * that restored spies apply again. This makes
- * automated cleaned up spies possible.
- *
- * Usually it should get called within one "beforeEach"-Hook.
- *
- * @param {string | void} scope -> A string identifying the scope.
- *                                 Scopes should not be used only in
- *                                 combination of custom beforeEach and
- *                                 afterEach-Hooks.
- *
- */
-Spy.initMocks = (scope?: string): void => {
-    initMocks(Spy.on, scope);
-};
 
 /**
  * This static method does restore all
@@ -1015,14 +946,38 @@ Spy.resetAll = (): void => {
     AllCreatedSpies.forEach((spy) => spy.reset());
 };
 
-const defaultHooks = {
-    beforeEach: Spy.initMocks,
-    afterEach: () => {
-        Spy.restoreAll();
-        Spy.resetAll();
-    },
+const defaultAfterEachCb = () => {
+    Spy.restoreAll();
+    Spy.resetAll();
 };
 
-TestSuite.configure(defaultHooks);
+Spy.setup = (config): void => {
+    configure(config);
+    const { beforeEach, afterEach, expect, runner } = Config;
+    if (!beforeEach || !afterEach || !expect) {
+        const vitestHint =
+            runner === 'vitest'
+                ? ` E.g. like this:
+
+import { beforeEach, afterEach, expect } from 'vitest';
+
+Spy.setup({ beforeEach, afterEach, expect });`
+                : '';
+        throw new Error(`Please provide "beforeEach", "afterEach" and "expect" functions.${vitestHint}`);
+    }
+
+    afterEach(() => {
+        const cb = Config?.afterEachCb || defaultAfterEachCb;
+        cb();
+    });
+
+    /**
+     * Specific snapshot serialization behavior.
+     */
+    expect.addSnapshotSerializer({
+        test: (v: any) => v && v[Symbols.isSpy],
+        print: (spy: SpyInstance) => spy[Symbols.snap],
+    });
+};
 
 export { Spy };

@@ -1,6 +1,6 @@
 {
   "name": "spy4js",
-  "version": "3.4.1",
+  "version": "4.0.0-beta.0",
   "description": "Smart, compact and powerful spy test framework",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -15,8 +15,8 @@
   "keywords": [
     "spy",
     "test",
-    "tool",
     "jest",
+    "vitest",
     "TypeScript"
   ],
   "author": "Viktor Luft <viktor.luft@freiheit.com> (https://github.com/fdc-viktor-luft)",

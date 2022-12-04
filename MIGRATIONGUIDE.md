@@ -1,6 +1,25 @@
 # Migration Guide
 You can find here tips for migrating breaking changes.
 
+## 4.0.0
+
+The library was previously causing side effects on import. This behavior changed now and requires manual
+invocation of `Spy.setup()`. This can be done ideally in some central setup file for all of your tests.
+
+The default configuration changed now. In order to continue using the previous defaults, you can do this:
+
+```ts
+Spy.setup({ enforceOrder: false, useGenericReactMocks: false });
+```
+
+The method `Spy.initMocks` was removed now as it was previously already more of an internal function. Mocks
+get initialized in test runner or provided `beforeEach` callbacks. This also means that `Spy.mock`, 
+`Spy.mockModule` and `Spy.mockReactComponents` cannot be invoked anymore inside the test suite.
+
+## 3.0.0
+
+- `new Spy()` -> `Spy()`
+
 ## 2.0.0
 - If you have previously added an own hook, which called `Spy.restoreAll` after each test suite, you may remove it.
 - If you get troubles with the automatically added test hooks, you can override/remove it by usage of `Spy.configure`

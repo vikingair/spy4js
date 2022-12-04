@@ -5,9 +5,9 @@
  *
  */
 
-import { setScope, createMock } from './mock';
+import { createMock } from './mock';
 import { SpyInstance } from './spy';
-import { Env } from './env';
+import { Config } from './config';
 
 // 'path' and 'fs' have to be lazy loaded because we first need to validate
 // if the CommonJS context is used by the test runner.
@@ -15,41 +15,33 @@ const pathDirname = (p: string) => require('path').dirname(p);
 const pathJoin = (...p: string[]) => require('path').join(...p);
 const fsExistsSync = (p: string) => require('fs').existsSync(p);
 
-type Scope = string;
-type Runner = { afterEach?: (scope: Scope) => void; beforeEach?: (scope: Scope) => void };
-const runner: Runner = {};
+//
+// const oldDescribe = describe;
+//
+// const newDescribe: jest.Describe = (name, suite) => {
+//     oldDescribe(name, () => {
+//         const scoping = String(name);
+//         setScope(scoping);
+//         beforeEach(() => {
+//             runner.beforeEach && runner.beforeEach(scoping);
+//         });
+//         afterEach(() => {
+//             runner.afterEach && runner.afterEach(scoping);
+//         });
+//         const rv = suite();
+//         setScope(undefined);
+//         return rv;
+//     });
+// };
+// newDescribe.each = oldDescribe.each;
+// newDescribe.only = oldDescribe.only;
+// newDescribe.skip = oldDescribe.skip;
+// // eslint-disable-next-line no-global-assign
+// describe = newDescribe;
 
-const oldDescribe = describe;
-
-const newDescribe: jest.Describe = (name, suite) => {
-    oldDescribe(name, () => {
-        const scoping = String(name);
-        setScope(scoping);
-        beforeEach(() => {
-            runner.beforeEach && runner.beforeEach(scoping);
-        });
-        afterEach(() => {
-            runner.afterEach && runner.afterEach(scoping);
-        });
-        const rv = suite();
-        setScope(undefined);
-        return rv;
-    });
-};
-newDescribe.each = oldDescribe.each;
-newDescribe.only = oldDescribe.only;
-newDescribe.skip = oldDescribe.skip;
-// eslint-disable-next-line no-global-assign
-describe = newDescribe;
-
-const configure = (other: Runner): void => {
-    if (other.afterEach) runner.afterEach = other.afterEach;
-    if (other.beforeEach) runner.beforeEach = other.beforeEach;
-};
-
-const addSnapshotSerializer = (serializer: any) => {
-    Env.isJest && expect && expect.addSnapshotSerializer && expect.addSnapshotSerializer(serializer);
-};
+// const addSnapshotSerializer = (serializer: any) => {
+//     Env.isJest && expect && expect.addSnapshotSerializer && expect.addSnapshotSerializer(serializer);
+// };
 
 // 1. Spy.createMock in some test
 // 2. _createMock from test-suite.js
@@ -101,7 +93,8 @@ const createModuleMock = <K extends string>(
     names: K[],
     callsFactory?: (methodName: string) => (...args: any[]) => any
 ): { [P in K]: SpyInstance } => {
-    if (!Env.isCJS) throw new Error('spy4js: Mocking a module only works if your test runner executes with CommonJS');
+    if (!Config.isCJS)
+        throw new Error('spy4js: Mocking a module only works if your test runner executes with CommonJS');
 
     const isNodeModule = moduleName.indexOf('.') !== 0 && moduleName.indexOf('/') !== 0;
     const modulePath = isNodeModule ? __getNodeModulePath(moduleName) : __getAbsolutePath(moduleName);
@@ -111,4 +104,4 @@ const createModuleMock = <K extends string>(
     return createMock(require(modulePath), names, callsFactory, moduleName);
 };
 
-export const TestSuite = { addSnapshotSerializer, createModuleMock, configure };
+export const TestSuite = { createModuleMock };
