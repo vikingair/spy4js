@@ -15,34 +15,6 @@ const pathDirname = (p: string) => require('path').dirname(p);
 const pathJoin = (...p: string[]) => require('path').join(...p);
 const fsExistsSync = (p: string) => require('fs').existsSync(p);
 
-//
-// const oldDescribe = describe;
-//
-// const newDescribe: jest.Describe = (name, suite) => {
-//     oldDescribe(name, () => {
-//         const scoping = String(name);
-//         setScope(scoping);
-//         beforeEach(() => {
-//             runner.beforeEach && runner.beforeEach(scoping);
-//         });
-//         afterEach(() => {
-//             runner.afterEach && runner.afterEach(scoping);
-//         });
-//         const rv = suite();
-//         setScope(undefined);
-//         return rv;
-//     });
-// };
-// newDescribe.each = oldDescribe.each;
-// newDescribe.only = oldDescribe.only;
-// newDescribe.skip = oldDescribe.skip;
-// // eslint-disable-next-line no-global-assign
-// describe = newDescribe;
-
-// const addSnapshotSerializer = (serializer: any) => {
-//     Env.isJest && expect && expect.addSnapshotSerializer && expect.addSnapshotSerializer(serializer);
-// };
-
 // 1. Spy.createMock in some test
 // 2. _createMock from test-suite.js
 // 3. __getAbsolutePath or __getNodeModulePath from test-suite.js

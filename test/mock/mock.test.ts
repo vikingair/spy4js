@@ -37,6 +37,14 @@ describe('Mocks - 2', () => {
         expect(IRL$Mock.doWithTree('kiss')).toBe('kiss the tree');
         IRL$Mock.giveBanana.transparent();
         expect(IRL$Mock.giveBanana('Joe')).toBe('Give Joe a banana');
+
+        IRL$Mock.doWithTree.configure({ persistent: true });
+        IRL$Mock.doWithTree.returns('was persisted');
+    });
+
+    it('allows to persist mocks', () => {
+        expect(IRL.doWithTree('whatever')).toBe('was persisted');
+        IRL$Mock.doWithTree.configure({ persistent: false });
     });
 });
 

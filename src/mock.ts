@@ -20,10 +20,9 @@ const uninitialized = (method: keyof any) => () => {
 type MockInfo = {
     mock: Mockable;
     mocked: Mockable;
-    // scope: string;
     callsFactory?: (methodName: string) => (...args: any[]) => any;
     moduleName?: string;
-    active: boolean;
+    activeMethods: Set<string>;
 };
 
 const registerMock = (mocked: Mockable, callsFactory?: MockInfo['callsFactory'], moduleName?: string) => {
@@ -34,8 +33,9 @@ const registerMock = (mocked: Mockable, callsFactory?: MockInfo['callsFactory'],
     const { currentTestName } = expect.getState();
     if (currentTestName) throw new Error('Mocks can only be created outside of tests');
 
+    const activeMethods = new Set<string>();
     beforeEach(() => {
-        initMock({ mocked, mock, callsFactory, moduleName, active: false }, Spy.on);
+        initMock({ mocked, mock, callsFactory, moduleName, activeMethods }, Spy.on);
     });
 
     return mock;
@@ -57,18 +57,18 @@ export const createMock = <T extends Mockable, K extends keyof T>(
 export const couldNotInitError = (additional: string) => new Error(`Could not initialize mock because:\n${additional}`);
 
 const initMock = (mockInfo: MockInfo, spyOn: SpyOn): void => {
-    const { mocked, mock, callsFactory, moduleName, active } = mockInfo;
+    const { mocked, mock, callsFactory, moduleName, activeMethods } = mockInfo;
     Object.keys(mock).forEach((method) => {
-        if (active) return;
+        if (activeMethods.has(method)) return;
         try {
             const spy = spyOn(mocked, method as keyof typeof mock);
-            mockInfo.active = true;
+            mockInfo.activeMethods.add(method);
             if (callsFactory) {
                 spy.calls(callsFactory(method));
                 spy.displayName = method; // TODO: test if name works, too
             }
             spy[Symbols.onRestore] = () => {
-                mockInfo.active = false;
+                mockInfo.activeMethods.delete(method);
             };
             mock[method as keyof typeof mock] = spy;
         } catch (e) {
