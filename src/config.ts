@@ -1,13 +1,15 @@
-export type SpyConfig = {
+type SpyNonSetupConfig = {
     useOwnEquals: boolean;
     enforceOrder: boolean;
     useGenericReactMocks: boolean;
-    afterEach?: (cb: () => void) => void;
     afterEachCb?: () => void;
+};
+
+export type SpyConfig = SpyNonSetupConfig & {
+    afterEach?: (cb: () => void) => void;
     beforeEach?: (cb: () => void) => void;
     expect?: { addSnapshotSerializer: (serializer: any) => void; getState: () => { currentTestName?: string } };
     runner: 'jest' | 'vitest' | 'other';
-
     isCJS: boolean;
 };
 
@@ -17,7 +19,7 @@ export type SpyConfig = {
  * implicitly by "Spy.configure".
  */
 const defaults: SpyConfig = {
-    useOwnEquals: true,
+    useOwnEquals: false,
     enforceOrder: true,
     useGenericReactMocks: false,
     afterEach: (global as any).afterEach,
@@ -29,7 +31,9 @@ const defaults: SpyConfig = {
 
 export const Config = { ...defaults };
 
-export const configure = (config: Partial<SpyConfig> = {}): void => {
+export const configure = (config: Partial<SpyNonSetupConfig>) => configureAll(config);
+
+export const configureAll = (config: Partial<SpyConfig> = {}): void => {
     Object.entries(config).forEach(([name, value]) => {
         if (value !== undefined) {
             Config[name as keyof SpyConfig] = value as never;

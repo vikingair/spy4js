@@ -9,12 +9,12 @@ invocation of `Spy.setup()`. This can be done ideally in some central setup file
 The default configuration changed now. In order to continue using the previous defaults, you can do this:
 
 ```ts
-Spy.setup({ enforceOrder: false, useGenericReactMocks: false });
+Spy.setup({ enforceOrder: false, useGenericReactMocks: false, useOwnEquals: true });
 ```
 
 The method `Spy.initMocks` was removed now as it was previously already more of an internal function. Mocks
 get initialized in test runner or provided `beforeEach` callbacks. This also means that `Spy.mock`, 
-`Spy.mockModule` and `Spy.mockReactComponents` cannot be invoked anymore inside the test suite.
+`Spy.mockModule` and `Spy.mockReactComponents` cannot be invoked anymore inside the `test` (`it`) function.
 
 ## 3.0.0
 

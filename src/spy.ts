@@ -11,7 +11,7 @@ import { createMock, type Mockable } from './mock';
 import { TestSuite } from './test-suite';
 import { Symbols } from './symbols';
 import { createMinimalComponent, createGenericComponent } from './react';
-import { Config, configure } from './config';
+import { Config, configure, configureAll } from './config';
 
 const CallOrder = {
     Idx: 0,
@@ -686,7 +686,7 @@ const AllCreatedSpies: Array<SpyInstance> = [];
 type ISpy = {
     (name?: string): SpyInstance;
     configure: typeof configure;
-    setup: typeof configure;
+    setup: typeof configureAll;
     IGNORE: Symbol;
     COMPARE: typeof COMPARE;
     MAPPER: typeof MAPPER;
@@ -952,7 +952,7 @@ const defaultAfterEachCb = () => {
 };
 
 Spy.setup = (config): void => {
-    configure(config);
+    configureAll(config);
     const { beforeEach, afterEach, expect, runner } = Config;
     if (!beforeEach || !afterEach || !expect) {
         const vitestHint =

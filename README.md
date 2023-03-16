@@ -80,17 +80,17 @@ const { Calculator } = Spy.mockModule('./my/fancy/Calculator', 'Calculator');
 
 You may apply additional behavior to every spy. The valid operations here are:
     
-  - `configure` (some external libraries may use own "equals" implementations unexpectedly)
-  - `calls` (does make the spy call the provided functions sequentially)
-  - `returns` (does make the spy return the provided params sequentially)
-  - `throws` (does make the spy throw an error when called)
-  - `resolves` (does make the spy resolve the provided params sequentially) #Promise
-  - `rejects` (does make the spy reject an error when called) #Promise
-  - `transparent` (does make the spy call the original method of a mocked object)
-  - `transparentAfter` (does make the spy call the original method of a mocked object after a certain amount of made calls)
-  - `reset` (resets the registered calls which were already made)
-  - `restore` (does make the spy restore the mocked object)
-  - `addSnapshotSerializer` (defines in `jest` snapshots how the spy will be serialized)
+- `configure` (allows to override some behavior of the spy)
+- `calls` (does make the spy call the provided functions sequentially)
+- `returns` (does make the spy return the provided params sequentially)
+- `throws` (does make the spy throw an error when called)
+- `resolves` (does make the spy resolve the provided params sequentially) #Promise
+- `rejects` (does make the spy reject an error when called) #Promise
+- `transparent` (does make the spy call the original method of a mocked object)
+- `transparentAfter` (does make the spy call the original method of a mocked object after a certain amount of made calls)
+- `reset` (resets the registered calls which were already made)
+- `restore` (does make the spy restore the mocked object)
+- `addSnapshotSerializer` (defines in `jest` snapshots how the spy will be serialized)
     
 All those methods on a spy has been designed in a builder pattern. So you may chain any of
 these configurations. Be aware some behaviors override existing behaviors.
@@ -136,12 +136,12 @@ spy.restore(); // other than "transparent" does not control input and output of 
 
 Even as important are the "facts", we want to display:
 
-  - `wasCalled` (does display that the spy has been called a specifiable amount of times)
-  - `wasNotCalled` (does display that the spy has never been called)
-  - `wasCalledWith` (does display that the spy has been called at least once like with the provided params)
-  - `wasNotCalledWith` (does display that the spy was never like with the provided params)
-  - `hasCallHistory` (does display that the spy has been called with the following params in the given order)
-  - `hasProps` (does display that the spy has been called with the given argument on the last invocation. In the
+- `wasCalled` (does display that the spy has been called a specifiable amount of times)
+- `wasNotCalled` (does display that the spy has never been called)
+- `wasCalledWith` (does display that the spy has been called at least once like with the provided params)
+- `wasNotCalledWith` (does display that the spy was never like with the provided params)
+- `hasCallHistory` (does display that the spy has been called with the following params in the given order)
+- `hasProps` (does display that the spy has been called with the given argument on the last invocation. In the
                 context of React: The spy being a mocked React component has currently the given props.)
 
 Those methods on a spy display facts. Facts have to be true, otherwise they
@@ -173,25 +173,15 @@ spy.wasNotCalledWith([1, 'test', {attr: [3]}]);
 spy.hasCallHistory([ [1, 'test', {attr: [4]}] ], 'with this text');
 ```
 
-There is one static method that does restore all existing spies in all tests.
-This is extremely useful to clean up all still existing mocks. By default, this is
-automatically done after every test run (this is done by default).
-    
-  - `restoreAll` (does restore every existing spy)
-
-```ts
-Spy.restoreAll();
-```
-
 Sometimes it is necessary to have access to some call arguments with
 which the spy had been called.
 
-  - `getAllCallArguments` (returns all call arguments for all calls in an array containing arrays)
-  - `getCallArguments` (returns all call arguments for a specified call in an array)
-  - `getCallArgument` (same as getCallArguments, but returns only a single element of the array)
-  - `getLatestCallArgument` (same as getCallArgument, but for the latest call)
-  - `getProps` (same as getLatestCallArgument, but only for the first param. Can be useful for mocked React components)
-  - `getCallCount` (returns the number of made calls)
+- `getAllCallArguments` (returns all call arguments for all calls in an array containing arrays)
+- `getCallArguments` (returns all call arguments for a specified call in an array)
+- `getCallArgument` (same as getCallArguments, but returns only a single element of the array)
+- `getLatestCallArgument` (same as getCallArgument, but for the latest call)
+- `getProps` (same as getLatestCallArgument, but only for the first param. Can be useful for mocked React components)
+- `getCallCount` (returns the number of made calls)
     
 ```ts
 const spy = Spy();
@@ -232,26 +222,44 @@ Spy(spyName:string = 'the spy') => SpyInstance
 ```
 The returned Spy instance has his own name-attribute (only) for debugging purpose.
 
+### setup (static)
+```ts
+Spy.setup(config: {
+    useOwnEquals?: boolean;
+    enforceOrder?: boolean;
+    useGenericReactMocks?: boolean;
+    afterEachCb?: () => void;
+    afterEach?: (cb: () => void) => void;
+    beforeEach?: (cb: () => void) => void;
+    expect?: { addSnapshotSerializer: (serializer: any) => void; getState: () => { currentTestName?: string } };
+    runner?: 'jest' | 'vitest' | 'other';
+    isCJS?: boolean;
+}) => void
+```
+This function should be ideally called in some setup-test file, but is required to be called to get all
+benefits of `spy4js`.
+- **afterEach**: The test runners `afterEach` hook (default: `global.afterEach`)
+- **beforeEach**: The test runners `beforeEach` hook (default: `global.beforeEach`)
+- **runner**: The test runner name (default: determines if "jest" or "vitest")
+- **isCJS**: The test runners `expect` function (default: `typeof module !== 'undefined'`)
+
+For the other options see [below](#configure-static).
+
 ### configure (static)
 ```ts
 Spy.configure(config: {
-    useOwnEquals?: boolean,
-    enforceOrder?: boolean,
-    useGenericReactMocks?: boolean,
-    beforeEach?: (scope: string) => void,
-    afterEach?: (scope: string) => void,
+    useOwnEquals?: boolean;
+    enforceOrder?: boolean;
+    useGenericReactMocks?: boolean;
+    afterEachCb?: () => void;
 }) => void
 ```
-Using this function you may edit the default behavior spy4js itself.
-The scope param will contain the test-suite name, which was provided as first parameter
-of the `describe` function. Please make sure that every scope name is unique per test file.
-The configuration possibility are:
+Using this function you may edit the default behavior `spy4js` itself.
 - **useOwnEquals**: Applies for all spy instances. See [configure](#configure) for more details.
 - **enforceOrder**: Opt-in to the [enforce-order mode](#enforce-order-mode).
 - **useGenericReactMocks**: Lets you opt in into using generic react components for mocks 
   created via [mockReactComponents](#mockreactcomponents-static).
-- **beforeEach**: Lets you override the default beforeEach test suite hook.
-- **afterEach**: Lets you override the default afterEach test suite hook.
+- **afterEachCb**: Lets you override the default afterEach fuctionality.
 
 ### on (static)
 ```ts

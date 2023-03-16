@@ -607,7 +607,7 @@ describe('Spy - Utils', () => {
     const testInstance4 = new TestClass(5);
 
     it('should use own "equals" implementations as default, but is able to reconfigure this behavior', () => {
-        const spy = Spy();
+        const spy = Spy().configure({ useOwnEquals: true });
 
         spy(testInstance1);
 
@@ -671,8 +671,8 @@ describe('Spy - Utils', () => {
             spy.wasNotCalledWith(testInstance4);
         };
 
-        wasCalledChecksForOwnEquals(defaultSpy1);
-        wasCalledChecksForOwnEquals(defaultSpy2);
+        wasCalledChecksForNotOwnEquals(defaultSpy1);
+        wasCalledChecksForNotOwnEquals(defaultSpy2);
 
         wasCalledChecksForNotOwnEquals(configuredSpy1);
         wasCalledChecksForNotOwnEquals(configuredSpy2);
