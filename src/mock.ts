@@ -21,11 +21,10 @@ type MockInfo = {
     mock: Mockable;
     mocked: Mockable;
     callsFactory?: (methodName: string) => (...args: any[]) => any;
-    moduleName?: string;
     activeMethods: Set<string>;
 };
 
-const registerMock = (mocked: Mockable, callsFactory?: MockInfo['callsFactory'], moduleName?: string) => {
+const registerMock = (mocked: Mockable, callsFactory?: MockInfo['callsFactory']) => {
     const mock = {};
     const { beforeEach, expect } = Config;
 
@@ -35,7 +34,7 @@ const registerMock = (mocked: Mockable, callsFactory?: MockInfo['callsFactory'],
 
     const activeMethods = new Set<string>();
     beforeEach(() => {
-        initMock({ mocked, mock, callsFactory, moduleName, activeMethods }, Spy.on);
+        initMock({ mocked, mock, callsFactory, activeMethods }, Spy.on);
     });
 
     return mock;
@@ -44,10 +43,9 @@ const registerMock = (mocked: Mockable, callsFactory?: MockInfo['callsFactory'],
 export const createMock = <T extends Mockable, K extends keyof T>(
     obj: T,
     methods: K[],
-    callsFactory?: MockInfo['callsFactory'],
-    moduleName?: string
+    callsFactory?: MockInfo['callsFactory']
 ): { [P in K]: any } => {
-    const mock = registerMock(obj, callsFactory, moduleName) as { [P in K]: any };
+    const mock = registerMock(obj, callsFactory) as { [P in K]: any };
     methods.forEach((method) => {
         mock[method] = uninitialized(method);
     });
@@ -57,7 +55,7 @@ export const createMock = <T extends Mockable, K extends keyof T>(
 export const couldNotInitError = (additional: string) => new Error(`Could not initialize mock because:\n${additional}`);
 
 const initMock = (mockInfo: MockInfo, spyOn: SpyOn): void => {
-    const { mocked, mock, callsFactory, moduleName, activeMethods } = mockInfo;
+    const { mocked, mock, callsFactory, activeMethods } = mockInfo;
     Object.keys(mock).forEach((method) => {
         if (activeMethods.has(method)) return;
         try {
@@ -75,17 +73,18 @@ const initMock = (mockInfo: MockInfo, spyOn: SpyOn): void => {
             let msg = (e as Error).message;
             const utilName = Config.runner === 'jest' ? 'jest' : Config.runner === 'vitest' ? 'vi' : undefined;
             if (utilName && msg.includes('has only a getter')) {
+                const actual =
+                    utilName === 'jest'
+                        ? `() => ({ ...jest.requireActual('<module-name>') })`
+                        : `async () => ({ ...((await vi.importActual('<module-name>')) as any) })`;
                 msg += `
-Inserting a module mock might resolve this problem. Add this code first:
+Inserting a module mock might should resolve this problem. Run this code beforehand:
 
-${utilName}.mock('${moduleName}');
+${utilName}.mock('<module-name>');
 
 Or if you don't want to mock everything from this module, you can use this:
 
-${utilName}.mock('${moduleName}', () => ({
-    ...${utilName}.requireActual('${moduleName}'),
-    '${method}': () => undefined,
-}));`;
+${utilName}.mock('<module-name>', ${actual});`;
             }
             throw couldNotInitError(msg);
         }

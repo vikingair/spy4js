@@ -10,7 +10,6 @@ export type SpyConfig = SpyNonSetupConfig & {
     beforeEach?: (cb: () => void) => void;
     expect?: { addSnapshotSerializer: (serializer: any) => void; getState: () => { currentTestName?: string } };
     runner: 'jest' | 'vitest' | 'other';
-    isCJS: boolean;
 };
 
 /**
@@ -26,7 +25,6 @@ const defaults: SpyConfig = {
     beforeEach: (global as any).beforeEach,
     expect: (global as any).expect,
     runner: process.env.JEST_WORKER_ID !== undefined ? 'jest' : 'vitest',
-    isCJS: typeof module !== 'undefined',
 };
 
 export const Config = { ...defaults };

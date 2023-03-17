@@ -14,7 +14,24 @@ Spy.setup({ enforceOrder: false, useGenericReactMocks: false, useOwnEquals: true
 
 The method `Spy.initMocks` was removed now as it was previously already more of an internal function. Mocks
 get initialized in test runner or provided `beforeEach` callbacks. This also means that `Spy.mock`, 
-`Spy.mockModule` and `Spy.mockReactComponents` cannot be invoked anymore inside the `test` (`it`) function.
+`Spy.mockReactComponents` cannot be invoked anymore inside the `test` (`it`) function.
+
+The library was also doing some custom module mocking that is no longer maintainable considering that it
+was based on CommonJS and does not work with `vitest` or the new (still experimental) ESM mode from `jest`.
+
+The method `Spy.mockModule` was removed. To achieve the same you need to transform like this:
+
+```ts
+Spy.mockModule('./my-module', 'foo'); // OLD
+Spy.mock(require('./my-module'), 'foo'); // NEW
+```
+
+The method `Spy.mockReactComponents` uses also no build-in module mocks anymore and requires this change:
+
+```ts
+Spy.mockReactComponents('./my-module', 'foo'); // OLD
+Spy.mockReactComponents(require('./my-module'), 'foo'); // NEW
+```
 
 ## 3.0.0
 

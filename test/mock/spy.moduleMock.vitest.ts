@@ -1,13 +1,18 @@
+import { vi } from 'vitest';
+
+vi.mock('../../src/utils', async () => ({ ...((await vi.importActual('../../src/utils')) as any) }));
+vi.mock('../../src/serializer', async () => ({ ...((await vi.importActual('../../src/serializer')) as any) }));
+vi.mock('@testing-library/react');
+
 import { differenceOf } from '../../src/utils';
 import { Spy } from '../../src/spy';
 import { serialize } from '../../src/serializer';
 import { render } from '@testing-library/react';
-import { watch } from 'rollup/dist/rollup.js';
 
 Spy.setup();
 
-describe('Spy.mockModule', () => {
-    const Mock$Utils = Spy.mockModule('../../src/utils', 'differenceOf', 'toError');
+describe('Spy.mockModule', async () => {
+    const Mock$Utils = Spy.mock(await import('../../src/utils'), 'differenceOf', 'toError');
 
     it('does something', () => {
         Mock$Utils.differenceOf.returns(42);
@@ -16,8 +21,8 @@ describe('Spy.mockModule', () => {
     });
 });
 
-describe('Spy.mockModule.2', () => {
-    const Mock$Serializer = Spy.mockModule('../../src/serializer', 'serialize');
+describe('Spy.mockModule.2', async () => {
+    const Mock$Serializer = Spy.mock(await import('../../src/serializer'), 'serialize');
 
     it('does something', () => {
         Mock$Serializer.serialize.returns(42);
@@ -26,19 +31,8 @@ describe('Spy.mockModule.2', () => {
     });
 });
 
-describe('Spy.mockModule.node_module', () => {
-    const Mock$Rollup = Spy.mockModule('rollup/dist/rollup.js', 'watch');
-
-    it('does something', () => {
-        expect(watch({})).toBe(undefined);
-        Mock$Rollup.watch.returns(42);
-        expect(watch({})).toBe(42);
-    });
-});
-
-jest.mock('@testing-library/react');
-describe('Spy.mockModule - with only getter property', () => {
-    const Mock$ReactTestingLibrary = Spy.mockModule('@testing-library/react', 'render');
+describe('Spy.mockModule - with only getter property', async () => {
+    const Mock$ReactTestingLibrary = Spy.mock(await import('@testing-library/react'), 'render');
 
     it('replaces the function by our spy', () => {
         expect(render).toBe(Mock$ReactTestingLibrary.render);

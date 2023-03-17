@@ -8,7 +8,6 @@ import { COMPARE, MAPPER, differenceOf, type OptionalMessageOrError, toError, ty
 import { SpyRegistry } from './registry';
 import { serialize, IGNORE } from './serializer';
 import { createMock, type Mockable } from './mock';
-import { TestSuite } from './test-suite';
 import { Symbols } from './symbols';
 import { createMinimalComponent, createGenericComponent } from './react';
 import { Config, configure, configureAll } from './config';
@@ -692,8 +691,7 @@ type ISpy = {
     MAPPER: typeof MAPPER;
     on<T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInstance;
     mock<T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance };
-    mockModule<K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance };
-    mockReactComponents<K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance };
+    mockReactComponents<T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance };
     restoreAll(): void;
     resetAll(): void;
 };
@@ -856,42 +854,16 @@ Spy.on = <T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInst
  *
  * (spy1 === obj$Mock.methodName1 and so forth)
  *
- * @param {Object} obj -> The manipulated object. Actual type:
- *                        Before initialization: { [$Keys<typeof methodNames>]: Throwing function }
- *                        After initialization: { [$Keys<typeof methodNames>]: SpyInstance }
+ * @param {Object} obj -> the object to be mocked.
  * @param {string[]} methodNames -> Iterative provided attribute
  *                                  names that will be mocked.
  *
- * @return {Object} Mock.
+ * @return {Object} Mock. -> The manipulated object. Actual type:
+ *                        Before initialization: { [$Keys<typeof methodNames>]: Throwing function }
+ *                        After initialization: { [$Keys<typeof methodNames>]: SpyInstance }
  */
 Spy.mock = <T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance } =>
     createMock(obj, methodNames);
-
-/**
- * This static method enables you to create mocks on module scope.
- * As long as jest will support this behavior, the Spy will too. If
- * you are calling this function on other test runners you will
- * encounter an exception. You should favor to use "Spy.mock" but there
- * might be reasons that this will not work. E.g. if you want to mock
- * directly exported functions.
- *
- * For example:
- *
- * const Mock$MyModule = Spy.mockModule('./my-module', 'useMe');
- *
- * Now you could do:
- * Mock$MyModule.useMe.returns(['foo', 'bar']);
- *
- * @param {string} moduleName -> Everything that's expected by "jest.mock"
- *                               as first parameter. Relative and absolute
- *                               module paths.
- * @param {string[]} methodNames -> Iterative provided attribute
- *                                  names that will be mocked.
- *
- * @return {Object} Mock.
- */
-Spy.mockModule = <K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance } =>
-    TestSuite.createModuleMock(moduleName, methodNames);
 
 /**
  * This static method is very similar to "Spy.mockModule" but perfectly
@@ -903,20 +875,19 @@ Spy.mockModule = <K extends string>(moduleName: string, ...methodNames: K[]): { 
  * instead of "undefined" as default. This is a minimal valid React
  * component.
  *
- * @param {string} moduleName -> Everything that's expected by "jest.mock"
- *                               as first parameter. Relative and absolute
- *                               module paths.
+ * @param {Object} obj -> the object to be mocked.
  * @param {string[]} methodNames -> Iterative provided attribute
  *                                  names that will be mocked.
  *
- * @return {Object} Mock.
+ * @return {Object} Mock. -> The manipulated object. Actual type:
+ *                        Before initialization: { [$Keys<typeof methodNames>]: Throwing function }
+ *                        After initialization: { [$Keys<typeof methodNames>]: SpyInstance }
  */
-Spy.mockReactComponents = <K extends string>(moduleName: string, ...methodNames: K[]): { [P in K]: SpyInstance } =>
-    TestSuite.createModuleMock(
-        moduleName,
-        methodNames,
-        Config.useGenericReactMocks ? createGenericComponent : createMinimalComponent
-    );
+Spy.mockReactComponents = <T extends Mockable, K extends keyof T>(
+    obj: T,
+    ...methodNames: K[]
+): { [P in K]: SpyInstance } =>
+    createMock(obj, methodNames, Config.useGenericReactMocks ? createGenericComponent : createMinimalComponent);
 
 /**
  * This static method does restore all

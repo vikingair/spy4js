@@ -28,26 +28,24 @@ The objects attribute 'swim' was already spied. Please make sure to spy only onc
     });
 });
 
-// TODO: Investigate if the whole module could be replaced by a Proxy to overcome this issue. Also check for ESM compat
 describe('Spy - Test-Suite with throwing scoped mock because of getters only', () => {
-    const Mock$BabelCore = Spy.mockModule('@babel/core', 'buildExternalHelpers');
+    const Mock$BabelCore = Spy.mock(require('@babel/core'), 'buildExternalHelpers');
 
     it('throws an error if scoped mocks can not initialize', () => {
         expect(Mock$BabelCore.buildExternalHelpers).toBeDefined();
 
-        expect(() => beforeEachSpy.getCallArgument(2)()).toThrowErrorMatchingInlineSnapshot(`
-"Could not initialize mock because:
+        expect(() => beforeEachSpy.getCallArgument(2)()).toThrowError(
+            `
+Could not initialize mock because:
 Cannot set property buildExternalHelpers of [object Object] which has only a getter
-Inserting a module mock might resolve this problem. Add this code first:
+Inserting a module mock might should resolve this problem. Run this code beforehand:
 
-jest.mock('@babel/core');
+jest.mock('<module-name>');
 
 Or if you don't want to mock everything from this module, you can use this:
 
-jest.mock('@babel/core', () => ({
-    ...jest.requireActual('@babel/core'),
-    'buildExternalHelpers': () => undefined,
-}));"
-`);
+jest.mock('<module-name>', () => ({ ...jest.requireActual('<module-name>') }));
+`.trim()
+        );
     });
 });

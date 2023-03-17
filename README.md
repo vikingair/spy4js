@@ -17,17 +17,20 @@
 
 ### Introduction
 
-**spy4js** provides a stand-alone spy framework. It is decoupled by any dependencies
-and other assertion frameworks.
+**spy4js** provides a stand-alone spy framework that can be integrated well with the frameworks
+[Vitest](https://vitest.dev/) and [Jest](https://jestjs.io/).
+
+⚠️Disclaimer: You don't need this library as the frameworks already everything in order to achieve
+everything without this library.
 
 **spy4js** exports only one object called `Spy`. The spy instances
 come with a lot of useful features. See below for more.
 
-**Hint**:
-My favorite test framework is [Jest](https://jestjs.io/). If you are using other
-frameworks you might get issues related to automatically applied test suite hooks.
-To overcome this default behavior see [here](#configure-static). Since Jest already
-includes excellent spies itself, you might ask yourself, why `spy4js`. Because it's better.
+**Hint**: 
+If you are using other frameworks you might not be able to benefit from all features of this library.
+Since the test frameworks already include excellent spies themselves, you might ask yourself, why `spy4js`... 
+
+Because it can make your tests more readable.
 
 Advantages over Jest spies:
 - Very important for tests is their readability. This spy API is much easier to learn, and
@@ -72,10 +75,14 @@ const someObject2 = new Date(2017, 1, 15);
 const someObject2$Mock = Spy.mock(someObject2, 'toJSON', 'toString', 'getDate');
 
 // mock exported functions from other modules
-const myModuleMocks = Spy.mockModule('./my-module', 'useMe');
+const myModuleMocksInJest = Spy.mock(require('./my-module'), 'useMe');
+vi.mock('./my-module', async () => ({ ...((await vi.importActual('./my-module')) as any) }));
+const myModuleMocksInVitest = Spy.mock(await import('./my-module'), 'useMe');
 
 // mock React components from other modules
-const { Calculator } = Spy.mockModule('./my/fancy/Calculator', 'Calculator');
+const mockedReactComponentsInJest = Spy.mockReactComponents(require('./my/fancy/Calculator'), 'Calculator');
+vi.mock('./my/fancy/Calculator', async () => ({ ...((await vi.importActual('./my/fancy/Calculator')) as any) }));
+const mockedReactComponentsInVitest = Spy.mockReactComponents(await import('./my/fancy/Calculator'), 'Calculator');
 ```
 
 You may apply additional behavior to every spy. The valid operations here are:
@@ -233,7 +240,6 @@ Spy.setup(config: {
     beforeEach?: (cb: () => void) => void;
     expect?: { addSnapshotSerializer: (serializer: any) => void; getState: () => { currentTestName?: string } };
     runner?: 'jest' | 'vitest' | 'other';
-    isCJS?: boolean;
 }) => void
 ```
 This function should be ideally called in some setup-test file, but is required to be called to get all
@@ -241,7 +247,6 @@ benefits of `spy4js`.
 - **afterEach**: The test runners `afterEach` hook (default: `global.afterEach`)
 - **beforeEach**: The test runners `beforeEach` hook (default: `global.beforeEach`)
 - **runner**: The test runner name (default: determines if "jest" or "vitest")
-- **isCJS**: The test runners `expect` function (default: `typeof module !== 'undefined'`)
 
 For the other options see [below](#configure-static).
 
@@ -280,15 +285,9 @@ Creating an object that references spies for all given methodNames.
 Initialize as many spies as required for the same object. Only
 after `Spy.initMocks` gets called, the created mock does affect the given object.
 
-### mockModule (static)
-```ts
-Spy.mockModule(moduleName: string, ...methodNames: string[]) => Object (Mock)
-```
-Same as [mock](#mock-static) but only necessary if you want to mock exported functions.
-
 ### mockReactComponents (static)
 ```ts
-Spy.mockReactComponents(moduleName: string, ...methodNames: string[]) => Object (Mock)
+Spy.mockReactComponents(object: object, ...methodNames: string[]) => Object (Mock)
 ```
 Same as [mockModule](#mockModule-static) but designed for ReactJS components. The registered
 spies return `null` instead of `undefined`. This makes minimal usable React components.

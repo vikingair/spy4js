@@ -1,14 +1,22 @@
+import { vi } from 'vitest';
 import React from 'react';
 import { Spy } from '../../src/spy';
-import { Component1, Component2, Component3 } from './test.reactComponents';
+vi.mock('./test.reactComponents', async () => ({ ...((await vi.importActual('./test.reactComponents')) as any) }));
+
+import { Component1, Component2 } from './test.reactComponents';
+import { Component3 } from './test.reactComponents2';
 import { render } from '@testing-library/react';
 import { _GenericComponent } from '../../src/react';
 
 Spy.setup();
 
-describe('mockReactComponents - minimal', () => {
+describe('mockReactComponents - minimal', async () => {
     Spy.configure({ useGenericReactMocks: false });
-    const Mock$TestReactComponents = Spy.mockReactComponents('./test.reactComponents', 'Component1', 'Component2');
+    const Mock$TestReactComponents = Spy.mockReactComponents(
+        await import('./test.reactComponents'),
+        'Component1',
+        'Component2'
+    );
 
     it('mocks as plain function', () => {
         expect(Component1({ foo: 'bar' })).toBe(null);
@@ -30,12 +38,16 @@ describe('mockReactComponents - minimal', () => {
     });
 });
 
-describe('mockReactComponents - generic', () => {
+describe('mockReactComponents - generic', async () => {
     beforeEach(() => {
         _GenericComponent.serializeAllProps = true;
     });
     Spy.configure({ useGenericReactMocks: true });
-    const Mock$TestReactComponents = Spy.mockReactComponents('./test.reactComponents', 'Component1', 'Component2');
+    const Mock$TestReactComponents = Spy.mockReactComponents(
+        await import('./test.reactComponents'),
+        'Component1',
+        'Component2'
+    );
 
     it('mocks as plain function', () => {
         expect(Component1({ foo: 'bar' })!.props['data-prop-foo']).toBe("'bar'");

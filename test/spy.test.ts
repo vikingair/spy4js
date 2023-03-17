@@ -350,11 +350,15 @@ describe('Spy - Utils', () => {
         expect(() => spy({ _key: 'callParams4' })).toThrow(/^CustomError\('bar'\)$/);
     });
 
-    it('should reset the call arguments on an object spy and NOT removing it (LIKE RESTORE)', (cb) => {
+    it('should reset the call arguments on an object spy and NOT removing it (LIKE RESTORE)', async () => {
+        let resolve: any = null;
+        const p = new Promise<undefined>((r) => {
+            resolve = r;
+        });
         const testObject = {
             func: (allowed: string) => {
                 expect(allowed).toEqual('testCall3');
-                cb();
+                resolve();
             },
         };
         const spy = Spy.on(testObject, 'func');
@@ -373,6 +377,7 @@ describe('Spy - Utils', () => {
         // if this would get spied, the test callback
         // would never be called which would make the test fail
         testObject.func('testCall3');
+        await p;
     });
 
     it('should call NOP if no input-function is supplied', () => {
@@ -838,8 +843,9 @@ describe('Spy - Utils', () => {
     });
 
     it('can spy on bound functions (bound to internal objects)', () => {
-        const spy = Spy.on(window.console, 'error').returns('spied!');
-        expect(window.console.error('foo')).toBe('spied!');
+        const spy = Spy.on(console, 'error').returns('spied!');
+        // eslint-disable-next-line no-console
+        expect(console.error('foo')).toBe('spied!');
         spy.hasCallHistory('foo');
     });
 
