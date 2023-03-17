@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0-beta.1] - 2023-03-17
+### Added
+- Support for `vitest` and `jest` ESM mode
+- `Spy.setup` to set up the library
+
+### Changed
+- `Spy.mockModule` removed
+- `Spy.mockReactComponents` changed first param type
+- side effects removed: `Spy.setup` needs to be invoked
+- default configs changed:
+  - `enforceOrder`: false -> true
+  - `useGenericReactMocks`: false -> true
+  - `useOwnEquals`: true -> false
+
+For more detailed information please see [Migration Guide v4](https://github.com/fdc-viktor-luft/spy4js/blob/master/MIGRATIONGUIDE.md#400)
+
+
 ## [3.4.1] - 2022-05-25
 ### Fixed
 - Only use generated TS declaration files instead of sources to avoid TS errors in peers.
