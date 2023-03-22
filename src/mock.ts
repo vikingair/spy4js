@@ -5,7 +5,6 @@
  *
  */
 import { Symbols } from './symbols';
-import { Spy } from './spy';
 import { Config } from './config';
 
 export type Mockable = Record<string, any>;
@@ -17,6 +16,19 @@ const uninitialized = (method: keyof any) => () => {
     throw new Error(`Method '${String(method)}' was not initialized on Mock.`);
 };
 
+export const createMock = <T extends Mockable, K extends keyof T>(
+    obj: T,
+    methods: K[],
+    spyOn: SpyOn,
+    callsFactory?: MockInfo['callsFactory']
+): { [P in K]: any } => {
+    const mock = registerMock(obj, spyOn, callsFactory) as { [P in K]: any };
+    methods.forEach((method) => {
+        mock[method] = uninitialized(method);
+    });
+    return mock;
+};
+
 type MockInfo = {
     mock: Mockable;
     mocked: Mockable;
@@ -24,7 +36,7 @@ type MockInfo = {
     activeMethods: Set<string>;
 };
 
-const registerMock = (mocked: Mockable, callsFactory?: MockInfo['callsFactory']) => {
+const registerMock = (mocked: Mockable, spyOn: SpyOn, callsFactory?: MockInfo['callsFactory']) => {
     const mock = {};
     const { beforeEach, expect } = Config;
 
@@ -34,21 +46,9 @@ const registerMock = (mocked: Mockable, callsFactory?: MockInfo['callsFactory'])
 
     const activeMethods = new Set<string>();
     beforeEach(() => {
-        initMock({ mocked, mock, callsFactory, activeMethods }, Spy.on);
+        initMock({ mocked, mock, callsFactory, activeMethods }, spyOn);
     });
 
-    return mock;
-};
-
-export const createMock = <T extends Mockable, K extends keyof T>(
-    obj: T,
-    methods: K[],
-    callsFactory?: MockInfo['callsFactory']
-): { [P in K]: any } => {
-    const mock = registerMock(obj, callsFactory) as { [P in K]: any };
-    methods.forEach((method) => {
-        mock[method] = uninitialized(method);
-    });
     return mock;
 };
 

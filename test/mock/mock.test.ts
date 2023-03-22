@@ -18,7 +18,7 @@ const IRL = {
 const Matrix = { tearDown: () => 1337, startup: () => 1 };
 
 describe('Mocks - 1', () => {
-    const IRL$Mock = createMock(IRL, ['doWithTree', 'giveBanana']);
+    const IRL$Mock = createMock(IRL, ['doWithTree', 'giveBanana'], Spy.on);
     const { doWithTree, giveBanana, saveTheWorld } = IRL$Mock as any;
 
     it('creates uninitialized mocks', () => {
@@ -29,7 +29,7 @@ describe('Mocks - 1', () => {
 });
 
 describe('Mocks - 2', () => {
-    const IRL$Mock = createMock(IRL, ['doWithTree', 'giveBanana']);
+    const IRL$Mock = createMock(IRL, ['doWithTree', 'giveBanana'], Spy.on);
 
     it('mocks specified methods', () => {
         expect((IRL$Mock as any).saveTheWorld).toBe(undefined);
@@ -49,8 +49,8 @@ describe('Mocks - 2', () => {
 });
 
 describe('Mocks - 3', () => {
-    const IRL$Mock = createMock(IRL, ['saveTheWorld']);
-    const Matrix$Mock = createMock(Matrix, ['tearDown']);
+    const IRL$Mock = createMock(IRL, ['saveTheWorld'], Spy.on);
+    const Matrix$Mock = createMock(Matrix, ['tearDown'], Spy.on);
 
     it('creates multiple mocks', () => {
         IRL$Mock.saveTheWorld.transparent();
@@ -66,6 +66,6 @@ describe('Mocks - 3', () => {
 
 describe('Mocks - 4', () => {
     it('fails if called within test', () => {
-        expect(() => createMock(IRL, ['doWithTree'])).toThrow('Mocks can only be created outside of tests');
+        expect(() => createMock(IRL, ['doWithTree'], Spy.on)).toThrow('Mocks can only be created outside of tests');
     });
 });

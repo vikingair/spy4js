@@ -863,7 +863,7 @@ Spy.on = <T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInst
  *                        After initialization: { [$Keys<typeof methodNames>]: SpyInstance }
  */
 Spy.mock = <T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance } =>
-    createMock(obj, methodNames);
+    createMock(obj, methodNames, Spy.on);
 
 /**
  * This static method is very similar to "Spy.mockModule" but perfectly
@@ -887,7 +887,7 @@ Spy.mockReactComponents = <T extends Mockable, K extends keyof T>(
     obj: T,
     ...methodNames: K[]
 ): { [P in K]: SpyInstance } =>
-    createMock(obj, methodNames, Config.useGenericReactMocks ? createGenericComponent : createMinimalComponent);
+    createMock(obj, methodNames, Spy.on, Config.useGenericReactMocks ? createGenericComponent : createMinimalComponent);
 
 /**
  * This static method does restore all
