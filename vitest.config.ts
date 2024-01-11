@@ -5,10 +5,10 @@ export default defineConfig({
     test: {
         environment: 'jsdom',
         include: ['**/*.{test,vitest}.{ts,tsx}'],
-        globals: true,
         coverage: {
             reporter: ['text', 'lcov'],
             include: ['src/**/*.ts'],
+            thresholds: { lines: 99, branches: 98, functions: 100, statements: 99 },
         },
     },
 });

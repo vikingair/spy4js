@@ -6,6 +6,7 @@
  */
 import { COMPARE, differenceOf, MAPPER } from '../src/utils';
 import { IGNORE } from '../src/serializer';
+import { describe, it, expect } from 'vitest';
 
 describe('Spy - Equality', () => {
     it('should make an equality check for classes correctly', () => {

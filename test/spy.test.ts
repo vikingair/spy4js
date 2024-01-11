@@ -5,8 +5,9 @@
  *
  */
 import { Spy, SpyInstance } from '../src/spy';
+import { beforeEach, afterEach, expect, describe, it } from 'vitest';
 
-Spy.setup({ enforceOrder: false });
+Spy.setup({ enforceOrder: false, beforeEach, afterEach, expect });
 
 describe('Spy - Utils', () => {
     class CustomError extends Error {
@@ -794,6 +795,8 @@ describe('Spy - Utils', () => {
     });
 
     it('overrides the snapshot rendering of spies', () => {
+        // skip for "bun test"
+        if ((global as any).Bun) return;
         expect(Spy()).toMatchInlineSnapshot('Spy()');
         expect(Spy('foo')).toMatchInlineSnapshot('Spy(foo)');
         const testObj = { func: () => {} };
@@ -802,6 +805,8 @@ describe('Spy - Utils', () => {
     });
 
     it('allows custom snapshot rendering of spies', () => {
+        // skip for "bun test"
+        if ((global as any).Bun) return;
         const spy = Spy().addSnapshotSerializer((foo) => `Called with ${foo}`);
         expect(spy).toMatchInlineSnapshot('Called with undefined');
 

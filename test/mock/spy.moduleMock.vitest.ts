@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 vi.mock('../../src/utils', async () => ({ ...((await vi.importActual('../../src/utils')) as any) }));
 vi.mock('../../src/serializer', async () => ({ ...((await vi.importActual('../../src/serializer')) as any) }));
@@ -9,7 +9,7 @@ import { Spy } from '../../src/spy';
 import { serialize } from '../../src/serializer';
 import { render } from '@testing-library/react';
 
-Spy.setup();
+Spy.setup({ expect, beforeEach, afterEach });
 
 describe('Spy.mockModule', async () => {
     const Mock$Utils = Spy.mock(await import('../../src/utils'), 'differenceOf', 'toError');

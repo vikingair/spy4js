@@ -5,8 +5,9 @@
  *
  */
 import { Spy } from '../../src/spy';
+import { beforeEach, afterEach, expect, describe, it } from 'vitest';
 
-Spy.setup();
+Spy.setup({ beforeEach, afterEach, expect });
 
 const IRL = {
     saveTheWorld: () => 'feed some koalas',

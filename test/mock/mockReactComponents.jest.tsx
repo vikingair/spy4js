@@ -47,7 +47,7 @@ describe('mockReactComponents - generic', () => {
     );
 
     it('mocks as plain function', () => {
-        expect(Component1({ foo: 'bar' })!.props['data-prop-foo']).toBe("'bar'");
+        expect((Component1({ foo: 'bar' }) as any).props['data-prop-foo']).toBe("'bar'");
         expect(Mock$TestReactComponents.Component1.getProps().foo).toBe('bar');
         Mock$TestReactComponents.Component1.wasCalledWith({ foo: 'bar' });
     });

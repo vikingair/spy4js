@@ -28,11 +28,11 @@ const registry = new SpyRegistry();
 
 let __LOCK__ = true;
 
-type SpyConfig = { useOwnEquals: boolean; persistent: boolean };
+type SpyInstanceConfig = { useOwnEquals: boolean; persistent: boolean };
 
 export type SpyInstance = {
     (...args: any[]): any;
-    configure: (config: Partial<SpyConfig>) => SpyInstance;
+    configure: (config: Partial<SpyInstanceConfig>) => SpyInstance;
     calls: (...funcs: Function[]) => SpyInstance;
     returns: (...args: any[]) => SpyInstance;
     resolves: (...args: any[]) => SpyInstance;
@@ -65,7 +65,7 @@ export type SpyInstance = {
     [Symbols.index]: number;
     [Symbols.isSpy]: boolean;
     [Symbols.func]: Function;
-    [Symbols.config]: SpyConfig;
+    [Symbols.config]: SpyInstanceConfig;
     [Symbols.onRestore]?: () => void;
 };
 
@@ -96,7 +96,7 @@ const SpyFunctions = {
      *                         for special configuration
      * @return {SpyInstance} <- BuilderPattern.
      */
-    configure(this: SpyInstance, config: Partial<SpyConfig>): SpyInstance {
+    configure(this: SpyInstance, config: Partial<SpyInstanceConfig>): SpyInstance {
         if (config.useOwnEquals !== undefined) {
             this[Symbols.config].useOwnEquals = config.useOwnEquals;
         }

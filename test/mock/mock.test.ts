@@ -6,8 +6,9 @@
  */
 import { createMock } from '../../src/mock';
 import { Spy } from '../../src/spy';
+import { beforeEach, afterEach, expect, describe, it } from 'vitest';
 
-Spy.setup();
+Spy.setup({ beforeEach, afterEach, expect });
 
 const IRL = {
     saveTheWorld: () => 'feed some koalas',
@@ -23,8 +24,8 @@ describe('Mocks - 1', () => {
 
     it('creates uninitialized mocks', () => {
         expect(saveTheWorld).toBe(undefined);
-        expect(doWithTree).toThrowErrorMatchingInlineSnapshot(`"Method 'doWithTree' was not initialized on Mock."`);
-        expect(giveBanana).toThrowErrorMatchingInlineSnapshot(`"Method 'giveBanana' was not initialized on Mock."`);
+        expect(doWithTree).toThrowError("Method 'doWithTree' was not initialized on Mock.");
+        expect(giveBanana).toThrowError("Method 'giveBanana' was not initialized on Mock.");
     });
 });
 
@@ -66,6 +67,8 @@ describe('Mocks - 3', () => {
 
 describe('Mocks - 4', () => {
     it('fails if called within test', () => {
+        // skip for "bun test"
+        if ((global as any).Bun) return;
         expect(() => createMock(IRL, ['doWithTree'], Spy.on)).toThrow('Mocks can only be created outside of tests');
     });
 });

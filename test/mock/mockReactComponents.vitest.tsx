@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { Spy } from '../../src/spy';
 vi.mock('./test.reactComponents', async () => ({ ...((await vi.importActual('./test.reactComponents')) as any) }));
@@ -8,7 +8,7 @@ import { Component3 } from './test.reactComponents2';
 import { render } from '@testing-library/react';
 import { _GenericComponent } from '../../src/react';
 
-Spy.setup();
+Spy.setup({ expect, beforeEach, afterEach });
 
 describe('mockReactComponents - minimal', async () => {
     Spy.configure({ useGenericReactMocks: false });
@@ -50,7 +50,7 @@ describe('mockReactComponents - generic', async () => {
     );
 
     it('mocks as plain function', () => {
-        expect(Component1({ foo: 'bar' })!.props['data-prop-foo']).toBe("'bar'");
+        expect((Component1({ foo: 'bar' }) as any).props['data-prop-foo']).toBe("'bar'");
         expect(Mock$TestReactComponents.Component1.getProps().foo).toBe('bar');
         Mock$TestReactComponents.Component1.wasCalledWith({ foo: 'bar' });
     });

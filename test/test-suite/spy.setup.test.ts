@@ -1,5 +1,6 @@
 import { Spy } from '../../src/spy';
 import { Config } from '../../src/config';
+import { describe, it, expect } from 'vitest';
 
 describe('Spy.setup', () => {
     it('vitest runner - missing expect', () => {

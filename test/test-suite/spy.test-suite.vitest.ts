@@ -1,7 +1,8 @@
 import { Spy } from '../../src/spy';
+import { describe, it, expect } from 'vitest';
 
 const beforeEachSpy = Spy('beforeEach');
-Spy.setup({ beforeEach: beforeEachSpy, afterEach: () => {} });
+Spy.setup({ beforeEach: beforeEachSpy, afterEach: () => {}, expect });
 
 describe('Spy - Test-Suite with throwing scoped mock because of getters only (vitest)', async () => {
     const Mock$BabelCore = Spy.mock(await import('@babel/core' as any), 'buildExternalHelpers');
