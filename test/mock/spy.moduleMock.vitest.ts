@@ -15,8 +15,8 @@ describe('Spy.mockModule', async () => {
     const Mock$Utils = Spy.mock(await import('../../src/utils'), 'differenceOf', 'toError');
 
     it('does something', () => {
-        Mock$Utils.differenceOf.returns(42);
-        expect(differenceOf('foo', 'bar')).toBe(42);
+        Mock$Utils.differenceOf.returns('42');
+        expect(differenceOf('foo', 'bar')).toBe('42');
         expect(serialize({ foo: 'bar' })).toBe("{foo: 'bar'}");
     });
 });
@@ -25,9 +25,9 @@ describe('Spy.mockModule.2', async () => {
     const Mock$Serializer = Spy.mock(await import('../../src/serializer'), 'serialize');
 
     it('does something', () => {
-        Mock$Serializer.serialize.returns(42);
+        Mock$Serializer.serialize.returns('42');
         expect(differenceOf('foo', 'bar')).toBe('different string');
-        expect(serialize({ foo: 'bar' })).toBe(42);
+        expect(serialize({ foo: 'bar' })).toBe('42');
     });
 });
 

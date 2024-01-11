@@ -30,19 +30,23 @@ let __LOCK__ = true;
 
 type SpyInstanceConfig = { useOwnEquals: boolean; persistent: boolean };
 
-export type SpyInstance = {
-    (...args: any[]): any;
-    configure: (config: Partial<SpyInstanceConfig>) => SpyInstance;
-    calls: (...funcs: Function[]) => SpyInstance;
-    returns: (...args: any[]) => SpyInstance;
-    resolves: (...args: any[]) => SpyInstance;
-    rejects: (...msgOrErrors: OptionalMessageOrError[]) => SpyInstance;
-    throws: (msgOrError?: MessageOrError) => SpyInstance;
-    reset: () => SpyInstance;
-    restore: () => SpyInstance;
-    transparent: () => SpyInstance;
-    transparentAfter: (callCount: number) => SpyInstance;
-    addSnapshotSerializer: (serialize: string | ((...args: any[]) => string)) => SpyInstance;
+type FlatAwaited<TVal> = TVal extends PromiseLike<infer TAwaited> ? TAwaited : never;
+export type SpyInstance<TFunc extends (...args: any) => any = (...args: any) => any> = TFunc & {
+    configure: (config: Partial<SpyInstanceConfig>) => SpyInstance<TFunc>;
+    calls: (...funcs: TFunc[]) => SpyInstance<TFunc>;
+    returns: (...args: ReturnType<TFunc>[]) => SpyInstance<TFunc>;
+    resolves: FlatAwaited<ReturnType<TFunc>> extends never
+        ? never
+        : (...args: FlatAwaited<ReturnType<TFunc>>[]) => SpyInstance<TFunc>;
+    rejects: FlatAwaited<ReturnType<TFunc>> extends never
+        ? never
+        : (...msgOrErrors: OptionalMessageOrError[]) => SpyInstance<TFunc>;
+    throws: (msgOrError?: MessageOrError) => SpyInstance<TFunc>;
+    reset: () => SpyInstance<TFunc>;
+    restore: () => SpyInstance<TFunc>;
+    transparent: () => SpyInstance<TFunc>;
+    transparentAfter: (callCount: number) => SpyInstance<TFunc>;
+    addSnapshotSerializer: (serialize: string | ((...args: any[]) => string)) => SpyInstance<TFunc>;
     wasCalled: (callCount?: number) => void;
     hasCallHistory: (...callHistory: Array<any[] | any>) => void;
     wasNotCalled: () => void;
@@ -689,9 +693,12 @@ type ISpy = {
     IGNORE: Symbol;
     COMPARE: typeof COMPARE;
     MAPPER: typeof MAPPER;
-    on<T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInstance;
-    mock<T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance };
-    mockReactComponents<T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance };
+    on<T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInstance<T[K]>;
+    mock<T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance<T[P]> };
+    mockReactComponents<T extends Mockable, K extends keyof T>(
+        obj: T,
+        ...methodNames: K[]
+    ): { [P in K]: SpyInstance<T[P]> };
     restoreAll(): void;
     resetAll(): void;
 };
@@ -813,7 +820,7 @@ Spy.MAPPER = MAPPER;
  *
  * @return {SpyInstance}
  */
-Spy.on = <T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInstance => {
+Spy.on = <T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInstance<T[K]> => {
     const method = obj[methodName];
     if (!(typeof method === 'function')) {
         throw new Error(
@@ -833,7 +840,7 @@ Spy.on = <T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInst
     const spy = _createSpy(methodName as string, { obj, methodName });
     __LOCK__ = true;
     obj[methodName] = spy as any;
-    return spy;
+    return spy as any;
 };
 
 /**
@@ -862,7 +869,7 @@ Spy.on = <T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInst
  *                        Before initialization: { [$Keys<typeof methodNames>]: Throwing function }
  *                        After initialization: { [$Keys<typeof methodNames>]: SpyInstance }
  */
-Spy.mock = <T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance } =>
+Spy.mock = <T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]): { [P in K]: SpyInstance<T[P]> } =>
     createMock(obj, methodNames, Spy.on);
 
 /**
@@ -886,7 +893,7 @@ Spy.mock = <T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]):
 Spy.mockReactComponents = <T extends Mockable, K extends keyof T>(
     obj: T,
     ...methodNames: K[]
-): { [P in K]: SpyInstance } =>
+): { [P in K]: SpyInstance<T[P]> } =>
     createMock(obj, methodNames, Spy.on, Config.useGenericReactMocks ? createGenericComponent : createMinimalComponent);
 
 /**

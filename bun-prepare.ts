@@ -1,8 +1,11 @@
-import { expect } from 'vitest';
+import { Spy } from './src/spy';
+import { beforeEach, afterEach, expect } from 'vitest';
 
+// necessary until Bun has implemented them
 expect.addSnapshotSerializer = () => null;
-expect.getState = () => ({} as any);
-expect.getState = () => ({} as any);
+expect.getState = () => ({}) as any;
+
+// only necessary when functionality is used but still missing in Bun
 expect.extend({
     toMatchInlineSnapshot: function (actual, match) {
         const padding = match.includes('\n') ? ' '.repeat(match.substring(1).indexOf('"')) : '';
@@ -22,3 +25,6 @@ expect.extend({
         }
     },
 });
+
+// ATTENTION: Calling "setup" here with "beforeEach" will break the scoping of the mocks currently
+Spy.setup({ beforeEach, afterEach, expect });

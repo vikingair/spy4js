@@ -292,6 +292,45 @@ describe('Spy - Utils', () => {
         expect(await p4).toBe(testObj3);
     });
 
+    it('fulfills type requirements', async () => {
+        const funcs = {
+            num: () => 123,
+            str: () => 'foo',
+            prom: async () => 123n,
+            mixed: (arg: string | Promise<number>) => arg,
+        };
+        Spy.on(funcs, 'num').returns(111).restore();
+        // @ts-expect-error
+        Spy.on(funcs, 'num').returns('111').restore();
+        // @ts-expect-error
+        Spy.on(funcs, 'num').rejects().restore();
+        // @ts-expect-error
+        Spy.on(funcs, 'num').resolves(111).restore();
+
+        // @ts-expect-error
+        Spy.on(funcs, 'str').returns(111).restore();
+        Spy.on(funcs, 'str').returns('111').restore();
+        // @ts-expect-error
+        Spy.on(funcs, 'str').rejects().restore();
+        // @ts-expect-error
+        Spy.on(funcs, 'str').resolves(111).restore();
+
+        // @ts-expect-error
+        Spy.on(funcs, 'prom').returns(111n).restore();
+        Spy.on(funcs, 'prom').rejects().restore();
+        // @ts-expect-error
+        Spy.on(funcs, 'prom').resolves(111).restore();
+        Spy.on(funcs, 'prom').resolves(111n).restore();
+
+        Spy.on(funcs, 'mixed').returns('111').restore();
+        // @ts-expect-error
+        Spy.on(funcs, 'mixed').returns(111n).restore();
+        Spy.on(funcs, 'mixed').rejects().restore();
+        Spy.on(funcs, 'mixed').resolves(111).restore();
+        // @ts-expect-error
+        Spy.on(funcs, 'mixed').resolves('111').restore();
+    });
+
     it('rejects default error if no arguments were provided to rejects', async () => {
         const spy = Spy().rejects();
 
@@ -828,7 +867,7 @@ describe('Spy - Utils', () => {
 
         expect(foo.bar).toThrowError('waiting');
 
-        Spy.on(foo, 'bar').returns('spied!');
+        Spy.on(foo, 'bar').returns('spied!' as any);
         expect(foo.bar()).toBe('spied!');
     });
 
@@ -843,12 +882,12 @@ describe('Spy - Utils', () => {
         const foo = new Foo();
         expect(() => foo.bar()).toThrowError('waiting');
 
-        Spy.on(foo, 'bar').returns('spied!');
+        Spy.on(foo, 'bar').returns('spied!' as any);
         expect(foo.bar()).toBe('spied!');
     });
 
     it('can spy on bound functions (bound to internal objects)', () => {
-        const spy = Spy.on(console, 'error').returns('spied!');
+        const spy = Spy.on(console, 'error').returns('spied!' as any);
         // eslint-disable-next-line no-console
         expect(console.error('foo')).toBe('spied!');
         spy.hasCallHistory('foo');
