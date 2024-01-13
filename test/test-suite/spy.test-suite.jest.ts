@@ -29,6 +29,7 @@ The objects attribute 'swim' was already spied. Please make sure to spy only onc
 });
 
 describe('Spy - Test-Suite with throwing scoped mock because of getters only', () => {
+    // no type declarations available for "@babel/core"
     const Mock$BabelCore = Spy.mock(require('@babel/core'), 'buildExternalHelpers');
 
     it('throws an error if scoped mocks can not initialize', () => {

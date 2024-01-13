@@ -1,4 +1,5 @@
 # Migration Guide
+
 You can find here tips for migrating breaking changes.
 
 ## 4.0.0
@@ -13,7 +14,7 @@ Spy.setup({ enforceOrder: false, useGenericReactMocks: false, useOwnEquals: true
 ```
 
 The method `Spy.initMocks` was removed now as it was previously already more of an internal function. Mocks
-get initialized in test runner or provided `beforeEach` callbacks. This also means that `Spy.mock`, 
+get initialized in test runner or provided `beforeEach` callbacks. This also means that `Spy.mock`,
 `Spy.mockReactComponents` cannot be invoked anymore inside the `test` (`it`) function.
 
 The library was also doing some custom module mocking that is no longer maintainable considering that it
@@ -24,23 +25,35 @@ The method `Spy.mockModule` was removed. To achieve the same you need to transfo
 ```ts
 Spy.mockModule('./my-module', 'foo'); // OLD
 Spy.mock(require('./my-module'), 'foo'); // NEW
+Spy.mock(require('./my-module') as typeof import('./my-module'), 'foo'); // with type safety
+
 ```
 
 The method `Spy.mockReactComponents` uses also no build-in module mocks anymore and requires this change:
 
 ```ts
-Spy.mockReactComponents('./my-module', 'foo'); // OLD
-Spy.mockReactComponents(require('./my-module'), 'foo'); // NEW
+Spy.mockReactComponents('./my-module', 'MyComponent'); // OLD
+Spy.mockReactComponents(require('./my-module'), 'MyComponent'); // NEW
+Spy.mockReactComponents(require('./my-module') as typeof import('./my-module'), 'MyComponent'); // with type safety
 ```
+
+Please note that it is rather recommended to use `await import('./my-module')` syntax with build-in type-safety
+that is explained in the main documentation.
+
+Since mocks are type safe now, you might need to fix some type issues or have to cast the mocked instance to `any`
+as it was before and lose the type safety. E.g. just using `require('./my-module')`
+or this `(await import('./my-module')) as any`.
 
 ## 3.0.0
 
 - `new Spy()` -> `Spy()`
 
 ## 2.0.0
+
 - If you have previously added an own hook, which called `Spy.restoreAll` after each test suite, you may remove it.
 - If you get troubles with the automatically added test hooks, you can override/remove it by usage of `Spy.configure`
 - If you have used `Spy.onMany` you have to switch to `Spy.mock`. Depending on your special case, this can get aweful. Here an example, how someone could accomplish it. Let's assume this v1 code:
+
 ```js
 describe('Test', () => {
     let spy1 = new Spy();
@@ -57,7 +70,9 @@ describe('Test', () => {
     });
 });
 ```
+
 This can be changed to:
+
 ```js
 // I recommend to initialize mocks ouside of the describe-Block (or update to 2.1 which includes scoped mocks)
 const Mock$LOG = Spy.mock(LOG, 'error', 'info');
@@ -70,4 +85,5 @@ describe('Test', () => {
     });
 });
 ```
+
 Notice how much more readable the test code became. Have fun :v:

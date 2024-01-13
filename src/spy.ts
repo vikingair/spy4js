@@ -873,7 +873,7 @@ Spy.mock = <T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]):
     createMock(obj, methodNames, Spy.on);
 
 /**
- * This static method is very similar to "Spy.mockModule" but perfectly
+ * This static method is very similar to "Spy.mock" but perfectly
  * suited for testing with React components. When using testing tools
  * that render the whole subtree it is sometimes better to mock parts
  * of your nested components.

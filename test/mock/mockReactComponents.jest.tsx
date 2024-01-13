@@ -10,7 +10,7 @@ Spy.setup();
 describe('mockReactComponents - minimal', () => {
     Spy.configure({ useGenericReactMocks: false });
     const Mock$TestReactComponents = Spy.mockReactComponents(
-        require('./test.reactComponents'),
+        require('./test.reactComponents') as typeof import('./test.reactComponents'),
         'Component1',
         'Component2'
     );
