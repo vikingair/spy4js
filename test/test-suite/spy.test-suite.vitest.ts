@@ -5,15 +5,16 @@ const beforeEachSpy = Spy('beforeEach');
 Spy.setup({ beforeEach: beforeEachSpy, afterEach: () => {}, expect });
 
 describe('Spy - Test-Suite with throwing scoped mock because of getters only (vitest)', async () => {
-    const Mock$BabelCore = Spy.mock(await import('@babel/core' as any), 'buildExternalHelpers');
+    // trying to replace an exported function of an ESM module
+    const Mock$Resource = Spy.mock(await import('./spy.test-suite.vitest-resource.mjs' as any), 'foo');
 
     it('throws an error if scoped mocks can not initialize', () => {
-        expect(Mock$BabelCore.buildExternalHelpers).toBeDefined();
+        expect(Mock$Resource.foo).toBeDefined();
 
         expect(() => beforeEachSpy.getCallArgument(0)()).toThrowError(
             `
 Could not initialize mock because:
-Cannot set property buildExternalHelpers of #<Object> which has only a getter
+Cannot set property foo of [object Module] which has only a getter
 Inserting a module mock might should resolve this problem. Run this code beforehand:
 
 vi.mock('<module-name>');
