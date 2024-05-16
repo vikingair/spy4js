@@ -1,7 +1,7 @@
-import { differenceOf } from '../../src/utils';
-import { Spy } from '../../src/spy';
-import { serialize } from '../../src/serializer';
 import { render } from '@testing-library/react';
+import { serialize } from '../../src/serializer';
+import { Spy } from '../../src/spy';
+import { differenceOf } from '../../src/utils';
 
 Spy.setup();
 

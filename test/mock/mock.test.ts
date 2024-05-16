@@ -4,9 +4,9 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createMock } from '../../src/mock';
 import { Spy } from '../../src/spy';
-import { beforeEach, afterEach, expect, describe, it } from 'vitest';
 
 Spy.setup({ beforeEach, afterEach, expect });
 

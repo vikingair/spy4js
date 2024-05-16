@@ -1,9 +1,9 @@
 import React from 'react';
+import { render } from '@testing-library/react';
+import { _GenericComponent } from '../../src/react';
 import { Spy } from '../../src/spy';
 import { Component1, Component2 } from './test.reactComponents';
 import { Component3 } from './test.reactComponents2';
-import { render } from '@testing-library/react';
-import { _GenericComponent } from '../../src/react';
 
 Spy.setup();
 

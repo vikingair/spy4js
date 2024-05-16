@@ -4,10 +4,10 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
-import { createMock } from '../../src/mock';
-import { Config } from '../../src/config';
+import { describe, expect, it } from 'vitest';
 import { Spy } from '../../src';
-import { expect, describe, it } from 'vitest';
+import { Config } from '../../src/config';
+import { createMock } from '../../src/mock';
 
 Config.expect = undefined;
 const Matrix = { tearDown: () => 1337, startup: () => 1 };

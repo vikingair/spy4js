@@ -1,5 +1,5 @@
+import { describe, expect, it } from 'vitest';
 import { Spy } from '../../src/spy';
-import { describe, it, expect } from 'vitest';
 
 const beforeEachSpy = Spy('beforeEach');
 Spy.setup({ beforeEach: beforeEachSpy, afterEach: () => {}, expect });

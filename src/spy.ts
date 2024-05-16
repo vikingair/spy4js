@@ -4,13 +4,13 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
-import { COMPARE, MAPPER, differenceOf, type OptionalMessageOrError, toError, type MessageOrError } from './utils';
-import { SpyRegistry } from './registry';
-import { serialize, IGNORE } from './serializer';
-import { createMock, type Mockable } from './mock';
-import { Symbols } from './symbols';
-import { createMinimalComponent, createGenericComponent } from './react';
 import { Config, configure, configureAll } from './config';
+import { createMock, type Mockable } from './mock';
+import { createGenericComponent, createMinimalComponent } from './react';
+import { SpyRegistry } from './registry';
+import { IGNORE, serialize } from './serializer';
+import { Symbols } from './symbols';
+import { COMPARE, differenceOf, MAPPER, type MessageOrError, type OptionalMessageOrError, toError } from './utils';
 
 const CallOrder = {
     Idx: 0,
@@ -68,7 +68,7 @@ export type SpyInstance<TFunc extends (...args: any) => any = (...args: any) => 
     [Symbols.calls]: { args: any[]; order: number }[];
     [Symbols.index]: number;
     [Symbols.isSpy]: boolean;
-    [Symbols.func]: Function;
+    [Symbols.func]: (...args: any[]) => any;
     [Symbols.config]: SpyInstanceConfig;
     [Symbols.onRestore]?: () => void;
 };
@@ -96,7 +96,7 @@ const SpyFunctions = {
      *                         I.e. making it restorable or not.
      *                         Throws for not mocking spies.
      *
-     * @param {Object} config <- An object containing attributes
+     * @param config <- An object containing attributes
      *                         for special configuration
      * @return {SpyInstance} <- BuilderPattern.
      */
@@ -122,7 +122,7 @@ const SpyFunctions = {
      * Accepts multiple functions. If called more often,
      * calling always the last supplied function.
      *
-     * @param {Array<Function>} funcs
+     * @param funcs
      *     -> The iterative provided functions
      *        can be accessed as array.
      *        And will be called one by one
@@ -130,7 +130,7 @@ const SpyFunctions = {
      *
      * @return {SpyInstance} <- BuilderPattern.
      */
-    calls(this: SpyInstance, ...funcs: Array<Function>): SpyInstance {
+    calls(this: SpyInstance, ...funcs: Array<(...args: any[]) => any>): SpyInstance {
         if (funcs.length === 0) {
             // no arguments provided
             this[Symbols.func] = () => {};
@@ -152,10 +152,10 @@ const SpyFunctions = {
      * Accepts multiple return values. If called more often,
      * returns always the last supplied return value.
      *
-     * @param {Array<any>} args -> The iterative provided arguments
-     *                             can be accessed as array.
-     *                             And will be returned one by one
-     *                             for each made call.
+     * @param args -> The iterative provided arguments
+     *                can be accessed as array.
+     *                And will be returned one by one
+     *                for each made call.
      *
      * @return {SpyInstance} <- BuilderPattern.
      */
@@ -167,10 +167,10 @@ const SpyFunctions = {
      * Accepts multiple values, which will be resolved sequentially.
      * If called more often, resolves always the last supplied value.
      *
-     * @param {Array<any>} args -> The iterative provided arguments
-     *                             can be accessed as array.
-     *                             And will be resolved one by one
-     *                             for each made call.
+     * @param args -> The iterative provided arguments
+     *                can be accessed as array.
+     *                And will be resolved one by one
+     *                for each made call.
      *
      * @return {SpyInstance} <- BuilderPattern.
      */
@@ -182,11 +182,10 @@ const SpyFunctions = {
      * Accepts multiple values, which will be rejected sequentially.
      * If called more often, rejects always the last supplied value.
      *
-     * @param {Array<OptionalMessageOrError>} msgOrErrors
-     *              -> The iterative provided arguments
-     *                 can be accessed as array.
-     *                 And will be rejected one by one
-     *                 for each made call.
+     * @param msgOrErrors -> The iterative provided arguments
+     *                       can be accessed as array.
+     *                       And will be rejected one by one
+     *                       for each made call.
      *
      * @return {SpyInstance} <- BuilderPattern.
      */
@@ -202,7 +201,7 @@ const SpyFunctions = {
      * Will make the spy throw an Error, if called next time.
      * The error message can be provided as parameter.
      *
-     * @param {OptionalMessageOrError} msgOrError -> Will be the error message.
+     * @param msgOrError -> Will be the error message.
      *
      * @return {SpyInstance} <- BuilderPattern
      */
@@ -282,8 +281,8 @@ const SpyFunctions = {
      * someObject.someFunc(); // calls only the spy
      * someObject.someFunc(); // behaves like calling the original method
      *
-     * @param {number} callCount <- The number after which the mocked function
-     *                              should be called again.
+     * @param callCount <- The number after which the mocked function
+     *                     should be called again.
      *
      * @return {SpyInstance} <- BuilderPattern
      */
@@ -333,7 +332,7 @@ const SpyFunctions = {
      *
      * Throws an error if the expectation is wrong.
      *
-     * @param {?number} callCount -> Is the number of expected calls made.
+     * @param callCount -> Is the number of expected calls made.
      */
     wasCalled(this: SpyInstance, callCount?: number) {
         const calls = SpyHelperFunctions.getCalls(this);
@@ -376,8 +375,7 @@ const SpyFunctions = {
      *
      * Throws an error if the expectation is wrong.
      *
-     * @param {Array<Array<any> | any>} callHistory
-     *          -> Are the expected made call arguments in correct order.
+     * @param callHistory -> Are the expected made call arguments in correct order.
      */
     hasCallHistory(this: SpyInstance, ...callHistory: Array<Array<any> | any>): void {
         const calls = SpyHelperFunctions.getCalls(this);
@@ -444,8 +442,7 @@ const SpyFunctions = {
      * spy.wasCalledWith(arg4, arg5); // no error
      * spy.wasCalledWith(arg1); // error!!!
      *
-     * @param {Array<any>} args -> The expected arguments
-     *                           for any made call.
+     * @param args -> The expected arguments for any made call.
      */
     wasCalledWith(this: SpyInstance, ...args: Array<any>): void {
         const calls = SpyHelperFunctions.getCalls(this);
@@ -476,8 +473,7 @@ const SpyFunctions = {
      *
      * It throws an error if the upper method would not.
      *
-     * @param {Array<any>} args -> The not expected arguments
-     *                             for any made call.
+     * @param args -> The not expected arguments for any made call.
      */
     wasNotCalledWith(this: SpyInstance, ...args: Array<any>) {
         let errorOccurred = false;
@@ -524,8 +520,8 @@ const SpyFunctions = {
      * spy(arg1, arg2, arg3);
      * spy.getCallArguments(); // returns [arg1, arg2, arg3]
      *
-     * @param {number} callNr -> represents the callNr for which
-     *                           the call argument should be returned.
+     * @param callNr -> represents the callNr for which
+     *                  the call argument should be returned.
      *
      * @return {Array<any>} -> the call arguments of the (callNr + 1)'th call.
      */
@@ -561,10 +557,10 @@ const SpyFunctions = {
      * spy.getCallArgument(1, 5) === undefined; // true
      * spy.getCallArgument(2); // throws an exception
      *
-     * @param {number} callNr -> represents the callNr for which
-     *                           a call argument should be returned.
-     * @param {number} argNr -> represents position of the argument
-     *                          when the corresponding call was made.
+     * @param callNr -> represents the callNr for which
+     *                  a call argument should be returned.
+     * @param argNr -> represents position of the argument
+     *                 when the corresponding call was made.
      *
      * @return {any} -> the (argNr + 1)'th call argument
      *                  of the (callNr + 1)'th call.
@@ -576,8 +572,8 @@ const SpyFunctions = {
     /**
      * Returns the latest call argument.
      *
-     * @param {number} argNr -> represents position of the argument
-     *                          when the corresponding call was made.
+     * @param argNr -> represents position of the argument
+     *                 when the corresponding call was made.
      *
      * @return {any} -> the props
      */
@@ -656,7 +652,7 @@ const SpyFunctions = {
      * call 2: [{"_key":"test3"},{"_key":"test2"},{"_key":"test1"}]
      * call 3: [{"_key":"test2"}]
      *
-     * @param {Array<string>} additionalInformation
+     * @param additionalInformation
      *      -> will be displayed below each call information
      *         as additional information.
      *
@@ -690,7 +686,7 @@ type ISpy = {
     (name?: string): SpyInstance;
     configure: typeof configure;
     setup: typeof configureAll;
-    IGNORE: Symbol;
+    IGNORE: symbol;
     COMPARE: typeof COMPARE;
     MAPPER: typeof MAPPER;
     on<T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInstance<T[K]>;
@@ -750,8 +746,8 @@ const _createSpy = (name: string = '', __mock?: any): SpyInstance => {
  * _config = {useOwnEquals: boolean} -> internal spy config.
  *
  *
- * @param {string} name -> the identifier of the spy.
- *                       Useful for debugging issues.
+ * @param name -> the identifier of the spy.
+ *                Useful for debugging issues.
  */
 const Spy: ISpy = (name?: string): SpyInstance => _createSpy(name);
 
@@ -815,8 +811,8 @@ Spy.MAPPER = MAPPER;
  * If the upper conditions are not fulfilled, this
  * method will throw to avoid unexpected behavior.
  *
- * @param {Object} obj -> The manipulated object.
- * @param {string} methodName -> The mocked attributes name.
+ * @param obj -> The manipulated object.
+ * @param methodName -> The mocked attributes name.
  *
  * @return {SpyInstance}
  */
@@ -861,9 +857,9 @@ Spy.on = <T extends Mockable, K extends keyof T>(obj: T, methodName: K): SpyInst
  *
  * (spy1 === obj$Mock.methodName1 and so forth)
  *
- * @param {Object} obj -> the object to be mocked.
- * @param {string[]} methodNames -> Iterative provided attribute
- *                                  names that will be mocked.
+ * @param obj -> the object to be mocked.
+ * @param methodNames -> Iterative provided attribute
+ *                       names that will be mocked.
  *
  * @return {Object} Mock. -> The manipulated object. Actual type:
  *                        Before initialization: { [$Keys<typeof methodNames>]: Throwing function }
@@ -882,9 +878,9 @@ Spy.mock = <T extends Mockable, K extends keyof T>(obj: T, ...methodNames: K[]):
  * instead of "undefined" as default. This is a minimal valid React
  * component.
  *
- * @param {Object} obj -> the object to be mocked.
- * @param {string[]} methodNames -> Iterative provided attribute
- *                                  names that will be mocked.
+ * @param obj -> the object to be mocked.
+ * @param methodNames -> Iterative provided attribute
+ *                       names that will be mocked.
  *
  * @return {Object} Mock. -> The manipulated object. Actual type:
  *                        Before initialization: { [$Keys<typeof methodNames>]: Throwing function }

@@ -1,13 +1,13 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../src/utils', async () => ({ ...((await vi.importActual('../../src/utils')) as any) }));
 vi.mock('../../src/serializer', async () => ({ ...((await vi.importActual('../../src/serializer')) as any) }));
 vi.mock('@testing-library/react');
 
-import { differenceOf } from '../../src/utils';
-import { Spy } from '../../src/spy';
-import { serialize } from '../../src/serializer';
 import { render } from '@testing-library/react';
+import { serialize } from '../../src/serializer';
+import { Spy } from '../../src/spy';
+import { differenceOf } from '../../src/utils';
 
 Spy.setup({ expect, beforeEach, afterEach });
 

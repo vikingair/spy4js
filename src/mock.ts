@@ -4,8 +4,8 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
-import { Symbols } from './symbols';
 import { Config } from './config';
+import { Symbols } from './symbols';
 
 export type Mockable = Record<string, any>;
 

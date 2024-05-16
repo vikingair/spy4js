@@ -1,5 +1,5 @@
+import { afterEach, beforeEach, expect } from 'vitest';
 import { Spy } from './src/spy';
-import { beforeEach, afterEach, expect } from 'vitest';
 
 // necessary until Bun has implemented them
 expect.addSnapshotSerializer = () => null;

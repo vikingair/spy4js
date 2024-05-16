@@ -4,9 +4,9 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
-import { COMPARE, differenceOf, MAPPER } from '../src/utils';
+import { describe, expect, it } from 'vitest';
 import { IGNORE } from '../src/serializer';
-import { describe, it, expect } from 'vitest';
+import { COMPARE, differenceOf, MAPPER } from '../src/utils';
 
 describe('Spy - Equality', () => {
     it('should make an equality check for classes correctly', () => {
@@ -16,14 +16,12 @@ describe('Spy - Equality', () => {
             attr3: Date;
 
             constructor(attr1: string, attr2: number, attr3: Date) {
-                // eslint-disable-line
                 this.attr1 = attr1;
                 this.attr2 = attr2;
                 this.attr3 = attr3;
             }
 
             method(): string {
-                // eslint-disable-line require-jsdoc
                 return this.attr1 + this.attr2.toString() + this.attr3.toDateString();
             }
         };
@@ -98,14 +96,12 @@ describe('Spy - Equality', () => {
         const TestClass1 = class {
             attr: string;
             constructor(attr: string) {
-                // eslint-disable-line require-jsdoc
                 this.attr = attr;
             }
         };
         const TestClass2 = class {
             attr: string;
             constructor(attr: string) {
-                // eslint-disable-line require-jsdoc
                 this.attr = attr;
             }
         };
@@ -124,11 +120,9 @@ describe('Spy - Equality', () => {
         class TestClass {
             attr: number;
             constructor(attr: number) {
-                // eslint-disable-line require-jsdoc
                 this.attr = attr;
             }
             equals(other: TestClass): boolean {
-                // eslint-disable-line
                 // returning true if both attr are odd or both are even
                 return !((this.attr - other.attr) % 2);
             }

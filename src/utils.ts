@@ -39,7 +39,7 @@ const COMPARE = (comparator: Comparator): any => new SpyComparator(comparator);
  * Returning "any" because this return value should be usable anywhere.
  */
 const MAPPER = (from: any | any[], to: any): any =>
-    new SpyComparator((mapper: Function) => {
+    new SpyComparator((mapper: (...args: any[]) => any) => {
         const result = mapper(...(Array.isArray(from) ? from : [from]));
         const diff = differenceOf(result, to);
         return diff ? `${serialize(result)} did not match ${serialize(to)}: ${diff}` : undefined;
@@ -210,4 +210,4 @@ export type OptionalMessageOrError = MessageOrError | undefined;
 const toError = (msgOrError: OptionalMessageOrError, spyName: string) =>
     msgOrError instanceof Error ? msgOrError : new Error(msgOrError || `${spyName} was requested to throw`);
 
-export { differenceOf, COMPARE, toError, MAPPER };
+export { COMPARE, differenceOf, MAPPER, toError };

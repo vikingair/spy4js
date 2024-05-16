@@ -4,8 +4,8 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Spy, SpyInstance } from '../src/spy';
-import { beforeEach, afterEach, expect, describe, it } from 'vitest';
 
 Spy.setup({ enforceOrder: false, beforeEach, afterEach, expect });
 
@@ -300,34 +300,34 @@ describe('Spy - Utils', () => {
             mixed: (arg: string | Promise<number>) => arg,
         };
         Spy.on(funcs, 'num').returns(111).restore();
-        // @ts-expect-error
+        // @ts-expect-error number !== string
         Spy.on(funcs, 'num').returns('111').restore();
-        // @ts-expect-error
+        // @ts-expect-error number !== Promise<any>
         Spy.on(funcs, 'num').rejects().restore();
-        // @ts-expect-error
+        // @ts-expect-error number !== Promise<number>
         Spy.on(funcs, 'num').resolves(111).restore();
 
-        // @ts-expect-error
+        // @ts-expect-error string !== number
         Spy.on(funcs, 'str').returns(111).restore();
         Spy.on(funcs, 'str').returns('111').restore();
-        // @ts-expect-error
+        // @ts-expect-error string !== Promise<any>
         Spy.on(funcs, 'str').rejects().restore();
-        // @ts-expect-error
-        Spy.on(funcs, 'str').resolves(111).restore();
+        // @ts-expect-error string !== Promise<any>
+        Spy.on(funcs, 'str').resolves('111').restore();
 
-        // @ts-expect-error
+        // @ts-expect-error Promise<bigint> !== bigint
         Spy.on(funcs, 'prom').returns(111n).restore();
         Spy.on(funcs, 'prom').rejects().restore();
-        // @ts-expect-error
+        // @ts-expect-error Promise<bigint> !== Promise<number>
         Spy.on(funcs, 'prom').resolves(111).restore();
         Spy.on(funcs, 'prom').resolves(111n).restore();
 
         Spy.on(funcs, 'mixed').returns('111').restore();
-        // @ts-expect-error
+        // @ts-expect-error string | Promise<number> !== bigint
         Spy.on(funcs, 'mixed').returns(111n).restore();
         Spy.on(funcs, 'mixed').rejects().restore();
         Spy.on(funcs, 'mixed').resolves(111).restore();
-        // @ts-expect-error
+        // @ts-expect-error string | Promise<number> !== Promise<string>
         Spy.on(funcs, 'mixed').resolves('111').restore();
     });
 
@@ -510,7 +510,7 @@ describe('Spy - Utils', () => {
     });
 
     it('mapper testing via Spy.MAPPER', () => {
-        const testMapper = (state: Object, moreState: Object) => ({
+        const testMapper = (state: any, moreState: any) => ({
             prop: 'foo',
             ...state,
             more: { ...moreState },
@@ -636,11 +636,9 @@ describe('Spy - Utils', () => {
     class TestClass {
         attr: number;
         constructor(attr: number) {
-            // eslint-disable-line require-jsdoc
             this.attr = attr;
         }
         equals(other: TestClass): boolean {
-            // eslint-disable-line
             // returning true if both attr are odd or both are even
             return !((this.attr - other.attr) % 2);
         }
@@ -757,8 +755,7 @@ describe('Spy - Utils', () => {
             'showCallArguments',
         ];
 
-        for (let prop in spy) {
-            // eslint-disable-line
+        for (const prop in spy) {
             let propUnknown = true;
             for (let i = 0; i < allowedProps.length; i++) {
                 if (prop === allowedProps[i]) {
