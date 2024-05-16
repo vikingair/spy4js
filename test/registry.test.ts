@@ -4,6 +4,7 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
+import { describe, expect, it } from 'vitest';
 import { SpyRegistry } from '../src/registry';
 
 /**

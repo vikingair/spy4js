@@ -14,7 +14,7 @@ const restoreAttributeForEntry = (value: any): void => {
     }
 };
 
-type SpyRegister = { [index: number]: { obj: any; method: Function; methodName: string } };
+type SpyRegister = { [index: number]: { obj: any; method: (...args: any[]) => any; methodName: string } };
 
 export class SpyRegistry {
     register: SpyRegister;
@@ -74,15 +74,15 @@ export class SpyRegistry {
      * If called, the SpyRegistry will store the given information.
      * The unique identifier index will be returned.
      *
-     * @param {Object} obj -> The related object, which will be spied.
-     * @param {string} methodName -> The name of the mocked method.
+     * @param obj -> The related object, which will be spied.
+     * @param methodName -> The name of the mocked method.
      * @return {number} -> The unique store index.
      */
-    push(obj: Object, methodName: keyof typeof obj): number {
+    push(obj: Record<string, unknown>, methodName: keyof typeof obj): number {
         this.registerCount += 1;
         this.register[this.registerCount] = {
             obj,
-            method: obj[methodName],
+            method: obj[methodName] as (...args: any[]) => any,
             methodName,
         };
         return this.registerCount;
@@ -93,12 +93,12 @@ export class SpyRegistry {
      * will be returned. If the registry entry does not exist,
      * undefined will be returned.
      *
-     * @param {number} index -> the unique identifier of stored information.
+     * @param index -> the unique identifier of stored information.
      * @return {any} -> Any stored information can be returned.
      *                   BUT: Usually this method returns a function or
      *                        undefined.
      */
-    getOriginalMethod(index: number): Function | void {
+    getOriginalMethod(index: number): ((...args: any[]) => any) | void {
         const entry = this.register[index];
         if (entry) {
             return entry.method;
@@ -110,9 +110,8 @@ export class SpyRegistry {
      * registry into the persistent registry or vice versa.
      * This can make restore and restoreAll having no effect anymore.
      *
-     * @param {number} index -> the unique identifier of stored information.
-     * @param {boolean} intoPersReg -> boolean to determine the moving
-     *                                 direction.
+     * @param index -> the unique identifier of stored information.
+     * @param intoPersReg -> boolean to determine the moving direction.
      */
     persist(index: number, intoPersReg: boolean): void {
         const fromReg = intoPersReg ? this.register : this.persReg;

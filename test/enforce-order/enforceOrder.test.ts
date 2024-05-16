@@ -4,7 +4,10 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Spy } from '../../src/spy';
+
+Spy.setup({ expect, beforeEach, afterEach });
 
 describe('enforceOrder', () => {
     beforeEach(() => {

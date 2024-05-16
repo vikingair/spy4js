@@ -4,8 +4,9 @@
  * The LICENSE file can be found in the root directory of this project.
  *
  */
-import { COMPARE, differenceOf, MAPPER } from '../src/utils';
+import { describe, expect, it } from 'vitest';
 import { IGNORE } from '../src/serializer';
+import { COMPARE, differenceOf, MAPPER } from '../src/utils';
 
 describe('Spy - Equality', () => {
     it('should make an equality check for classes correctly', () => {
@@ -15,14 +16,12 @@ describe('Spy - Equality', () => {
             attr3: Date;
 
             constructor(attr1: string, attr2: number, attr3: Date) {
-                // eslint-disable-line
                 this.attr1 = attr1;
                 this.attr2 = attr2;
                 this.attr3 = attr3;
             }
 
             method(): string {
-                // eslint-disable-line require-jsdoc
                 return this.attr1 + this.attr2.toString() + this.attr3.toDateString();
             }
         };
@@ -73,8 +72,8 @@ describe('Spy - Equality', () => {
         expect(differenceOf(NaN, 123)).toBe('different number');
         expect(differenceOf(12, -13)).toBe('different number');
         // BigInt
-        expect(differenceOf(window.BigInt(123), window.BigInt(123))).toBe(undefined);
-        expect(differenceOf(window.BigInt(123), window.BigInt(124))).toBe('different BigInt');
+        expect(differenceOf(BigInt(123), BigInt(123))).toBe(undefined);
+        expect(differenceOf(BigInt(123), BigInt(124))).toBe('different BigInt');
         // date
         expect(differenceOf(new Date(2016, 12, 24), new Date(2016, 12, 24))).toBe(undefined);
         expect(differenceOf(new Date(2016, 12, 24), new Date(2017, 12, 24))).toBe('different date');
@@ -97,14 +96,12 @@ describe('Spy - Equality', () => {
         const TestClass1 = class {
             attr: string;
             constructor(attr: string) {
-                // eslint-disable-line require-jsdoc
                 this.attr = attr;
             }
         };
         const TestClass2 = class {
             attr: string;
             constructor(attr: string) {
-                // eslint-disable-line require-jsdoc
                 this.attr = attr;
             }
         };
@@ -123,11 +120,9 @@ describe('Spy - Equality', () => {
         class TestClass {
             attr: number;
             constructor(attr: number) {
-                // eslint-disable-line require-jsdoc
                 this.attr = attr;
             }
             equals(other: TestClass): boolean {
-                // eslint-disable-line
                 // returning true if both attr are odd or both are even
                 return !((this.attr - other.attr) % 2);
             }
