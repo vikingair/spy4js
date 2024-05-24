@@ -13,6 +13,7 @@ jobs:
       - uses: ./.github/actions/pnpm-install
         with:
           target: '.'
+      - uses: oven-sh/setup-bun@v1
       - name: Test
         run: pnpm test
       - name: Coveralls
