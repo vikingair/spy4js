@@ -20,7 +20,7 @@
     "vitest",
     "TypeScript"
   ],
-  "author": "Viktor Luft <viktor.luft@freiheit.com> (https://github.com/fdc-viktor-luft)",
+  "author": "Viktor Luft <viktor.luft@freiheit.com> (https://github.com/vikingair)",
   "license": "MIT",
   "scripts": {
     "dist": "vite build && pnpm dist:ts",
