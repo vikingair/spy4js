@@ -9,10 +9,12 @@ export const createGenericComponent = (method: string) => (props: any) => {
         ? Object.fromEntries(Object.entries(rest).map(([name, v]) => ['data-prop-' + name.toLowerCase(), serialize(v)]))
         : {};
     return {
-        $$typeof: Symbol.for('react.element'),
+        $$typeof: Symbol.for('react.transitional.element'),
         type: 'samp',
         props: { 'data-component': method, children, ...dataProps },
-        ref: null,
+        key: null,
+        _owner: null,
+        _store: {},
     };
 };
 

@@ -36,7 +36,7 @@ exports[`mockReactComponents - generic > renders component snapshot - nested moc
     <samp
       data-component="Component1"
       data-prop-foo="'bar'"
-      data-prop-onemore="{data: Symbol(oneMore), elem: <div>Test</div>}"
+      data-prop-onemore="{data: Symbol(oneMore)}"
     />
   </samp>
 </div>

@@ -13,7 +13,7 @@ describe('Spy - Utils', () => {
     class CustomError extends Error {
         constructor(m: string) {
             super(`CustomError('${m}')`);
-            Error.captureStackTrace && Error.captureStackTrace(this, CustomError);
+            Error.captureStackTrace?.(this, CustomError);
             this.name = 'CustomError';
         }
     }
@@ -207,9 +207,9 @@ describe('Spy - Utils', () => {
         spy('foo');
         spy('bar', 42);
         spy('test');
-        expect(spy.showCallArguments([' -> ??? <- ', '\t no way'])).toMatchInlineSnapshot(`
+        expect(spy.showCallArguments([' -> ??? <-\t', '\t no way'])).toMatchInlineSnapshot(`
             "call 0: ['foo']
-                     -> ??? <- 
+                     -> ??? <-\t
             call 1: ['bar', 42]
                     	 no way
             call 2: ['test']

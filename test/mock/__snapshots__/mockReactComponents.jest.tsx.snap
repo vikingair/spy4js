@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`mockReactComponents - generic renders component snapshot - contained mock 1`] = `
 <div>
@@ -36,7 +36,7 @@ exports[`mockReactComponents - generic renders component snapshot - nested mocks
     <samp
       data-component="Component1"
       data-prop-foo="'bar'"
-      data-prop-onemore="{data: Symbol(oneMore), elem: <div>Test</div>}"
+      data-prop-onemore="{data: Symbol(oneMore)}"
     />
   </samp>
 </div>

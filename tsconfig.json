@@ -18,7 +18,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "noEmit": true
   },
   "include": ["src", "test", "test_resources"]

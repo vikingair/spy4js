@@ -7,6 +7,7 @@ Spy.setup();
 
 describe('Spy.mockModule', () => {
     const Mock$Utils = Spy.mock(
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require('../../src/utils') as typeof import('../../src/utils'),
         'differenceOf',
         'toError'
@@ -21,6 +22,7 @@ describe('Spy.mockModule', () => {
 
 describe('Spy.mockModule.2', () => {
     const Mock$Serializer = Spy.mock(
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require('../../src/serializer') as typeof import('../../src/serializer'),
         'serialize'
     );
@@ -35,6 +37,7 @@ describe('Spy.mockModule.2', () => {
 jest.mock('@testing-library/react');
 describe('Spy.mockModule - with only getter property', () => {
     const Mock$ReactTestingLibrary = Spy.mock(
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require('@testing-library/react') as typeof import('@testing-library/react'),
         'render'
     );

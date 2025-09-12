@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2024-09-12
+
+- `Spy.mockReactComponents` is now only compatible to React v19 or higher.
+
 ## [4.0.0] - 2024-05-16
 
 ### Added
@@ -180,10 +184,10 @@ For more detailed information please see [Migration Guide v4](https://github.com
 
 ### Changed
 
-- More detailed error messages. 
-  - Before: `--> foo / different string` 
+- More detailed error messages.
+  - Before: `--> foo / different string`
   - Now: `--> foo / different string ['bar' != 'test']`
-- Improved UX for `Spy.COMPARE`. You can make assertions that throw instead of returning a 
+- Improved UX for `Spy.COMPARE`. You can make assertions that throw instead of returning a
   boolean indicator. E.g.
 
   ```js
@@ -196,7 +200,7 @@ For more detailed information please see [Migration Guide v4](https://github.com
 
 ### Changed
 
-- Allow to spy on all kind of bound methods (e.g. `window.console.error` which is no 
+- Allow to spy on all kind of bound methods (e.g. `window.console.error` which is no
   instance of `Function` on JSDom)
 
 ## [2.6.0] - 2019-08-15
@@ -235,10 +239,10 @@ For more detailed information please see [Migration Guide v4](https://github.com
 
 ### Changed
 
-- The default `afterEach` Test-Suite-Hook now also calls `Spy.resetAll`. Therefore created 
-  spies should not be able to effect other tests. Since the reset operation is a very cheap 
-  operation, this change should not effect the performance of your tests visibly. If any of 
-  your tests should break, consider to clean those up, because you should not write 
+- The default `afterEach` Test-Suite-Hook now also calls `Spy.resetAll`. Therefore created
+  spies should not be able to effect other tests. Since the reset operation is a very cheap
+  operation, this change should not effect the performance of your tests visibly. If any of
+  your tests should break, consider to clean those up, because you should not write
   conditionally related tests, if it is avoidable.
 
 ## [2.1.0] - 2018-11-12
@@ -315,7 +319,7 @@ For more detailed information please see [Migration Guide v4](https://github.com
 
 - `Spy.IGNORE` as flexible replacement for object properties or whole arguments which should be
   ignored on comparison with `spy.wasCalledWith`
-  
+
 ### Fixed
 
 - Instead of rendering `undefined` just like `null` as `null` it will be rendered as the string "UNDEFINED"

@@ -479,7 +479,7 @@ const SpyFunctions = {
         let errorOccurred = false;
         try {
             this.wasCalledWith(...args);
-        } catch (e) {
+        } catch {
             errorOccurred = true;
         }
         if (!errorOccurred) {

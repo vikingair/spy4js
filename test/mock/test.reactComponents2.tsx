@@ -1,3 +1,4 @@
+// React import is still required for some reason for Jest.
 import React from 'react';
 import { Component1 } from './test.reactComponents';
 
