@@ -2,6 +2,10 @@
 
 You can find here tips for migrating breaking changes.
 
+## 5.0.0
+
+Only breaking change if you were using generic React component mocks. You need to update to React v19 or higher.
+
 ## 4.0.0
 
 The library was previously causing side effects on import. This behavior changed now and requires manual

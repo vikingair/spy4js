@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import React from 'react';
 import { Spy } from '../../src/spy';
 vi.mock('./test.reactComponents', async () => ({ ...((await vi.importActual('./test.reactComponents')) as any) }));
 
@@ -9,6 +8,12 @@ import { Component1, Component2 } from './test.reactComponents';
 import { Component3 } from './test.reactComponents2';
 
 Spy.setup({ expect, beforeEach, afterEach });
+
+// console.log(
+//     <samp data-foo={'component-3'}>
+//         <Component1 foo={'in-component-3'} />
+//     </samp>
+// );
 
 describe('mockReactComponents - minimal', async () => {
     Spy.configure({ useGenericReactMocks: false });
@@ -58,7 +63,7 @@ describe('mockReactComponents - generic', async () => {
     it('renders component snapshot - nested mocks', () => {
         const { container } = render(
             <Component2>
-                <Component1 foo={'bar'} oneMore={{ data: Symbol('oneMore'), elem: <div>Test</div> }} />
+                <Component1 foo={'bar'} oneMore={{ data: Symbol('oneMore') }} />
             </Component2>
         );
         expect(container).toMatchSnapshot();
@@ -68,7 +73,7 @@ describe('mockReactComponents - generic', async () => {
         _GenericComponent.serializeAllProps = false;
         const { container } = render(
             <Component2>
-                <Component1 foo={'bar'} oneMore={{ data: Symbol('oneMore'), elem: <div>Test</div> }} />
+                <Component1 foo={'bar'} oneMore={{ data: Symbol('oneMore') }} />
                 <div>More children</div>
             </Component2>
         );

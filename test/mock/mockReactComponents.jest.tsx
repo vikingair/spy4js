@@ -1,3 +1,4 @@
+// @ts-expect-error React import is still required for some reason for Jest.
 import React from 'react';
 import { render } from '@testing-library/react';
 import { _GenericComponent } from '../../src/react';
@@ -10,6 +11,7 @@ Spy.setup();
 describe('mockReactComponents - minimal', () => {
     Spy.configure({ useGenericReactMocks: false });
     const Mock$TestReactComponents = Spy.mockReactComponents(
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require('./test.reactComponents') as typeof import('./test.reactComponents'),
         'Component1',
         'Component2'
@@ -41,6 +43,7 @@ describe('mockReactComponents - generic', () => {
     });
     Spy.configure({ useGenericReactMocks: true });
     const Mock$TestReactComponents = Spy.mockReactComponents(
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         require('./test.reactComponents'),
         'Component1',
         'Component2'
@@ -55,7 +58,7 @@ describe('mockReactComponents - generic', () => {
     it('renders component snapshot - nested mocks', () => {
         const { container } = render(
             <Component2>
-                <Component1 foo={'bar'} oneMore={{ data: Symbol('oneMore'), elem: <div>Test</div> }} />
+                <Component1 foo={'bar'} oneMore={{ data: Symbol('oneMore') }} />
             </Component2>
         );
         expect(container).toMatchSnapshot();
@@ -65,7 +68,7 @@ describe('mockReactComponents - generic', () => {
         _GenericComponent.serializeAllProps = false;
         const { container } = render(
             <Component2>
-                <Component1 foo={'bar'} oneMore={{ data: Symbol('oneMore'), elem: <div>Test</div> }} />
+                <Component1 foo={'bar'} oneMore={{ data: Symbol('oneMore') }} />
                 <div>More children</div>
             </Component2>
         );

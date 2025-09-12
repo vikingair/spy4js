@@ -1,3 +1,4 @@
+// React import is still required for some reason for Jest.
 import React from 'react';
 
 export const Component1: React.FC<{ foo: string; oneMore?: any }> = ({ foo }) => <div id={'component-1'}>{foo}</div>;
