@@ -24,7 +24,7 @@ const defaults: SpyConfig = {
     afterEach: (global as any).afterEach,
     beforeEach: (global as any).beforeEach,
     expect: (global as any).expect,
-    /* v8 ignore next */ // covered by jest run
+    /* v8 ignore next -- @preserve covered by jest run */
     runner: process.env.JEST_WORKER_ID !== undefined ? 'jest' : 'vitest',
 };
 

@@ -1,23 +1,24 @@
 // @ts-check
 
 import js from '@eslint/js';
-// @ts-expect-error https://github.com/import-js/eslint-plugin-import/issues/2948
+import { defineConfig } from 'eslint/config';
 import imp from 'eslint-plugin-import';
 import prettier from 'eslint-plugin-prettier';
 import simpleImpSort from 'eslint-plugin-simple-import-sort';
-import ts from 'typescript-eslint';
+import tseslint from 'typescript-eslint';
 
-export default ts.config(
+export default defineConfig(
     { ignores: ['node_modules', 'dist'] },
     {
         files: ['**/*.{j,t}s?(x)'],
         extends: [
             js.configs.recommended,
-            ...ts.configs.recommended,
+            tseslint.configs.recommended,
             // reactRecommended, // not compatible currently
             // reactHooks.configs.recommended, // not compatible currently
         ],
         plugins: {
+            '@typescript-eslint': tseslint.plugin,
             prettier,
             import: imp,
             'simple-import-sort': simpleImpSort,
