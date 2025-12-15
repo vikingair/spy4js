@@ -71,13 +71,14 @@ const initMock = (mockInfo: MockInfo, spyOn: SpyOn): void => {
             mock[method as keyof typeof mock] = spy;
         } catch (e) {
             let msg = (e as Error).message;
-            /* v8 ignore next */ // covered by jest run
+            /* v8 ignore next -- @preserve covered by jest run */
             const utilName = Config.runner === 'jest' ? 'jest' : Config.runner === 'vitest' ? 'vi' : undefined;
+            /* v8 ignore next -- @preserve covered by jest run */
             if (utilName && msg.includes('has only a getter')) {
                 const actual =
-                    /* v8 ignore next */ // covered by jest run
+                    /* v8 ignore next -- @preserve covered by jest run */
                     utilName === 'jest'
-                        ? /* v8 ignore next */ // covered by jest run
+                        ? /* v8 ignore next -- @preserve covered by jest run */
                           `() => ({ ...jest.requireActual('<module-name>') })`
                         : `async () => ({ ...((await vi.importActual('<module-name>')) as any) })`;
                 msg += `

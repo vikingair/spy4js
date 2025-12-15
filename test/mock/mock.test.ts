@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createMock } from '../../src/mock';
 import { Spy } from '../../src/spy';
 
-Spy.setup({ beforeEach, afterEach, expect });
+Spy.setup({ beforeEach, afterEach, expect, useOwnEquals: undefined });
 
 const IRL = {
     saveTheWorld: () => 'feed some koalas',
